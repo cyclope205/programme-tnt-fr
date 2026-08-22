@@ -10,15 +10,15 @@
   var STYLE = [
     "ha-card { padding: 16px; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 12px; }",
-    ".channel-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); }",
+    ".channel-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); }",
     ".channel-row:last-child { border-bottom: none; }",
-    ".channel-info { display: flex; align-items: center; justify-content: center; width: 44px; flex-shrink: 0; font-size: 0.7em; font-weight: 600; text-align: center; }",
+    ".channel-info { display: flex; align-items: center; justify-content: center; width: 44px; flex-shrink: 0; font-size: 0.7em; font-weight: 600; text-align: center; padding-top: 8px; }",
     ".channel-logo { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; background: var(--card-background-color, #fff); }",
-    ".slots { display: flex; flex: 1; gap: 8px; min-width: 0; }",
-    ".slot { flex: 1; min-width: 0; text-align: left; background: var(--secondary-background-color, #f2f2f2); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-family: inherit; color: var(--primary-text-color); }",
+    ".slots { display: flex; flex: 1; gap: 8px; min-width: 0; align-items: stretch; }",
+    ".slot { flex: 1; min-width: 0; text-align: left; background: var(--secondary-background-color, #f2f2f2); border: 1px solid var(--divider-color, rgba(127,127,127,0.25)); border-radius: 8px; padding: 8px 10px; cursor: pointer; font-family: inherit; color: var(--primary-text-color); }",
     ".slot:disabled { opacity: 0.4; cursor: default; }",
-    ".slot-label { font-size: 0.72em; opacity: 0.7; text-transform: uppercase; }",
-    ".slot-title { font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }",
+    ".slot-label { font-size: 0.72em; opacity: 0.85; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--secondary-text-color, var(--primary-text-color)); }",
+    ".slot-title { font-size: 0.92em; font-weight: 500; line-height: 1.28; margin-top: 4px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }",
     ".empty { opacity: 0.7; font-style: italic; }",
     ".overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }",
     ".overlay[hidden] { display: none; }",
@@ -39,9 +39,56 @@
     ["second_part", "2e partie de soiree"]
   ];
 
+  // Ordre officiel des chaines TNT francaises (numerotation logique / LCN).
+  // Les chaines premium sans numero officiel (Canal+ et declinaisons,
+  // Planete+) sont placees juste a cote de leur famille via un rang
+  // fractionnaire. Toute chaine absente de cette table est classee a la
+  // fin, triee alphabetiquement (voir _resolveEntities).
+  var CHANNEL_ORDER = {
+    "TF1.fr": 1,
+    "France2.fr": 2,
+    "France3.fr": 3,
+    "CanalPlus.fr": 3.1,
+    "CanalPlusCinema.fr": 3.2,
+    "CanalPlusSport.fr": 3.3,
+    "France4.fr": 4,
+    "France5.fr": 5,
+    "PlanetePlus.fr": 5.1,
+    "M6.fr": 6,
+    "Arte.fr": 7,
+    "LaChaineParlementaire.fr": 8,
+    "W9.fr": 9,
+    "TMC.fr": 10,
+    "NT1.fr": 11,
+    "Gulli.fr": 12,
+    "BFMTV.fr": 13,
+    "CNews.fr": 14,
+    "LCI.fr": 15,
+    "FranceInfo.fr": 16,
+    "CStar.fr": 17,
+    "T18.fr": 18,
+    "NOVO19.fr": 19,
+    "TF1SeriesFilms.fr": 20,
+    "LEquipe21.fr": 21,
+    "6ter.fr": 22,
+    "Numero23.fr": 23,
+    "RMCDecouverte.fr": 24,
+    "Cherie25.fr": 25,
+    "ParisPremiere.fr": 26
+  };
+
   function channelName(hass, entityId) {
     var attrs = hass.states[entityId].attributes || {};
     return attrs.channel_name || entityId;
+  }
+
+  function channelRank(hass, entityId) {
+    var attrs = hass.states[entityId].attributes || {};
+    var cid = attrs.channel_id;
+    if (cid && Object.prototype.hasOwnProperty.call(CHANNEL_ORDER, cid)) {
+      return CHANNEL_ORDER[cid];
+    }
+    return 999;
   }
 
   class ProgrammeTntFrCard extends HTMLElement {
@@ -75,6 +122,9 @@
         });
       }
       ids.sort(function (a, b) {
+        var ra = channelRank(hass, a);
+        var rb = channelRank(hass, b);
+        if (ra !== rb) return ra - rb;
         return channelName(hass, a).localeCompare(channelName(hass, b), "fr", { sensitivity: "base" });
       });
       return ids;
@@ -285,6 +335,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaines de la TNT francaise (maintenant / 1re et 2e partie de soiree), avec details au clic."
+    description: "Programme TV des chaines de la TNT francaise (maintenant / 1re et 2e partie de soiree), classees dans l'ordre officiel des chaines, avec details au clic."
   });
 })();
