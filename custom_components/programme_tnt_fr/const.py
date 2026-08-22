@@ -21,8 +21,8 @@ FETCH_MIN_INTERVAL_MINUTES = 60
 # demarre juste apres. Cela evite qu'un tres court programme de transition
 # (bande-annonce, interstitiel de quelques minutes) ne soit choisi a la
 # place du programme vedette de la soiree.
-PRIME_TIME_START = time(21, 0)
-LATE_NIGHT_START = time(22, 45)
+PRIME_TIME_START = time(21, 15)
+LATE_NIGHT_START = time(22, 40)
 DAY_RESET = time(5, 0)
 
 # Chaines standard de la TNT francaise telles que publiees par xmltvfr.fr
