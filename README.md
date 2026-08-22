@@ -81,4 +81,13 @@ l'integration.
 
 ## Licence
 
-MIT, voir [LICENSE](LICENSE).
+Voir [LICENSE](LICENSE).
+
+## ☕ Vous aimez cette integration ?
+
+EN - If it saves you time, consider buying me a coffee. It keeps this project maintained and new features coming.
+
+FR - Si cette integration te fait gagner du temps, un petit don est toujours apprecie : ca m'aide a maintenir le projet et a ajouter de nouvelles fonctionnalites.
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
