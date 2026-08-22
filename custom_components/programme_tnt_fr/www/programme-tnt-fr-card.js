@@ -10,16 +10,15 @@
   var STYLE = [
     "ha-card { padding: 16px; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 12px; }",
-    ".channel-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); }",
+    ".channel-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); }",
     ".channel-row:last-child { border-bottom: none; }",
-    ".channel-info { display: flex; align-items: center; gap: 8px; width: 110px; flex-shrink: 0; }",
-    ".channel-logo { width: 32px; height: 32px; object-fit: contain; border-radius: 4px; background: var(--card-background-color, #fff); }",
-    ".channel-name { font-size: 0.85em; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
+    ".channel-info { display: flex; align-items: center; justify-content: center; width: 44px; flex-shrink: 0; font-size: 0.7em; font-weight: 600; text-align: center; }",
+    ".channel-logo { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; background: var(--card-background-color, #fff); }",
     ".slots { display: flex; flex: 1; gap: 8px; min-width: 0; }",
-    ".slot { flex: 1; min-width: 0; text-align: left; background: var(--secondary-background-color, #f2f2f2); border: none; border-radius: 8px; padding: 6px 8px; cursor: pointer; font-family: inherit; color: var(--primary-text-color); }",
+    ".slot { flex: 1; min-width: 0; text-align: left; background: var(--secondary-background-color, #f2f2f2); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-family: inherit; color: var(--primary-text-color); }",
     ".slot:disabled { opacity: 0.4; cursor: default; }",
-    ".slot-label { font-size: 0.7em; opacity: 0.7; text-transform: uppercase; }",
-    ".slot-title { font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }",
+    ".slot-label { font-size: 0.72em; opacity: 0.7; text-transform: uppercase; }",
+    ".slot-title { font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }",
     ".empty { opacity: 0.7; font-style: italic; }",
     ".overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }",
     ".overlay[hidden] { display: none; }",
@@ -40,6 +39,11 @@
     ["second_part", "2e partie de soiree"]
   ];
 
+  function channelName(hass, entityId) {
+    var attrs = hass.states[entityId].attributes || {};
+    return attrs.channel_name || entityId;
+  }
+
   class ProgrammeTntFrCard extends HTMLElement {
     setConfig(config) {
       this._config = config || {};
@@ -59,19 +63,19 @@
     _resolveEntities() {
       var hass = this._hass;
       if (!hass) return [];
+      var ids;
       if (this._entities && this._entities.length) {
-        return this._entities.filter(function (id) {
+        ids = this._entities.filter(function (id) {
           return !!hass.states[id];
         });
+      } else {
+        ids = Object.keys(hass.states).filter(function (id) {
+          var st = hass.states[id];
+          return id.indexOf("sensor.") === 0 && st.attributes && st.attributes.channel_id;
+        });
       }
-      var ids = Object.keys(hass.states).filter(function (id) {
-        var st = hass.states[id];
-        return id.indexOf("sensor.") === 0 && st.attributes && st.attributes.channel_id;
-      });
       ids.sort(function (a, b) {
-        var na = hass.states[a].attributes.channel_name || a;
-        var nb = hass.states[b].attributes.channel_name || b;
-        return na.localeCompare(nb);
+        return channelName(hass, a).localeCompare(channelName(hass, b), "fr", { sensitivity: "base" });
       });
       return ids;
     }
@@ -170,6 +174,7 @@
       entities.forEach(function (entityId) {
         var state = self._hass.states[entityId];
         var attrs = state.attributes || {};
+        var name = attrs.channel_name || entityId;
 
         var row = document.createElement("div");
         row.className = "channel-row";
@@ -181,13 +186,13 @@
           var img = document.createElement("img");
           img.src = logoSrc;
           img.className = "channel-logo";
-          img.alt = "";
+          img.alt = name;
+          img.title = name;
           chan.appendChild(img);
+        } else {
+          chan.title = name;
+          chan.textContent = name.slice(0, 3).toUpperCase();
         }
-        var name = document.createElement("span");
-        name.className = "channel-name";
-        name.textContent = attrs.channel_name || entityId;
-        chan.appendChild(name);
         row.appendChild(chan);
 
         var slots = document.createElement("div");
@@ -215,7 +220,7 @@
 
           if (prog) {
             cell.addEventListener("click", function () {
-              self._openModal(attrs.channel_name || entityId, prog);
+              self._openModal(name, prog);
             });
           } else {
             cell.disabled = true;
@@ -228,7 +233,7 @@
       });
     }
 
-    _openModal(channelName, prog) {
+    _openModal(channelLabel, prog) {
       var els = this._els;
       els.modalTitle.textContent = prog.title || "";
 
@@ -240,7 +245,7 @@
       }
 
       var bits = [];
-      if (channelName) bits.push(channelName);
+      if (channelLabel) bits.push(channelLabel);
       if (prog.start) {
         var start = new Date(prog.start);
         if (!isNaN(start.getTime())) {
