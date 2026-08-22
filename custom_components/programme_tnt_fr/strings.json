@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Programme TNT FR",
+        "description": "Choisissez les chaines de la TNT a suivre.",
+        "data": {
+          "channels": "Chaines"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Selectionnez au moins une chaine."
+    },
+    "abort": {
+      "single_instance_allowed": "Une seule instance de Programme TNT FR est autorisee."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Chaines suivies",
+        "description": "Modifiez la liste des chaines de la TNT a suivre.",
+        "data": {
+          "channels": "Chaines"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Selectionnez au moins une chaine."
+    }
+  }
+}
