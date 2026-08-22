@@ -1,5 +1,8 @@
 # Programme TNT FR
 
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
+
 Integration Home Assistant + carte Lovelace pour suivre le programme TV des
 chaines de la TNT francaise : ce qui passe en ce moment, la premiere partie
 de soiree et la deuxieme partie de soiree, chaine par chaine, avec le detail
@@ -17,8 +20,8 @@ programme complet des chaines de la TNT francaise. Pour chaque chaine
 selectionnee, elle calcule :
 
 - **En ce moment** : le programme en cours de diffusion.
-- **1re partie de soiree** : le programme diffuse a partir d'environ 20h30.
-- **2e partie de soiree** : le programme diffuse a partir d'environ 22h30.
+- **1re partie de soiree** : le programme diffuse a partir d'environ 21h15.
+- **2e partie de soiree** : le programme diffuse a partir d'environ 22h40.
 
 Le flux complet n'est retelecharge qu'une fois par heure maximum ; le calcul
 "en ce moment" est lui rafraichi toutes les 5 minutes a partir des donnees
@@ -30,11 +33,11 @@ deja en cache.
 
 1. Dans HACS, ouvrez le menu **...** puis **Depots personnalises**.
 2. Ajoutez `https://github.com/cyclope205/programme-tnt-fr` avec le type
-   **Integration**.
+**Integration**.
 3. Installez **Programme TNT FR**, puis redemarrez Home Assistant.
 4. Allez dans **Parametres > Appareils et services > Ajouter une
-   integration**, cherchez **Programme TNT FR** et choisissez les chaines a
-   suivre.
+integration**, cherchez **Programme TNT FR** et choisissez les chaines a
+suivre.
 
 ### Installation manuelle
 
@@ -60,8 +63,8 @@ l'affichage a une liste precise :
 type: custom:programme-tnt-fr-card
 title: Programme TNT
 entities:
-  - sensor.tf1
-  - sensor.france_2
+- sensor.tf1
+- sensor.france_2
 ```
 
 Cliquez sur un programme pour ouvrir le detail (sous-titre, description,
@@ -77,7 +80,7 @@ l'integration.
 
 - Donnees TV : [xmltvfr.fr](https://xmltvfr.fr) / [XML TV Fr](https://github.com/racacax/XML-TV-Fr).
 - Cette integration n'est ni affiliee ni soutenue par les chaines de
-  television citees.
+television citees.
 
 ## Licence
 
