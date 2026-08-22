@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Programme TNT FR",
+        "description": "Choose the French TNT channels to follow.",
+        "data": {
+          "channels": "Channels"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Select at least one channel."
+    },
+    "abort": {
+      "single_instance_allowed": "Only one instance of Programme TNT FR is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Followed channels",
+        "description": "Change the list of TNT channels to follow.",
+        "data": {
+          "channels": "Channels"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Select at least one channel."
+    }
+  }
+}
