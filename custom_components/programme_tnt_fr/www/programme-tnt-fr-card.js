@@ -15,10 +15,11 @@
     ".channel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }",
     ".channel-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; background: #fff; padding: 2px; flex-shrink: 0; }",
     ".channel-name { font-weight: 600; font-size: 0.98em; color: var(--primary-text-color); }",
-    ".carousel { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }",
+    ".carousel-wrap { position: relative; }",
+    ".carousel { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 1 1 0; min-width: 118px; max-width: 220px; aspect-ratio: 2 / 3; border-radius: 14px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(145deg, #454b6b, #1c1e2e); box-shadow: 0 3px 10px rgba(0,0,0,0.3); transition: transform 0.12s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
+    ".poster-card { position: relative; flex: 0 0 138px; width: 138px; aspect-ratio: 2 / 3; border-radius: 14px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(145deg, #454b6b, #1c1e2e); box-shadow: 0 3px 10px rgba(0,0,0,0.3); transition: transform 0.12s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
     ".poster-card:active { transform: scale(0.96); }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
@@ -35,6 +36,11 @@
     ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.25); }",
     ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 3px; background: #e0263f; }",
     ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.78em; opacity: 0.7; font-style: italic; color: var(--primary-text-color); }",
+    ".carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(20,20,30,0.72); color: #fff; font-size: 1.2em; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; opacity: 0; transition: opacity 0.15s ease; padding: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }",
+    ".carousel-wrap:hover .carousel-nav.visible { opacity: 1; }",
+    ".carousel-nav.visible:hover { background: rgba(20,20,30,0.9); }",
+    ".carousel-nav.prev { left: 2px; }",
+    ".carousel-nav.next { right: 2px; }",
     ".overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; }",
     ".overlay[hidden] { display: none; }",
     ".modal { background: var(--card-background-color, #fff); color: var(--primary-text-color); border-radius: 12px; padding: 20px; max-width: 480px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }",
@@ -286,6 +292,45 @@
       return btn;
     }
 
+    _buildCarouselWrap(carousel) {
+      var wrap = document.createElement("div");
+      wrap.className = "carousel-wrap";
+      wrap.appendChild(carousel);
+
+      var prevBtn = document.createElement("button");
+      prevBtn.type = "button";
+      prevBtn.className = "carousel-nav prev";
+      prevBtn.setAttribute("aria-label", "Precedent");
+      prevBtn.textContent = "‹";
+
+      var nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "carousel-nav next";
+      nextBtn.setAttribute("aria-label", "Suivant");
+      nextBtn.textContent = "›";
+
+      function updateNav() {
+        var maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        var canScroll = maxScroll > 4;
+        prevBtn.classList.toggle("visible", canScroll && carousel.scrollLeft > 4);
+        nextBtn.classList.toggle("visible", canScroll && carousel.scrollLeft < maxScroll - 4);
+      }
+
+      prevBtn.addEventListener("click", function () {
+        carousel.scrollBy({ left: -carousel.clientWidth, behavior: "smooth" });
+      });
+      nextBtn.addEventListener("click", function () {
+        carousel.scrollBy({ left: carousel.clientWidth, behavior: "smooth" });
+      });
+      carousel.addEventListener("scroll", updateNav);
+
+      wrap.appendChild(prevBtn);
+      wrap.appendChild(nextBtn);
+
+      requestAnimationFrame(updateNav);
+      return wrap;
+    }
+
     _render() {
       this._ensureDom();
       var hass = this._hass;
@@ -328,8 +373,8 @@
           var card = self._buildPosterCard(channelLabel, slotKey, slotLabel, badgeClass, prog, channelIcon);
           carousel.appendChild(card);
         });
-        section.appendChild(carousel);
 
+        section.appendChild(self._buildCarouselWrap(carousel));
         els.body.appendChild(section);
       });
     }
