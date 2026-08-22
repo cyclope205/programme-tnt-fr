@@ -2,36 +2,24 @@
  * Servie automatiquement par l'integration Home Assistant du meme nom :
  * aucune configuration de ressource Lovelace manuelle n'est necessaire.
  * Utilisation minimale dans un tableau de bord :
- *   type: custom:programme-tnt-fr-card
- *
- * Presentation inspiree des carrousels "Programme TV" de Molotov : une
- * section par creneau (maintenant / ce soir / 2e partie de soiree), chacune
- * affichee sous forme de carrousel horizontal de vignettes par chaine.
+ * type: custom:programme-tnt-fr-card
  */
 (function () {
   "use strict";
 
   var STYLE = [
     "ha-card { padding: 16px; }",
-    ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; }",
-    ".section { margin-bottom: 20px; }",
-    ".section:last-child { margin-bottom: 0; }",
-    ".section-title { font-size: 1em; font-weight: 600; margin-bottom: 10px; }",
-    ".carousel { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }",
-    ".carousel::-webkit-scrollbar { height: 6px; }",
-    ".carousel::-webkit-scrollbar-thumb { background: var(--divider-color, #ccc); border-radius: 3px; }",
-    ".poster { position: relative; flex: 0 0 112px; width: 112px; height: 152px; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--secondary-background-color, #f2f2f2); border: none; padding: 0; font-family: inherit; text-align: left; }",
-    ".poster-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
-    ".poster-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }",
-    ".poster-placeholder img { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }",
-    ".poster-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 65%; background: linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0)); }",
-    ".poster-logo { position: absolute; left: 6px; bottom: 6px; width: 26px; height: 26px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.92); padding: 2px; }",
-    ".poster-live { position: absolute; top: 6px; left: 6px; display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.6em; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }",
-    ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #e53935; flex-shrink: 0; }",
-    ".poster-title { position: absolute; left: 6px; right: 6px; bottom: 7px; color: #fff; font-size: 0.72em; font-weight: 600; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }",
-    ".poster-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.3); }",
-    ".poster-progress-fill { height: 100%; background: #e53935; }",
-    ".empty { opacity: 0.7; font-style: italic; font-size: 0.9em; }",
+    ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 12px; }",
+    ".channel-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); }",
+    ".channel-row:last-child { border-bottom: none; }",
+    ".channel-info { display: flex; align-items: center; justify-content: center; width: 44px; flex-shrink: 0; font-size: 0.7em; font-weight: 600; text-align: center; }",
+    ".channel-logo { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; background: var(--card-background-color, #fff); }",
+    ".slots { display: flex; flex: 1; gap: 8px; min-width: 0; }",
+    ".slot { flex: 1; min-width: 0; text-align: left; background: var(--secondary-background-color, #f2f2f2); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-family: inherit; color: var(--primary-text-color); }",
+    ".slot:disabled { opacity: 0.4; cursor: default; }",
+    ".slot-label { font-size: 0.72em; opacity: 0.7; text-transform: uppercase; }",
+    ".slot-title { font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }",
+    ".empty { opacity: 0.7; font-style: italic; }",
     ".overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }",
     ".overlay[hidden] { display: none; }",
     ".modal { background: var(--card-background-color, #fff); color: var(--primary-text-color); border-radius: 12px; padding: 20px; max-width: 480px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }",
@@ -45,33 +33,15 @@
     ".modal-desc { line-height: 1.4; white-space: pre-line; }"
   ].join("\n");
 
-  var SECTIONS = [
-    ["current", "En ce moment a la tele"],
-    ["prime_time", "Ce soir"],
-    ["second_part", "Deuxieme partie de soiree"]
+  var SLOT_DEFS = [
+    ["current", "En ce moment"],
+    ["prime_time", "1re partie de soiree"],
+    ["second_part", "2e partie de soiree"]
   ];
 
   function channelName(hass, entityId) {
     var attrs = hass.states[entityId].attributes || {};
     return attrs.channel_name || entityId;
-  }
-
-  function channelLogo(hass, entityId) {
-    var attrs = hass.states[entityId].attributes || {};
-    return attrs.channel_icon || attrs.entity_picture || null;
-  }
-
-  function liveFraction(prog) {
-    if (!prog || !prog.start || !prog.stop) return null;
-    var start = new Date(prog.start).getTime();
-    var stop = new Date(prog.stop).getTime();
-    var now = Date.now();
-    if (isNaN(start) || isNaN(stop) || stop <= start) return null;
-    if (now < start || now >= stop) return null;
-    var frac = (now - start) / (stop - start);
-    if (frac < 0) frac = 0;
-    if (frac > 1) frac = 1;
-    return frac;
   }
 
   class ProgrammeTntFrCard extends HTMLElement {
@@ -87,7 +57,7 @@
     }
 
     getCardSize() {
-      return 5;
+      return 1 + this._resolveEntities().length;
     }
 
     _resolveEntities() {
@@ -120,8 +90,8 @@
       var card = document.createElement("ha-card");
       var header = document.createElement("div");
       header.className = "header";
-      var sections = document.createElement("div");
-      sections.className = "sections";
+      var rows = document.createElement("div");
+      rows.className = "rows";
 
       var overlay = document.createElement("div");
       overlay.className = "overlay";
@@ -155,7 +125,7 @@
       overlay.appendChild(modal);
 
       card.appendChild(header);
-      card.appendChild(sections);
+      card.appendChild(rows);
       card.appendChild(overlay);
 
       this.shadowRoot.appendChild(style);
@@ -170,7 +140,7 @@
 
       this._els = {
         header: header,
-        sections: sections,
+        rows: rows,
         overlay: overlay,
         modalIcon: modalIcon,
         modalTitle: modalTitle,
@@ -178,78 +148,6 @@
         modalMeta: modalMeta,
         modalDesc: modalDesc
       };
-    }
-
-    _buildPoster(entityId, name, prog) {
-      var self = this;
-      var poster = document.createElement("button");
-      poster.type = "button";
-      poster.className = "poster";
-
-      if (prog.icon) {
-        var img = document.createElement("img");
-        img.className = "poster-image";
-        img.src = prog.icon;
-        img.alt = "";
-        poster.appendChild(img);
-      } else {
-        var placeholder = document.createElement("div");
-        placeholder.className = "poster-placeholder";
-        var logoBig = channelLogo(this._hass, entityId);
-        if (logoBig) {
-          var pimg = document.createElement("img");
-          pimg.src = logoBig;
-          pimg.alt = name;
-          placeholder.appendChild(pimg);
-        }
-        poster.appendChild(placeholder);
-      }
-
-      var scrim = document.createElement("div");
-      scrim.className = "poster-scrim";
-      poster.appendChild(scrim);
-
-      var frac = liveFraction(prog);
-      if (frac !== null) {
-        var live = document.createElement("div");
-        live.className = "poster-live";
-        var dot = document.createElement("span");
-        dot.className = "poster-live-dot";
-        live.appendChild(dot);
-        live.appendChild(document.createTextNode("En direct"));
-        poster.appendChild(live);
-
-        var progress = document.createElement("div");
-        progress.className = "poster-progress";
-        var fill = document.createElement("div");
-        fill.className = "poster-progress-fill";
-        fill.style.width = Math.round(frac * 100) + "%";
-        progress.appendChild(fill);
-        poster.appendChild(progress);
-      }
-
-      var logoSrc = channelLogo(this._hass, entityId);
-      if (logoSrc) {
-        var logo = document.createElement("img");
-        logo.className = "poster-logo";
-        logo.src = logoSrc;
-        logo.alt = name;
-        logo.title = name;
-        poster.appendChild(logo);
-      }
-
-      var titleEl = document.createElement("div");
-      titleEl.className = "poster-title";
-      titleEl.textContent = prog.title || name;
-      poster.appendChild(titleEl);
-
-      poster.title = name + (prog.title ? " - " + prog.title : "");
-
-      poster.addEventListener("click", function () {
-        self._openModal(name, prog);
-      });
-
-      return poster;
     }
 
     _render() {
@@ -261,53 +159,77 @@
       this._els.header.style.display = title ? "block" : "none";
 
       var entities = this._resolveEntities();
-      var sectionsEl = this._els.sections;
-      sectionsEl.innerHTML = "";
+      var rows = this._els.rows;
+      rows.innerHTML = "";
 
       if (!entities.length) {
         var empty = document.createElement("div");
         empty.className = "empty";
         empty.textContent = "Aucune chaine trouvee. Verifiez la configuration de l'integration Programme TNT FR.";
-        sectionsEl.appendChild(empty);
+        rows.appendChild(empty);
         return;
       }
 
       var self = this;
-      SECTIONS.forEach(function (def) {
-        var key = def[0];
-        var label = def[1];
+      entities.forEach(function (entityId) {
+        var state = self._hass.states[entityId];
+        var attrs = state.attributes || {};
+        var name = attrs.channel_name || entityId;
 
-        var section = document.createElement("div");
-        section.className = "section";
-        var titleEl = document.createElement("div");
-        titleEl.className = "section-title";
-        titleEl.textContent = label;
-        section.appendChild(titleEl);
+        var row = document.createElement("div");
+        row.className = "channel-row";
 
-        var carousel = document.createElement("div");
-        carousel.className = "carousel";
+        var chan = document.createElement("div");
+        chan.className = "channel-info";
+        var logoSrc = attrs.channel_icon || attrs.entity_picture;
+        if (logoSrc) {
+          var img = document.createElement("img");
+          img.src = logoSrc;
+          img.className = "channel-logo";
+          img.alt = name;
+          img.title = name;
+          chan.appendChild(img);
+        } else {
+          chan.title = name;
+          chan.textContent = name.slice(0, 3).toUpperCase();
+        }
+        row.appendChild(chan);
 
-        var count = 0;
-        entities.forEach(function (entityId) {
-          var state = self._hass.states[entityId];
-          var attrs = state.attributes || {};
-          var name = attrs.channel_name || entityId;
+        var slots = document.createElement("div");
+        slots.className = "slots";
+
+        SLOT_DEFS.forEach(function (def) {
+          var key = def[0];
+          var label = def[1];
           var prog = attrs[key];
-          if (!prog) return;
-          carousel.appendChild(self._buildPoster(entityId, name, prog));
-          count++;
+
+          var cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "slot";
+
+          var labelEl = document.createElement("div");
+          labelEl.className = "slot-label";
+          labelEl.textContent = label;
+
+          var titleEl = document.createElement("div");
+          titleEl.className = "slot-title";
+          titleEl.textContent = prog && prog.title ? prog.title : String.fromCharCode(8212);
+
+          cell.appendChild(labelEl);
+          cell.appendChild(titleEl);
+
+          if (prog) {
+            cell.addEventListener("click", function () {
+              self._openModal(name, prog);
+            });
+          } else {
+            cell.disabled = true;
+          }
+          slots.appendChild(cell);
         });
 
-        if (count === 0) {
-          var none = document.createElement("div");
-          none.className = "empty";
-          none.textContent = "Aucun programme disponible.";
-          section.appendChild(none);
-        } else {
-          section.appendChild(carousel);
-        }
-
-        sectionsEl.appendChild(section);
+        row.appendChild(slots);
+        rows.appendChild(row);
       });
     }
 
@@ -363,6 +285,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaines de la TNT francaise, en carrousels par creneau (maintenant / ce soir / 2e partie de soiree), avec details au clic."
+    description: "Programme TV des chaines de la TNT francaise (maintenant / 1re et 2e partie de soiree), avec details au clic."
   });
 })();
