@@ -176,15 +176,19 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         else:
             broadcast_day = now.date()
 
-        def _first_after(threshold_time):
-            threshold = datetime.combine(broadcast_day, threshold_time, tzinfo=now.tzinfo)
+        def _programme_at(reference_time):
+            """Programme airing at reference_time, or the next one if none covers it."""
+            threshold = datetime.combine(broadcast_day, reference_time, tzinfo=now.tzinfo)
+            for programme in progs:
+                if programme.start <= threshold < programme.stop:
+                    return programme
             for programme in progs:
                 if programme.start >= threshold:
                     return programme
             return None
 
-        prime_time = _first_after(PRIME_TIME_START)
-        second_part = _first_after(LATE_NIGHT_START)
+        prime_time = _programme_at(PRIME_TIME_START)
+        second_part = _programme_at(LATE_NIGHT_START)
         if second_part is not None and prime_time is not None and second_part is prime_time:
             second_part = None
             for programme in progs:
