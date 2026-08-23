@@ -7,17 +7,23 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
-from .const import CONF_CHANNELS, DEFAULT_CHANNELS, DOMAIN, TNT_CHANNELS
+from .const import (
+    CONF_CHANNELS,
+    CONF_TMDB_API_KEY,
+    DEFAULT_CHANNELS,
+    DOMAIN,
+    TNT_CHANNELS,
+)
 
 
-def _channels_schema(default: list[str]) -> vol.Schema:
+def _schema(channels_default: list[str], tmdb_default: str) -> vol.Schema:
     options = [
         selector.SelectOptionDict(value=channel_id, label=name)
         for channel_id, name in TNT_CHANNELS.items()
     ]
     return vol.Schema(
         {
-            vol.Required(CONF_CHANNELS, default=default): selector.selector(
+            vol.Required(CONF_CHANNELS, default=channels_default): selector.selector(
                 {
                     "select": {
                         "options": options,
@@ -25,7 +31,10 @@ def _channels_schema(default: list[str]) -> vol.Schema:
                         "mode": "list",
                     }
                 }
-            )
+            ),
+            vol.Optional(CONF_TMDB_API_KEY, default=tmdb_default): selector.selector(
+                {"text": {"type": "password"}}
+            ),
         }
     )
 
@@ -45,13 +54,15 @@ class ProgrammeTntFrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not channels:
                 errors["base"] = "no_channels"
             else:
-                return self.async_create_entry(
-                    title="Programme TNT FR", data={CONF_CHANNELS: channels}
-                )
+                data: dict = {CONF_CHANNELS: channels}
+                tmdb_key = (user_input.get(CONF_TMDB_API_KEY) or "").strip()
+                if tmdb_key:
+                    data[CONF_TMDB_API_KEY] = tmdb_key
+                return self.async_create_entry(title="Programme TNT FR", data=data)
 
         return self.async_show_form(
             step_id="user",
-            data_schema=_channels_schema(DEFAULT_CHANNELS),
+            data_schema=_schema(DEFAULT_CHANNELS, ""),
             errors=errors,
         )
 
@@ -62,16 +73,20 @@ class ProgrammeTntFrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
-    """Let the user change the list of followed channels later."""
+    """Let the user change the followed channels and the TMDB key later."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._config_entry = config_entry
 
     async def async_step_init(self, user_input: dict | None = None):
         errors: dict[str, str] = {}
-        current = self._config_entry.options.get(
+        current_channels = self._config_entry.options.get(
             CONF_CHANNELS,
             self._config_entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS),
+        )
+        current_tmdb_key = self._config_entry.options.get(
+            CONF_TMDB_API_KEY,
+            self._config_entry.data.get(CONF_TMDB_API_KEY, ""),
         )
 
         if user_input is not None:
@@ -79,10 +94,14 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
             if not channels:
                 errors["base"] = "no_channels"
             else:
-                return self.async_create_entry(title="", data={CONF_CHANNELS: channels})
+                data: dict = {CONF_CHANNELS: channels}
+                tmdb_key = (user_input.get(CONF_TMDB_API_KEY) or "").strip()
+                if tmdb_key:
+                    data[CONF_TMDB_API_KEY] = tmdb_key
+                return self.async_create_entry(title="", data=data)
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_channels_schema(current),
+            data_schema=_schema(current_channels, current_tmdb_key),
             errors=errors,
         )
