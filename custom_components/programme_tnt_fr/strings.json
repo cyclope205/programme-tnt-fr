@@ -6,7 +6,7 @@
         "description": "Choisissez les chaines de la TNT a suivre.",
         "data": {
           "channels": "Chaines",
-          "tmdb_api_key": "Cle API TMDB (optionnel, pour les affiches de films/series)"
+          "tmdb_api_key": "Cle API TMDB personnelle (optionnel : une cle partagee est deja incluse pour les affiches, ne remplir que pour utiliser la votre)"
         }
       }
     },
@@ -24,7 +24,7 @@
         "description": "Modifiez la liste des chaines de la TNT a suivre.",
         "data": {
           "channels": "Chaines",
-          "tmdb_api_key": "Cle API TMDB (optionnel, pour les affiches de films/series)"
+          "tmdb_api_key": "Cle API TMDB personnelle (optionnel : une cle partagee est deja incluse pour les affiches, ne remplir que pour utiliser la votre)"
         }
       }
     },
