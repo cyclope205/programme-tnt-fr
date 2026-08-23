@@ -15,6 +15,9 @@ from .const import (
     FETCH_MIN_INTERVAL_MINUTES,
     LATE_NIGHT_START,
     PRIME_TIME_START,
+    TMDB_IMAGE_BASE_URL,
+    TMDB_SEARCH_MOVIE_URL,
+    TMDB_SEARCH_TV_URL,
     UPDATE_INTERVAL_MINUTES,
     XMLTV_URL,
 )
@@ -55,13 +58,14 @@ class Programme:
         self.icon = icon
         self.rating = rating
 
-    def as_dict(self) -> dict:
+    def as_dict(self, poster: str | None = None) -> dict:
         return {
             "title": self.title,
             "subtitle": self.subtitle,
             "description": self.desc,
             "category": self.category,
             "icon": self.icon,
+            "poster": poster,
             "rating": self.rating,
             "start": self.start.isoformat() if self.start else None,
             "stop": self.stop.isoformat() if self.stop else None,
@@ -71,7 +75,9 @@ class Programme:
 class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     """Fetches the XMLTV feed and derives now / prime-time / late-night slots."""
 
-    def __init__(self, hass: HomeAssistant, channels: list[str]) -> None:
+    def __init__(
+        self, hass: HomeAssistant, channels: list[str], tmdb_api_key: str | None = None
+    ) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -79,10 +85,15 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
         )
         self._channels = channels
+        self._tmdb_api_key = tmdb_api_key or None
         self._session = async_get_clientsession(hass)
         self._programmes_by_channel: dict[str, list[Programme]] = {}
         self._channels_meta: dict[str, dict] = {}
         self._last_fetch = None
+        # Cache titre -> URL d'affiche TMDB (ou None si aucune correspondance
+        # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
+        # (toutes les 5 min) pour un programme deja resolu.
+        self._tmdb_poster_cache: dict[str, str | None] = {}
 
     async def _async_update_data(self) -> dict:
         now = dt_util.now()
@@ -104,10 +115,74 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     err,
                 )
 
-        return {
-            channel_id: self._compute_slots(channel_id, now)
+        picks = {
+            channel_id: self._pick_slots(channel_id, now)
             for channel_id in self._channels
         }
+
+        if self._tmdb_api_key:
+            titles = {
+                programme.title
+                for slots in picks.values()
+                for programme in slots
+                if programme is not None
+                and programme.title
+                and programme.title not in self._tmdb_poster_cache
+            }
+            if titles:
+                await self._resolve_tmdb_posters(titles)
+
+        result: dict[str, dict] = {}
+        for channel_id, (current, prime_time, second_part) in picks.items():
+            meta = self._channels_meta.get(channel_id, {})
+            result[channel_id] = {
+                "channel_id": channel_id,
+                "channel_name": meta.get("name", channel_id),
+                "channel_icon": meta.get("icon"),
+                "current": self._programme_dict(current),
+                "prime_time": self._programme_dict(prime_time),
+                "second_part": self._programme_dict(second_part),
+            }
+        return result
+
+    def _programme_dict(self, programme: Programme | None) -> dict | None:
+        if programme is None:
+            return None
+        poster = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
+        return programme.as_dict(poster=poster)
+
+    async def _resolve_tmdb_posters(self, titles: set[str]) -> None:
+        """Look up a poster on TMDB (film puis serie) for each new title."""
+        for title in titles:
+            try:
+                self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title)
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.debug("Echec de la recherche TMDB pour %s: %s", title, err)
+                self._tmdb_poster_cache[title] = None
+
+    async def _lookup_tmdb_poster(self, title: str) -> str | None:
+        poster_path = await self._tmdb_search(TMDB_SEARCH_MOVIE_URL, title)
+        if not poster_path:
+            poster_path = await self._tmdb_search(TMDB_SEARCH_TV_URL, title)
+        if not poster_path:
+            return None
+        return TMDB_IMAGE_BASE_URL + poster_path
+
+    async def _tmdb_search(self, url: str, title: str) -> str | None:
+        params = {
+            "api_key": self._tmdb_api_key,
+            "query": title,
+            "language": "fr-FR",
+            "include_adult": "false",
+        }
+        resp = await self._session.get(url, params=params, timeout=10)
+        if resp.status != 200:
+            return None
+        data = await resp.json()
+        results = data.get("results") or []
+        if not results:
+            return None
+        return results[0].get("poster_path")
 
     async def _fetch_and_parse(self) -> None:
         resp = await self._session.get(XMLTV_URL, timeout=30)
@@ -161,9 +236,10 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         self._programmes_by_channel = programmes
         self._channels_meta = channels_meta
 
-    def _compute_slots(self, channel_id: str, now) -> dict:
+    def _pick_slots(
+        self, channel_id: str, now
+    ) -> tuple[Programme | None, Programme | None, Programme | None]:
         progs = self._programmes_by_channel.get(channel_id, [])
-        meta = self._channels_meta.get(channel_id, {})
 
         current = None
         for programme in progs:
@@ -196,11 +272,4 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     second_part = programme
                     break
 
-        return {
-            "channel_id": channel_id,
-            "channel_name": meta.get("name", channel_id),
-            "channel_icon": meta.get("icon"),
-            "current": current.as_dict() if current else None,
-            "prime_time": prime_time.as_dict() if prime_time else None,
-            "second_part": second_part.as_dict() if second_part else None,
-        }
+        return current, prime_time, second_part
