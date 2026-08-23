@@ -3,15 +3,15 @@
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
 
-Integration Home Assistant + carte Lovelace pour suivre le programme TV des
-chaines de la TNT francaise : ce qui passe en ce moment, la premiere partie
-de soiree et la deuxieme partie de soiree, chaine par chaine, avec le detail
+Intégration Home Assistant + carte Lovelace pour suivre le programme TV des
+chaines de la TNT française : ce qui passe en ce moment, la première partie
+de soirée et la deuxième partie de soirée, chaine par chaine, avec le détail
 complet (description, genre, casting...) accessible en un clic.
 
 Aucune ressource Lovelace a ajouter a la main : la carte est servie et
-enregistree automatiquement par l'integration.
+enregistrée automatiquement par l'intégration.
 
-## Captures d'ecran
+## Captures d'écran
 
 Ecran de configuration des chaines suivies :
 
@@ -21,39 +21,47 @@ Vue "En ce moment" / "1ere partie de soiree" avec jaquettes TMDB :
 
 ![Rendu de la carte avec jaquettes TMDB](https://github.com/user-attachments/assets/ee3804a9-a729-4b10-820b-aa1d210eba1b)
 
+Vue "2eme partie de soirée" :
+
+![Vue "2eme partie de soiree"](https://github.com/user-attachments/assets/39e629c2-02e7-43a5-bd89-fc73f2d7f03d)
+
 ## Fonctionnement
 
-L'integration recupere le flux XMLTV public de
+L'intégration récupère le flux XMLTV public de
 [xmltvfr.fr](https://xmltvfr.fr) (projet
 [racacax/XML-TV-Fr](https://github.com/racacax/XML-TV-Fr)), qui publie le
-programme complet des chaines de la TNT francaise. Pour chaque chaine
-selectionnee, elle calcule :
+programme complet des chaines de la TNT française. Pour chaque chaine
+sélectionnée, elle calcule :
 
 - **En ce moment** : le programme en cours de diffusion.
-- **1re partie de soiree** : le programme diffuse a partir d'environ 21h15.
-- **2e partie de soiree** : le programme diffuse a partir d'environ 22h40.
+- **1re partie de soirée** : le programme diffuse a partir d'environ 21h15.
+- **2e partie de soirée** : le programme diffuse a partir d'environ 22h40.
 
-Le flux complet n'est retelecharge qu'une fois par heure maximum ; le calcul
-"en ce moment" est lui rafraichi toutes les 5 minutes a partir des donnees
-deja en cache.
+Le flux complet n'est retélécharge qu'une fois par heure maximum ; le calcul
+"en ce moment" est lui rafraichi toutes les 5 minutes a partir des données
+déjà en cache.
+
+Une affiche/jaquette TMDB est recherchée automatiquement pour chaque programme
+(films et séries). Si aucune correspondance n'est trouvée sur TMDB, c'est
+l'image du flux XMLTV (visuel de la chaine) qui est affichée a la place.
 
 ## Installation
 
 ### Via HACS (recommande)
 
-1. Dans HACS, ouvrez le menu **...** puis **Depots personnalises**.
+1. Dans HACS, ouvrez le menu **...** puis **Dépôts personnalises**.
 2. Ajoutez `https://github.com/cyclope205/programme-tnt-fr` avec le type
-**Integration**.
-3. Installez **Programme TNT FR**, puis redemarrez Home Assistant.
-4. Allez dans **Parametres > Appareils et services > Ajouter une
-integration**, cherchez **Programme TNT FR** et choisissez les chaines a
+**Intégration**.
+3. Installez **Programme TNT FR**, puis redémarrez Home Assistant.
+4. Allez dans **Paramètres > Appareils et services > Ajouter une
+intégration**, cherchez **Programme TNT FR** et choisissez les chaines a
 suivre.
 
 ### Installation manuelle
 
 Copiez le dossier `custom_components/programme_tnt_fr` dans le dossier
 `custom_components` de votre configuration Home Assistant, puis
-redemarrez.
+redémarrez.
 
 ## Utiliser la carte
 
@@ -82,8 +90,8 @@ genre, note CSA...).
 
 ## Modifier les chaines suivies
 
-**Parametres > Appareils et services > Programme TNT FR > Configurer**
-permet de changer la liste des chaines a tout moment, sans reinstaller
+**Paramètres > Appareils et services > Programme TNT FR > Configurer**
+permet de changer la liste des chaines a tout moment, sans réinstaller
 l'integration.
 
 ## Credits
@@ -101,7 +109,7 @@ Voir [LICENSE](LICENSE).
 
 EN - If it saves you time, consider buying me a coffee. It keeps this project maintained and new features coming.
 
-FR - Si cette integration te fait gagner du temps, un petit don est toujours apprecie : ca m'aide a maintenir le projet et a ajouter de nouvelles fonctionnalites.
+FR - Si cette intégration te fait gagner du temps, un petit don est toujours apprécie : ca m'aide a maintenir le projet et à ajouter de nouvelles fonctionnalités.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
