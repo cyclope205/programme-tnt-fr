@@ -9,27 +9,34 @@
 
   var STYLE = [
     "ha-card { padding: 16px; overflow: hidden; }",
-    ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; }",
-    ".slot-section { margin-bottom: 24px; }",
+    ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 12px; }",
+    ".slot-section { margin-bottom: 14px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
-    ".slot-title-header { font-size: 1.14em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); }",
+    ".slot-title-header { font-size: 1.1em; font-weight: 700; margin-bottom: 8px; color: var(--primary-text-color); }",
     ".carousel-wrap { position: relative; }",
     ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 0 0 46%; width: 46%; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: transparent; font-family: inherit; text-align: left; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }",
+    ".poster-card { position: relative; flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: transparent; font-family: inherit; text-align: left; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 14px; overflow: hidden; background: linear-gradient(160deg, #4c4a6b 0%, #262445 55%, #121022 100%); box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: transform 0.15s ease; }",
     ".poster-card:active .poster-image-wrap { transform: scale(0.96); }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
+    ".poster-bg[hidden] { display: none; }",
     ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.18; }",
+    ".poster-watermark[hidden] { display: none; }",
     ".poster-watermark img { width: 50%; height: 50%; object-fit: contain; filter: brightness(0) invert(1); }",
     ".poster-badge { position: absolute; left: 8px; bottom: 8px; width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px; box-shadow: 0 2px 6px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
+    ".poster-badge[hidden] { display: none; }",
     ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,0.25); }",
+    ".poster-progress-track[hidden] { display: none; }",
     ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 4px; background: #e0263f; }",
     ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.85em; opacity: 0.75; font-style: italic; color: #fff; }",
+    ".poster-empty-msg[hidden] { display: none; }",
     ".poster-caption { padding: 10px 2px 0; }",
+    ".poster-caption[hidden] { display: none; }",
     ".poster-live-tag { color: #ff3b5c; font-size: 0.78em; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }",
+    ".poster-live-tag[hidden] { display: none; }",
     ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff3b5c; animation: tntfr-pulse 1.6s infinite; flex-shrink: 0; }",
     "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,59,92,0.55); } 70% { box-shadow: 0 0 0 6px rgba(255,59,92,0); } 100% { box-shadow: 0 0 0 0 rgba(255,59,92,0); } }",
     ".poster-title-below { font-size: 0.95em; font-weight: 700; line-height: 1.28; color: var(--primary-text-color); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
@@ -55,8 +62,8 @@
 
   var SLOT_DEFS = [
     ["current", "En ce moment"],
-    ["prime_time", "1re partie de soiree"],
-    ["second_part", "2e partie de soiree"]
+    ["prime_time", "1re partie de soirée"],
+    ["second_part", "2e partie de soirée"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
