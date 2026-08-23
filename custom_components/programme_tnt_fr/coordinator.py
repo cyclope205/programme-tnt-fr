@@ -164,10 +164,10 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 self._tmdb_poster_cache[title] = None
 
     async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> str | None:
-        if self._is_series_category(category):
-            search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
-        else:
+        if self._is_movie_category(category):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
+        else:
+            search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
         poster_path = await self._tmdb_search(search_order[0], title)
         if not poster_path:
             poster_path = await self._tmdb_search(search_order[1], title)
@@ -176,21 +176,27 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         return TMDB_IMAGE_BASE_URL + poster_path
 
     @staticmethod
-    def _is_series_category(category: str | None) -> bool:
-        """Return True if the XMLTV category indicates a TV series rather than a movie."""
+    def _is_movie_category(category: str | None) -> bool:
+        """Return True if the XMLTV category explicitly indicates a movie.
+
+        Le flux XMLTV tague systematiquement les films avec "Film" (ou
+        variantes), alors que les series n'ont pas toujours de categorie
+        "Serie" explicite (parfois seulement un genre comme "Action"). On ne
+        bascule donc en recherche film que si la categorie le confirme
+        explicitement ; sinon on cherche d'abord cote serie, avec repli
+        automatique sur film si la recherche serie ne trouve rien.
+        """
         if not category:
             return False
         normalized = category.strip().lower()
-        series_keywords = (
-            "serie",
-            "s\u00e9rie",
-            "feuilleton",
-            "sitcom",
-            "telenovela",
-            "soap",
-            "animation",
+        movie_keywords = (
+            "film",
+            "long m\u00e9trage",
+            "long metrage",
+            "cin\u00e9ma",
+            "cinema",
         )
-        return any(keyword in normalized for keyword in series_keywords)
+        return any(keyword in normalized for keyword in movie_keywords)
 
     async def _tmdb_search(self, url: str, title: str) -> str | None:
         params = {
