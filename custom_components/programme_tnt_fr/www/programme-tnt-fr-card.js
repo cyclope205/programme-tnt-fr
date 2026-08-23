@@ -10,11 +10,9 @@
   var STYLE = [
     "ha-card { padding: 16px; overflow: hidden; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; }",
-    ".channel-section { margin-bottom: 20px; }",
-    ".channel-section:last-child { margin-bottom: 0; }",
-    ".channel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }",
-    ".channel-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; background: #fff; padding: 2px; flex-shrink: 0; }",
-    ".channel-name { font-weight: 600; font-size: 0.98em; color: var(--primary-text-color); }",
+    ".slot-section { margin-bottom: 22px; }",
+    ".slot-section:last-child { margin-bottom: 0; }",
+    ".slot-title-header { font-size: 1.05em; font-weight: 600; margin-bottom: 10px; color: var(--primary-text-color); }",
     ".carousel-wrap { position: relative; }",
     ".carousel { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
@@ -26,12 +24,11 @@
     ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.18; }",
     ".poster-watermark img { width: 56%; height: 56%; object-fit: contain; filter: brightness(0) invert(1); }",
     ".poster-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 78%; background: linear-gradient(to top, rgba(0,0,0,0.95) 12%, rgba(0,0,0,0.75) 48%, rgba(0,0,0,0) 100%); }",
-    ".poster-badge { position: absolute; top: 8px; left: 8px; font-size: 0.62em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 3px 7px; border-radius: 20px; color: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }",
-    ".poster-badge.live { background: #e0263f; }",
-    ".poster-badge.prime { background: #3f6fe0; }",
-    ".poster-badge.second { background: #1c9c8a; }",
+    ".poster-channel-badge { position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; border-radius: 50%; background: #fff; padding: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.4); object-fit: contain; z-index: 1; }",
+    ".poster-live-badge { position: absolute; top: 8px; right: 8px; background: #e0263f; color: #fff; font-size: 0.6em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 3px 7px; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 1; }",
     ".poster-content { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px 10px; color: #fff; }",
-    ".poster-title { font-size: 0.84em; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }",
+    ".poster-channel-name { font-size: 0.66em; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+    ".poster-title { font-size: 0.84em; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }",
     ".poster-time { font-size: 0.68em; font-weight: 600; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); }",
     ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.25); }",
     ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 3px; background: #e0263f; }",
@@ -55,9 +52,9 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En direct", "live"],
-    ["prime_time", "1re partie", "prime"],
-    ["second_part", "2e partie", "second"]
+    ["current", "En ce moment"],
+    ["prime_time", "1re partie de soiree"],
+    ["second_part", "2e partie de soiree"]
   ];
 
   var CHANNEL_ORDER = {
@@ -121,7 +118,7 @@
     }
 
     getCardSize() {
-      return 1 + this._resolveEntities().length * 2;
+      return 10;
     }
 
     _resolveEntities() {
@@ -201,11 +198,19 @@
       this._built = true;
     }
 
-    _buildPosterCard(channelLabel, slotKey, slotLabel, badgeClass, prog, channelIcon) {
+    _buildPosterCard(channelLabel, slotKey, prog, channelIcon) {
       var self = this;
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "poster-card";
+
+      if (channelIcon) {
+        var badge = document.createElement("img");
+        badge.className = "poster-channel-badge";
+        badge.src = channelIcon;
+        badge.alt = "";
+        btn.appendChild(badge);
+      }
 
       if (!prog) {
         btn.disabled = true;
@@ -213,10 +218,6 @@
         empty.className = "poster-empty-msg";
         empty.textContent = "Pas de programme";
         btn.appendChild(empty);
-        var badgeEmpty = document.createElement("div");
-        badgeEmpty.className = "poster-badge " + badgeClass;
-        badgeEmpty.textContent = slotLabel;
-        btn.appendChild(badgeEmpty);
         return btn;
       }
 
@@ -238,28 +239,38 @@
             btn.insertBefore(wm, btn.firstChild);
           }
         });
-        btn.appendChild(img);
+        btn.insertBefore(img, btn.firstChild);
       } else if (channelIcon) {
         var wm2 = document.createElement("div");
         wm2.className = "poster-watermark";
         var wmImg2 = document.createElement("img");
         wmImg2.src = channelIcon;
         wm2.appendChild(wmImg2);
-        btn.appendChild(wm2);
+        btn.insertBefore(wm2, btn.firstChild);
       }
 
       var scrim = document.createElement("div");
       scrim.className = "poster-scrim";
       btn.appendChild(scrim);
 
-      var badge = document.createElement("div");
-      badge.className = "poster-badge " + badgeClass;
       var startFmt = formatTime(prog.start);
-      badge.textContent = startFmt ? slotLabel + " " + startFmt : slotLabel;
-      btn.appendChild(badge);
+      var stopFmt = formatTime(prog.stop);
+
+      if (slotKey === "current") {
+        var live = document.createElement("div");
+        live.className = "poster-live-badge";
+        live.textContent = "Direct";
+        btn.appendChild(live);
+      }
 
       var content = document.createElement("div");
       content.className = "poster-content";
+
+      var chanEl = document.createElement("div");
+      chanEl.className = "poster-channel-name";
+      chanEl.textContent = channelLabel;
+      content.appendChild(chanEl);
+
       var titleEl = document.createElement("div");
       titleEl.className = "poster-title";
       titleEl.textContent = prog.title || "";
@@ -267,7 +278,6 @@
 
       var timeEl = document.createElement("div");
       timeEl.className = "poster-time";
-      var stopFmt = formatTime(prog.stop);
       timeEl.textContent = (startFmt || "?") + " - " + (stopFmt || "?");
       content.appendChild(timeEl);
       btn.appendChild(content);
@@ -342,35 +352,26 @@
 
       var entities = this._resolveEntities();
       var self = this;
-      entities.forEach(function (entityId) {
-        var attrs = hass.states[entityId].attributes || {};
-        var channelLabel = attrs.channel_name || entityId;
-        var channelIcon = attrs.channel_icon || null;
+
+      SLOT_DEFS.forEach(function (def) {
+        var slotKey = def[0], sectionTitle = def[1];
 
         var section = document.createElement("div");
-        section.className = "channel-section";
+        section.className = "slot-section";
 
-        var headerRow = document.createElement("div");
-        headerRow.className = "channel-header";
-        if (channelIcon) {
-          var logo = document.createElement("img");
-          logo.className = "channel-logo";
-          logo.src = channelIcon;
-          logo.alt = "";
-          headerRow.appendChild(logo);
-        }
-        var nameEl = document.createElement("div");
-        nameEl.className = "channel-name";
-        nameEl.textContent = channelLabel;
-        headerRow.appendChild(nameEl);
-        section.appendChild(headerRow);
+        var titleEl = document.createElement("div");
+        titleEl.className = "slot-title-header";
+        titleEl.textContent = sectionTitle;
+        section.appendChild(titleEl);
 
         var carousel = document.createElement("div");
         carousel.className = "carousel";
-        SLOT_DEFS.forEach(function (def) {
-          var slotKey = def[0], slotLabel = def[1], badgeClass = def[2];
+        entities.forEach(function (entityId) {
+          var attrs = hass.states[entityId].attributes || {};
+          var channelLabel = attrs.channel_name || entityId;
+          var channelIcon = attrs.channel_icon || null;
           var prog = attrs[slotKey];
-          var card = self._buildPosterCard(channelLabel, slotKey, slotLabel, badgeClass, prog, channelIcon);
+          var card = self._buildPosterCard(channelLabel, slotKey, prog, channelIcon);
           carousel.appendChild(card);
         });
 
@@ -421,6 +422,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaines de la TNT francaise en carrousel de vignettes (maintenant / 1re et 2e partie de soiree), classees dans l'ordre officiel des chaines, avec details au clic."
+    description: "Programme TV des chaines de la TNT francaise en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soiree), une vignette par chaine classee dans l'ordre officiel, avec details au clic."
   });
 })();
