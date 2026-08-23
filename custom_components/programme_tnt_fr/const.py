@@ -9,6 +9,16 @@ XMLTV_URL = "https://xmltvfr.fr/xmltv/xmltv_tnt.xml"
 
 CONF_CHANNELS = "channels"
 
+# Cle API TMDB (The Movie Database) optionnelle : si renseignee, l'integration
+# tente de recuperer une affiche officielle (films et series) pour chaque
+# programme via l'API publique TMDB, en complement de l'image fournie par le
+# flux XMLTV (qui n'est pas toujours une vraie jaquette). Facultatif : sans
+# cle, le comportement precedent (image du flux XMLTV) est inchange.
+CONF_TMDB_API_KEY = "tmdb_api_key"
+TMDB_SEARCH_MOVIE_URL = "https://api.themoviedb.org/3/search/movie"
+TMDB_SEARCH_TV_URL = "https://api.themoviedb.org/3/search/tv"
+TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
+
 # La liste complete est re-telechargee au plus une fois par heure.
 # Le calcul "en ce moment / soiree" est, lui, rafraichi toutes les 5 minutes
 # a partir des donnees deja en cache, sans nouvelle requete reseau.
