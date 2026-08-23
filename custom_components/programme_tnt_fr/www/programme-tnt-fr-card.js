@@ -61,9 +61,9 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment"],
-    ["prime_time", "1re partie de soirée"],
-    ["second_part", "2e partie de soirée"]
+    ["current", "En ce moment à la télé"],
+    ["prime_time", "Programmes télé en 1ère partie de soirée"],
+    ["second_part", "Programmes télé en 2ème partie de soirée"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
@@ -403,7 +403,7 @@
       refs.empty.hidden = true;
       refs.caption.hidden = false;
 
-      var artUrl = prog.icon || null;
+      var artUrl = prog.poster || prog.icon || null;
       refs.bgFailed = false;
       if (artUrl) {
         if (refs.bg.getAttribute("src") !== artUrl) refs.bg.src = artUrl;
@@ -451,7 +451,7 @@
       this._ensureDom();
       var hass = this._hass;
       var els = this._els;
-      els.header.textContent = this._config.title || "Programme TNT";
+      els.header.textContent = this._config.title || "Programme TV : que regarder ce soir ?";
 
       if (!hass) {
         els.body.innerHTML = "";
@@ -509,7 +509,7 @@
     }
 
     static getStubConfig() {
-      return { title: "Programme TNT" };
+      return { title: "Programme TV : que regarder ce soir ?" };
     }
   }
 
