@@ -19,6 +19,13 @@ TMDB_SEARCH_MOVIE_URL = "https://api.themoviedb.org/3/search/movie"
 TMDB_SEARCH_TV_URL = "https://api.themoviedb.org/3/search/tv"
 TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
+# Cle TMDB partagee par defaut : cela evite a chaque utilisateur de devoir
+# creer un compte TMDB pour profiter des jaquettes. Usage strictement non
+# commercial (voir la section Credits du README pour attribution requise
+# par TMDB). Les utilisateurs qui le souhaitent peuvent renseigner leur
+# propre cle dans les options de integration : celle-ci a alors priorite.
+DEFAULT_TMDB_API_KEY = "3180ede1f0ea4c773b9d54f45020143c"
+
 # La liste complete est re-telechargee au plus une fois par heure.
 # Le calcul "en ce moment / soiree" est, lui, rafraichi toutes les 5 minutes
 # a partir des donnees deja en cache, sans nouvelle requete reseau.
