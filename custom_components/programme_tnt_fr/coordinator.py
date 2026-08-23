@@ -122,16 +122,18 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         }
 
         if self._tmdb_api_key:
-            titles = {
-                programme.title
-                for slots in picks.values()
-                for programme in slots
-                if programme is not None
-                and programme.title
-                and programme.title not in self._tmdb_poster_cache
-            }
-            if titles:
-                await self._resolve_tmdb_posters(titles)
+            title_categories: dict[str, str | None] = {}
+            for slots in picks.values():
+                for programme in slots:
+                    if (
+                        programme is not None
+                        and programme.title
+                        and programme.title not in self._tmdb_poster_cache
+                        and programme.title not in title_categories
+                    ):
+                        title_categories[programme.title] = programme.category
+            if title_categories:
+                await self._resolve_tmdb_posters(title_categories)
 
         result: dict[str, dict] = {}
         for channel_id, (current, prime_time, second_part) in picks.items():
@@ -152,22 +154,43 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         poster = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
         return programme.as_dict(poster=poster)
 
-    async def _resolve_tmdb_posters(self, titles: set[str]) -> None:
-        """Look up a poster on TMDB (film puis serie) for each new title."""
-        for title in titles:
+    async def _resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
+        """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre."""
+        for title, category in title_categories.items():
             try:
-                self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title)
+                self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title, category)
             except Exception as err:  # noqa: BLE001
                 _LOGGER.debug("Echec de la recherche TMDB pour %s: %s", title, err)
                 self._tmdb_poster_cache[title] = None
 
-    async def _lookup_tmdb_poster(self, title: str) -> str | None:
-        poster_path = await self._tmdb_search(TMDB_SEARCH_MOVIE_URL, title)
+    async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> str | None:
+        if self._is_series_category(category):
+            search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
+        else:
+            search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
+        poster_path = await self._tmdb_search(search_order[0], title)
         if not poster_path:
-            poster_path = await self._tmdb_search(TMDB_SEARCH_TV_URL, title)
+            poster_path = await self._tmdb_search(search_order[1], title)
         if not poster_path:
             return None
         return TMDB_IMAGE_BASE_URL + poster_path
+
+    @staticmethod
+    def _is_series_category(category: str | None) -> bool:
+        """Return True if the XMLTV category indicates a TV series rather than a movie."""
+        if not category:
+            return False
+        normalized = category.strip().lower()
+        series_keywords = (
+            "serie",
+            "s\u00e9rie",
+            "feuilleton",
+            "sitcom",
+            "telenovela",
+            "soap",
+            "animation",
+        )
+        return any(keyword in normalized for keyword in series_keywords)
 
     async def _tmdb_search(self, url: str, title: str) -> str | None:
         params = {
