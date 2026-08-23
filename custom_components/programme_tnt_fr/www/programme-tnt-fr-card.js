@@ -10,36 +10,31 @@
   var STYLE = [
     "ha-card { padding: 16px; overflow: hidden; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; }",
-    ".slot-section { margin-bottom: 26px; }",
+    ".slot-section { margin-bottom: 24px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
-    ".slot-title-header { font-size: 1.12em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); display: flex; align-items: center; gap: 9px; }",
-    ".slot-title-icon { width: 8px; height: 22px; border-radius: 4px; flex-shrink: 0; }",
-    ".slot-title-icon.live { background: #e0263f; }",
-    ".slot-title-icon.prime { background: #3f6fe0; }",
-    ".slot-title-icon.second { background: #1c9c8a; }",
+    ".slot-title-header { font-size: 1.14em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); }",
     ".carousel-wrap { position: relative; }",
     ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 0 0 230px; width: 230px; aspect-ratio: 2 / 3; border-radius: 18px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); box-shadow: 0 10px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); transition: transform 0.15s ease, box-shadow 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
-    ".poster-card:active { transform: scale(0.97); }",
+    ".poster-card { position: relative; flex: 0 0 46%; width: 46%; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: transparent; font-family: inherit; text-align: left; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
+    ".poster-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 14px; overflow: hidden; background: linear-gradient(160deg, #4c4a6b 0%, #262445 55%, #121022 100%); box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: transform 0.15s ease; }",
+    ".poster-card:active .poster-image-wrap { transform: scale(0.96); }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
-    ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.16; }",
-    ".poster-watermark img { width: 52%; height: 52%; object-fit: contain; filter: brightness(0) invert(1); }",
-    ".poster-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: linear-gradient(to top, rgba(0,0,0,0.94) 8%, rgba(0,0,0,0.72) 42%, rgba(0,0,0,0) 100%); }",
-    ".poster-channel-badge { position: absolute; top: 10px; left: 10px; width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
-    ".poster-live-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.66em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
-    ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
-    "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }",
-    ".poster-content { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px 14px; color: #fff; }",
-    ".poster-channel-name { font-size: 0.72em; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-    ".poster-title { font-size: 1.02em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }",
-    ".poster-time { font-size: 0.76em; font-weight: 600; opacity: 0.9; margin-top: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); }",
+    ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.18; }",
+    ".poster-watermark img { width: 50%; height: 50%; object-fit: contain; filter: brightness(0) invert(1); }",
+    ".poster-badge { position: absolute; left: 8px; bottom: 8px; width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px; box-shadow: 0 2px 6px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
     ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,0.25); }",
     ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 4px; background: #e0263f; }",
-    ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.85em; opacity: 0.7; font-style: italic; color: var(--primary-text-color); }",
-    ".carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(15,15,25,0.68); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 3; opacity: 0; transition: opacity 0.18s ease, transform 0.18s ease; padding: 0; box-shadow: 0 2px 12px rgba(0,0,0,0.45); }",
+    ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.85em; opacity: 0.75; font-style: italic; color: #fff; }",
+    ".poster-caption { padding: 10px 2px 0; }",
+    ".poster-live-tag { color: #ff3b5c; font-size: 0.78em; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }",
+    ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff3b5c; animation: tntfr-pulse 1.6s infinite; flex-shrink: 0; }",
+    "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,59,92,0.55); } 70% { box-shadow: 0 0 0 6px rgba(255,59,92,0); } 100% { box-shadow: 0 0 0 0 rgba(255,59,92,0); } }",
+    ".poster-title-below { font-size: 0.95em; font-weight: 700; line-height: 1.28; color: var(--primary-text-color); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
+    ".poster-meta-below { font-size: 0.78em; color: var(--secondary-text-color, #8a8a8a); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+    ".carousel-nav { position: absolute; top: 42%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(15,15,25,0.68); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 3; opacity: 0; transition: opacity 0.18s ease, transform 0.18s ease; padding: 0; box-shadow: 0 2px 12px rgba(0,0,0,0.45); }",
     ".carousel-nav.visible { opacity: 0.92; }",
     ".carousel-nav.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.08); }",
     ".carousel-nav svg { width: 20px; height: 20px; }",
@@ -59,9 +54,9 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment", "live"],
-    ["prime_time", "1re partie de soiree", "prime"],
-    ["second_part", "2e partie de soiree", "second"]
+    ["current", "En ce moment"],
+    ["prime_time", "1re partie de soiree"],
+    ["second_part", "2e partie de soiree"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
@@ -119,6 +114,8 @@
       this._config = config || {};
       this._entities = this._config.entities || null;
       this._built = false;
+      this._skeletonSignature = null;
+      this._cardBtns = null;
       this._render();
     }
 
@@ -208,113 +205,6 @@
       this._built = true;
     }
 
-    _buildPosterCard(channelLabel, slotKey, prog, channelIcon) {
-      var self = this;
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "poster-card";
-
-      if (channelIcon) {
-        var badge = document.createElement("img");
-        badge.className = "poster-channel-badge";
-        badge.src = channelIcon;
-        badge.alt = "";
-        btn.appendChild(badge);
-      }
-
-      if (!prog) {
-        btn.disabled = true;
-        var empty = document.createElement("div");
-        empty.className = "poster-empty-msg";
-        empty.textContent = "Pas de programme";
-        btn.appendChild(empty);
-        return btn;
-      }
-
-      var artUrl = prog.icon || null;
-      if (artUrl) {
-        var img = document.createElement("img");
-        img.className = "poster-bg";
-        img.src = artUrl;
-        img.loading = "lazy";
-        img.alt = "";
-        img.addEventListener("error", function () {
-          img.remove();
-          if (channelIcon) {
-            var wm = document.createElement("div");
-            wm.className = "poster-watermark";
-            var wmImg = document.createElement("img");
-            wmImg.src = channelIcon;
-            wm.appendChild(wmImg);
-            btn.insertBefore(wm, btn.firstChild);
-          }
-        });
-        btn.insertBefore(img, btn.firstChild);
-      } else if (channelIcon) {
-        var wm2 = document.createElement("div");
-        wm2.className = "poster-watermark";
-        var wmImg2 = document.createElement("img");
-        wmImg2.src = channelIcon;
-        wm2.appendChild(wmImg2);
-        btn.insertBefore(wm2, btn.firstChild);
-      }
-
-      var scrim = document.createElement("div");
-      scrim.className = "poster-scrim";
-      btn.appendChild(scrim);
-
-      var startFmt = formatTime(prog.start);
-      var stopFmt = formatTime(prog.stop);
-
-      if (slotKey === "current") {
-        var live = document.createElement("div");
-        live.className = "poster-live-badge";
-        var dot = document.createElement("span");
-        dot.className = "poster-live-dot";
-        live.appendChild(dot);
-        live.appendChild(document.createTextNode("Direct"));
-        btn.appendChild(live);
-      }
-
-      var content = document.createElement("div");
-      content.className = "poster-content";
-
-      var chanEl = document.createElement("div");
-      chanEl.className = "poster-channel-name";
-      chanEl.textContent = channelLabel;
-      content.appendChild(chanEl);
-
-      var titleEl = document.createElement("div");
-      titleEl.className = "poster-title";
-      titleEl.textContent = prog.title || "";
-      content.appendChild(titleEl);
-
-      var timeEl = document.createElement("div");
-      timeEl.className = "poster-time";
-      timeEl.textContent = (startFmt || "?") + " - " + (stopFmt || "?");
-      content.appendChild(timeEl);
-      btn.appendChild(content);
-
-      if (slotKey === "current") {
-        var frac = liveFraction(prog);
-        if (frac !== null) {
-          var track = document.createElement("div");
-          track.className = "poster-progress-track";
-          var fill = document.createElement("div");
-          fill.className = "poster-progress-fill";
-          fill.style.width = (frac * 100).toFixed(1) + "%";
-          track.appendChild(fill);
-          btn.appendChild(track);
-        }
-      }
-
-      btn.addEventListener("click", function () {
-        self._openModal(channelLabel, prog);
-      });
-
-      return btn;
-    }
-
     _buildCarouselWrap(carousel) {
       var wrap = document.createElement("div");
       wrap.className = "carousel-wrap";
@@ -354,6 +244,202 @@
       return wrap;
     }
 
+    _ensureSkeleton(entities) {
+      var signature = entities.join("|");
+      if (this._skeletonSignature === signature && this._cardBtns) return;
+      this._skeletonSignature = signature;
+
+      var els = this._els;
+      els.body.innerHTML = "";
+      this._cardBtns = {};
+
+      var self = this;
+      SLOT_DEFS.forEach(function (def) {
+        var slotKey = def[0], sectionTitle = def[1];
+
+        var section = document.createElement("div");
+        section.className = "slot-section";
+
+        var titleEl = document.createElement("div");
+        titleEl.className = "slot-title-header";
+        titleEl.textContent = sectionTitle;
+        section.appendChild(titleEl);
+
+        var carousel = document.createElement("div");
+        carousel.className = "carousel";
+
+        self._cardBtns[slotKey] = {};
+        entities.forEach(function (entityId) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "poster-card";
+          carousel.appendChild(btn);
+          self._cardBtns[slotKey][entityId] = btn;
+        });
+
+        section.appendChild(self._buildCarouselWrap(carousel));
+        els.body.appendChild(section);
+      });
+    }
+
+    _updateWatermarkVisibility(refs) {
+      var channelIcon = refs.currentChannelIcon;
+      var showWatermark = (refs.bg.hidden || refs.bgFailed) && !!channelIcon;
+      if (showWatermark) {
+        if (refs.watermarkImg.getAttribute("src") !== channelIcon) refs.watermarkImg.src = channelIcon;
+        refs.watermark.hidden = false;
+      } else {
+        refs.watermark.hidden = true;
+      }
+    }
+
+    _fillPosterCard(btn, channelLabel, slotKey, prog, channelIcon) {
+      var self = this;
+      if (!btn._refs) {
+        btn.innerHTML = "";
+        var refs = {};
+
+        refs.imageWrap = document.createElement("div");
+        refs.imageWrap.className = "poster-image-wrap";
+        btn.appendChild(refs.imageWrap);
+
+        refs.bg = document.createElement("img");
+        refs.bg.className = "poster-bg";
+        refs.bg.loading = "lazy";
+        refs.bg.alt = "";
+        refs.bg.hidden = true;
+        refs.bg.addEventListener("error", function () {
+          refs.bgFailed = true;
+          refs.bg.hidden = true;
+          self._updateWatermarkVisibility(refs);
+        });
+        refs.imageWrap.appendChild(refs.bg);
+
+        refs.watermark = document.createElement("div");
+        refs.watermark.className = "poster-watermark";
+        refs.watermark.hidden = true;
+        refs.watermarkImg = document.createElement("img");
+        refs.watermark.appendChild(refs.watermarkImg);
+        refs.imageWrap.appendChild(refs.watermark);
+
+        refs.badge = document.createElement("img");
+        refs.badge.className = "poster-badge";
+        refs.badge.alt = "";
+        refs.badge.hidden = true;
+        refs.imageWrap.appendChild(refs.badge);
+
+        refs.progressTrack = document.createElement("div");
+        refs.progressTrack.className = "poster-progress-track";
+        refs.progressFill = document.createElement("div");
+        refs.progressFill.className = "poster-progress-fill";
+        refs.progressTrack.appendChild(refs.progressFill);
+        refs.progressTrack.hidden = true;
+        refs.imageWrap.appendChild(refs.progressTrack);
+
+        refs.empty = document.createElement("div");
+        refs.empty.className = "poster-empty-msg";
+        refs.empty.textContent = "Pas de programme";
+        refs.empty.hidden = true;
+        refs.imageWrap.appendChild(refs.empty);
+
+        refs.caption = document.createElement("div");
+        refs.caption.className = "poster-caption";
+        btn.appendChild(refs.caption);
+
+        refs.liveTag = document.createElement("div");
+        refs.liveTag.className = "poster-live-tag";
+        var dot = document.createElement("span");
+        dot.className = "poster-live-dot";
+        refs.liveTag.appendChild(dot);
+        refs.liveTag.appendChild(document.createTextNode("En direct"));
+        refs.liveTag.hidden = true;
+        refs.caption.appendChild(refs.liveTag);
+
+        refs.titleEl = document.createElement("div");
+        refs.titleEl.className = "poster-title-below";
+        refs.caption.appendChild(refs.titleEl);
+
+        refs.metaEl = document.createElement("div");
+        refs.metaEl.className = "poster-meta-below";
+        refs.caption.appendChild(refs.metaEl);
+
+        refs.clickHandler = null;
+        btn._refs = refs;
+      }
+
+      var refs = btn._refs;
+      refs.currentChannelIcon = channelIcon || null;
+
+      if (channelIcon) {
+        if (refs.badge.getAttribute("src") !== channelIcon) refs.badge.src = channelIcon;
+        refs.badge.hidden = false;
+      } else {
+        refs.badge.hidden = true;
+      }
+
+      if (!prog) {
+        btn.disabled = true;
+        refs.bg.hidden = true;
+        refs.bgFailed = false;
+        refs.watermark.hidden = true;
+        refs.progressTrack.hidden = true;
+        refs.empty.hidden = false;
+        refs.caption.hidden = true;
+        if (refs.clickHandler) {
+          btn.removeEventListener("click", refs.clickHandler);
+          refs.clickHandler = null;
+        }
+        return;
+      }
+
+      btn.disabled = false;
+      refs.empty.hidden = true;
+      refs.caption.hidden = false;
+
+      var artUrl = prog.icon || null;
+      refs.bgFailed = false;
+      if (artUrl) {
+        if (refs.bg.getAttribute("src") !== artUrl) refs.bg.src = artUrl;
+        refs.bg.hidden = false;
+      } else {
+        refs.bg.hidden = true;
+        refs.bg.removeAttribute("src");
+      }
+      this._updateWatermarkVisibility(refs);
+
+      refs.liveTag.hidden = slotKey !== "current";
+
+      refs.titleEl.textContent = prog.title || "";
+
+      var startFmt = formatTime(prog.start);
+      var stopFmt = formatTime(prog.stop);
+      var metaParts = [];
+      if (prog.category) metaParts.push(prog.category);
+      metaParts.push(channelLabel);
+      if (startFmt && stopFmt) metaParts.push(startFmt + "-" + stopFmt);
+      refs.metaEl.textContent = metaParts.join(" • ");
+
+      if (slotKey === "current") {
+        var frac = liveFraction(prog);
+        if (frac !== null) {
+          refs.progressTrack.hidden = false;
+          refs.progressFill.style.width = (frac * 100).toFixed(1) + "%";
+        } else {
+          refs.progressTrack.hidden = true;
+        }
+      } else {
+        refs.progressTrack.hidden = true;
+      }
+
+      if (refs.clickHandler) {
+        btn.removeEventListener("click", refs.clickHandler);
+      }
+      refs.clickHandler = function () {
+        self._openModal(channelLabel, prog);
+      };
+      btn.addEventListener("click", refs.clickHandler);
+    }
+
     _render() {
       this._ensureDom();
       var hass = this._hass;
@@ -362,50 +448,25 @@
 
       if (!hass) {
         els.body.innerHTML = "";
+        this._skeletonSignature = null;
+        this._cardBtns = null;
         return;
       }
 
-      var previousScroll = Array.prototype.map.call(
-        els.body.querySelectorAll(".carousel"),
-        function (c) { return c.scrollLeft; }
-      );
-
-      els.body.innerHTML = "";
-
       var entities = this._resolveEntities();
+      this._ensureSkeleton(entities);
+
       var self = this;
-
-      SLOT_DEFS.forEach(function (def, index) {
-        var slotKey = def[0], sectionTitle = def[1], colorClass = def[2];
-
-        var section = document.createElement("div");
-        section.className = "slot-section";
-
-        var titleEl = document.createElement("div");
-        titleEl.className = "slot-title-header";
-        var icon = document.createElement("span");
-        icon.className = "slot-title-icon " + colorClass;
-        titleEl.appendChild(icon);
-        titleEl.appendChild(document.createTextNode(sectionTitle));
-        section.appendChild(titleEl);
-
-        var carousel = document.createElement("div");
-        carousel.className = "carousel";
+      SLOT_DEFS.forEach(function (def) {
+        var slotKey = def[0];
         entities.forEach(function (entityId) {
           var attrs = hass.states[entityId].attributes || {};
           var channelLabel = attrs.channel_name || entityId;
           var channelIcon = attrs.channel_icon || null;
           var prog = attrs[slotKey];
-          var card = self._buildPosterCard(channelLabel, slotKey, prog, channelIcon);
-          carousel.appendChild(card);
+          var btn = self._cardBtns[slotKey][entityId];
+          self._fillPosterCard(btn, channelLabel, slotKey, prog, channelIcon);
         });
-
-        section.appendChild(self._buildCarouselWrap(carousel));
-        els.body.appendChild(section);
-
-        if (previousScroll[index]) {
-          carousel.scrollLeft = previousScroll[index];
-        }
       });
     }
 
@@ -451,6 +512,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaines de la TNT francaise en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soiree), une vignette par chaine classee dans l'ordre officiel, avec details au clic."
+    description: "Programme TV des chaines de la TNT francaise en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soiree), affiche/jaquette par programme quand disponible, avec details au clic."
   });
 })();
