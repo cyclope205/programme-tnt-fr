@@ -11,6 +11,16 @@ complet (description, genre, casting...) accessible en un clic.
 Aucune ressource Lovelace a ajouter a la main : la carte est servie et
 enregistree automatiquement par l'integration.
 
+## Captures d'ecran
+
+Ecran de configuration des chaines suivies :
+
+![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
+
+Vue "En ce moment" / "1ere partie de soiree" avec jaquettes TMDB :
+
+![Rendu de la carte avec jaquettes TMDB](https://github.com/user-attachments/assets/ee3804a9-a729-4b10-820b-aa1d210eba1b)
+
 ## Fonctionnement
 
 L'integration recupere le flux XMLTV public de
@@ -79,6 +89,7 @@ l'integration.
 ## Credits
 
 - Donnees TV : [xmltvfr.fr](https://xmltvfr.fr) / [XML TV Fr](https://github.com/racacax/XML-TV-Fr).
+- Jaquettes/posters : This product uses the TMDB API but is not endorsed or certified by TMDB.
 - Cette integration n'est ni affiliee ni soutenue par les chaines de
 television citees.
 
