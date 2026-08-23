@@ -10,34 +10,41 @@
   var STYLE = [
     "ha-card { padding: 16px; overflow: hidden; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; }",
-    ".slot-section { margin-bottom: 22px; }",
+    ".slot-section { margin-bottom: 26px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
-    ".slot-title-header { font-size: 1.05em; font-weight: 600; margin-bottom: 10px; color: var(--primary-text-color); }",
+    ".slot-title-header { font-size: 1.12em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); display: flex; align-items: center; gap: 9px; }",
+    ".slot-title-icon { width: 8px; height: 22px; border-radius: 4px; flex-shrink: 0; }",
+    ".slot-title-icon.live { background: #e0263f; }",
+    ".slot-title-icon.prime { background: #3f6fe0; }",
+    ".slot-title-icon.second { background: #1c9c8a; }",
     ".carousel-wrap { position: relative; }",
-    ".carousel { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
+    ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 0 0 138px; width: 138px; aspect-ratio: 2 / 3; border-radius: 14px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(145deg, #454b6b, #1c1e2e); box-shadow: 0 3px 10px rgba(0,0,0,0.3); transition: transform 0.12s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
-    ".poster-card:active { transform: scale(0.96); }",
+    ".poster-card { position: relative; flex: 0 0 230px; width: 230px; aspect-ratio: 2 / 3; border-radius: 18px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); box-shadow: 0 10px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); transition: transform 0.15s ease, box-shadow 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
+    ".poster-card:active { transform: scale(0.97); }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
-    ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.18; }",
-    ".poster-watermark img { width: 56%; height: 56%; object-fit: contain; filter: brightness(0) invert(1); }",
-    ".poster-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 78%; background: linear-gradient(to top, rgba(0,0,0,0.95) 12%, rgba(0,0,0,0.75) 48%, rgba(0,0,0,0) 100%); }",
-    ".poster-channel-badge { position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; border-radius: 50%; background: #fff; padding: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.4); object-fit: contain; z-index: 1; }",
-    ".poster-live-badge { position: absolute; top: 8px; right: 8px; background: #e0263f; color: #fff; font-size: 0.6em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 3px 7px; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 1; }",
-    ".poster-content { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px 10px; color: #fff; }",
-    ".poster-channel-name { font-size: 0.66em; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-    ".poster-title { font-size: 0.84em; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }",
-    ".poster-time { font-size: 0.68em; font-weight: 600; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); }",
-    ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.25); }",
-    ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 3px; background: #e0263f; }",
-    ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.78em; opacity: 0.7; font-style: italic; color: var(--primary-text-color); }",
-    ".carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(20,20,30,0.72); color: #fff; font-size: 1.2em; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; opacity: 0; transition: opacity 0.15s ease; padding: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }",
-    ".carousel-wrap:hover .carousel-nav.visible { opacity: 1; }",
-    ".carousel-nav.visible:hover { background: rgba(20,20,30,0.9); }",
-    ".carousel-nav.prev { left: 2px; }",
-    ".carousel-nav.next { right: 2px; }",
+    ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.16; }",
+    ".poster-watermark img { width: 52%; height: 52%; object-fit: contain; filter: brightness(0) invert(1); }",
+    ".poster-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: linear-gradient(to top, rgba(0,0,0,0.94) 8%, rgba(0,0,0,0.72) 42%, rgba(0,0,0,0) 100%); }",
+    ".poster-channel-badge { position: absolute; top: 10px; left: 10px; width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
+    ".poster-live-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.66em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
+    ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
+    "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }",
+    ".poster-content { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px 14px; color: #fff; }",
+    ".poster-channel-name { font-size: 0.72em; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
+    ".poster-title { font-size: 1.02em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }",
+    ".poster-time { font-size: 0.76em; font-weight: 600; opacity: 0.9; margin-top: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.85); }",
+    ".poster-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,0.25); }",
+    ".poster-progress-fill { position: absolute; left: 0; bottom: 0; height: 4px; background: #e0263f; }",
+    ".poster-empty-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; font-size: 0.85em; opacity: 0.7; font-style: italic; color: var(--primary-text-color); }",
+    ".carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(15,15,25,0.68); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 3; opacity: 0; transition: opacity 0.18s ease, transform 0.18s ease; padding: 0; box-shadow: 0 2px 12px rgba(0,0,0,0.45); }",
+    ".carousel-nav.visible { opacity: 0.92; }",
+    ".carousel-nav.visible:hover { opacity: 1; transform: translateY(-50%) scale(1.08); }",
+    ".carousel-nav svg { width: 20px; height: 20px; }",
+    ".carousel-nav.prev { left: 6px; }",
+    ".carousel-nav.next { right: 6px; }",
     ".overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; }",
     ".overlay[hidden] { display: none; }",
     ".modal { background: var(--card-background-color, #fff); color: var(--primary-text-color); border-radius: 12px; padding: 20px; max-width: 480px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }",
@@ -52,10 +59,13 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment"],
-    ["prime_time", "1re partie de soiree"],
-    ["second_part", "2e partie de soiree"]
+    ["current", "En ce moment", "live"],
+    ["prime_time", "1re partie de soiree", "prime"],
+    ["second_part", "2e partie de soiree", "second"]
   ];
+
+  var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+  var CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
 
   var CHANNEL_ORDER = {
     "TF1.fr": 1, "France2.fr": 2, "France3.fr": 3,
@@ -118,7 +128,7 @@
     }
 
     getCardSize() {
-      return 10;
+      return 12;
     }
 
     _resolveEntities() {
@@ -259,7 +269,10 @@
       if (slotKey === "current") {
         var live = document.createElement("div");
         live.className = "poster-live-badge";
-        live.textContent = "Direct";
+        var dot = document.createElement("span");
+        dot.className = "poster-live-dot";
+        live.appendChild(dot);
+        live.appendChild(document.createTextNode("Direct"));
         btn.appendChild(live);
       }
 
@@ -311,13 +324,13 @@
       prevBtn.type = "button";
       prevBtn.className = "carousel-nav prev";
       prevBtn.setAttribute("aria-label", "Precedent");
-      prevBtn.textContent = "‹";
+      prevBtn.innerHTML = CHEVRON_LEFT;
 
       var nextBtn = document.createElement("button");
       nextBtn.type = "button";
       nextBtn.className = "carousel-nav next";
       nextBtn.setAttribute("aria-label", "Suivant");
-      nextBtn.textContent = "›";
+      nextBtn.innerHTML = CHEVRON_RIGHT;
 
       function updateNav() {
         var maxScroll = carousel.scrollWidth - carousel.clientWidth;
@@ -347,21 +360,33 @@
       var els = this._els;
       els.header.textContent = this._config.title || "Programme TNT";
 
+      if (!hass) {
+        els.body.innerHTML = "";
+        return;
+      }
+
+      var previousScroll = Array.prototype.map.call(
+        els.body.querySelectorAll(".carousel"),
+        function (c) { return c.scrollLeft; }
+      );
+
       els.body.innerHTML = "";
-      if (!hass) return;
 
       var entities = this._resolveEntities();
       var self = this;
 
-      SLOT_DEFS.forEach(function (def) {
-        var slotKey = def[0], sectionTitle = def[1];
+      SLOT_DEFS.forEach(function (def, index) {
+        var slotKey = def[0], sectionTitle = def[1], colorClass = def[2];
 
         var section = document.createElement("div");
         section.className = "slot-section";
 
         var titleEl = document.createElement("div");
         titleEl.className = "slot-title-header";
-        titleEl.textContent = sectionTitle;
+        var icon = document.createElement("span");
+        icon.className = "slot-title-icon " + colorClass;
+        titleEl.appendChild(icon);
+        titleEl.appendChild(document.createTextNode(sectionTitle));
         section.appendChild(titleEl);
 
         var carousel = document.createElement("div");
@@ -377,6 +402,10 @@
 
         section.appendChild(self._buildCarouselWrap(carousel));
         els.body.appendChild(section);
+
+        if (previousScroll[index]) {
+          carousel.scrollLeft = previousScroll[index];
+        }
       });
     }
 
