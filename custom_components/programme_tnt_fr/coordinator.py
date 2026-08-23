@@ -12,6 +12,7 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     DAY_RESET,
+    DEFAULT_TMDB_API_KEY,
     FETCH_MIN_INTERVAL_MINUTES,
     LATE_NIGHT_START,
     PRIME_TIME_START,
@@ -85,7 +86,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
         )
         self._channels = channels
-        self._tmdb_api_key = tmdb_api_key or None
+        self._tmdb_api_key = tmdb_api_key or DEFAULT_TMDB_API_KEY
         self._session = async_get_clientsession(hass)
         self._programmes_by_channel: dict[str, list[Programme]] = {}
         self._channels_meta: dict[str, dict] = {}
