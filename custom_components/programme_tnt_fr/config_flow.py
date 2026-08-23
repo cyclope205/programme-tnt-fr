@@ -9,14 +9,13 @@ from homeassistant.helpers import selector
 
 from .const import (
     CONF_CHANNELS,
-    CONF_TMDB_API_KEY,
     DEFAULT_CHANNELS,
     DOMAIN,
     TNT_CHANNELS,
 )
 
 
-def _schema(channels_default: list[str], tmdb_default: str) -> vol.Schema:
+def _schema(channels_default: list[str]) -> vol.Schema:
     options = [
         selector.SelectOptionDict(value=channel_id, label=name)
         for channel_id, name in TNT_CHANNELS.items()
@@ -31,9 +30,6 @@ def _schema(channels_default: list[str], tmdb_default: str) -> vol.Schema:
                         "mode": "list",
                     }
                 }
-            ),
-            vol.Optional(CONF_TMDB_API_KEY, default=tmdb_default): selector.selector(
-                {"text": {"type": "password"}}
             ),
         }
     )
@@ -55,14 +51,11 @@ class ProgrammeTntFrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "no_channels"
             else:
                 data: dict = {CONF_CHANNELS: channels}
-                tmdb_key = (user_input.get(CONF_TMDB_API_KEY) or "").strip()
-                if tmdb_key:
-                    data[CONF_TMDB_API_KEY] = tmdb_key
                 return self.async_create_entry(title="Programme TNT FR", data=data)
 
         return self.async_show_form(
             step_id="user",
-            data_schema=_schema(DEFAULT_CHANNELS, ""),
+            data_schema=_schema(DEFAULT_CHANNELS),
             errors=errors,
         )
 
@@ -73,7 +66,7 @@ class ProgrammeTntFrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
-    """Let the user change the followed channels and the TMDB key later."""
+    """Let the user change the followed channels later."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._config_entry = config_entry
@@ -84,10 +77,6 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
             CONF_CHANNELS,
             self._config_entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS),
         )
-        current_tmdb_key = self._config_entry.options.get(
-            CONF_TMDB_API_KEY,
-            self._config_entry.data.get(CONF_TMDB_API_KEY, ""),
-        )
 
         if user_input is not None:
             channels = user_input.get(CONF_CHANNELS) or []
@@ -95,13 +84,10 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                 errors["base"] = "no_channels"
             else:
                 data: dict = {CONF_CHANNELS: channels}
-                tmdb_key = (user_input.get(CONF_TMDB_API_KEY) or "").strip()
-                if tmdb_key:
-                    data[CONF_TMDB_API_KEY] = tmdb_key
                 return self.async_create_entry(title="", data=data)
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_schema(current_channels, current_tmdb_key),
+            data_schema=_schema(current_channels),
             errors=errors,
         )
