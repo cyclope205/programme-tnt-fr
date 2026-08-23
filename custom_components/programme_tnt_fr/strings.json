@@ -5,7 +5,8 @@
         "title": "Programme TNT FR",
         "description": "Choisissez les chaines de la TNT a suivre.",
         "data": {
-          "channels": "Chaines"
+          "channels": "Chaines",
+          "tmdb_api_key": "Cle API TMDB (optionnel, pour les affiches de films/series)"
         }
       }
     },
@@ -22,7 +23,8 @@
         "title": "Chaines suivies",
         "description": "Modifiez la liste des chaines de la TNT a suivre.",
         "data": {
-          "channels": "Chaines"
+          "channels": "Chaines",
+          "tmdb_api_key": "Cle API TMDB (optionnel, pour les affiches de films/series)"
         }
       }
     },
