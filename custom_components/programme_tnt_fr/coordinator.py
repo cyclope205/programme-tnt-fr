@@ -317,3 +317,39 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     break
 
         return current, prime_time, second_part
+
+    def get_programmes_for_day(
+        self, channel_id: str, date_str: str | None = None
+    ) -> list[dict] | None:
+        """Retourne tous les programmes en cache pour channel_id sur une
+        journee de diffusion (de DAY_RESET a DAY_RESET le lendemain), pour
+        alimenter la carte "Guide TV". Utilise la meme frontiere que le
+        calcul des creneaux pour que les programmes de nuit avant 05h00
+        restent rattaches a la soiree precedente. date_str est une date ISO
+        (AAAA-MM-JJ) ; si absente, utilise la journee de diffusion en cours.
+        """
+        if channel_id not in self._programmes_by_channel:
+            return None
+
+        tzinfo = dt_util.now().tzinfo
+        if date_str:
+            try:
+                broadcast_day = datetime.strptime(date_str, "%Y-%m-%d").date()
+            except ValueError:
+                return None
+        else:
+            now = dt_util.now()
+            broadcast_day = (
+                (now - timedelta(days=1)).date()
+                if now.time() < DAY_RESET
+                else now.date()
+            )
+
+        day_start = datetime.combine(broadcast_day, DAY_RESET, tzinfo=tzinfo)
+        day_end = day_start + timedelta(days=1)
+
+        return [
+            p.as_dict()
+            for p in self._programmes_by_channel[channel_id]
+            if p.start < day_end and p.stop > day_start
+        ]
