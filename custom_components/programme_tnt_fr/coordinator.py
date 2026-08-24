@@ -1,6 +1,7 @@
 """Data update coordinator for the Programme TNT FR integration."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
@@ -134,7 +135,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     ):
                         title_categories[programme.title] = programme.category
             if title_categories:
-                await self._resolve_tmdb_posters(title_categories)
+                self.hass.async_create_task(
+                    self._background_resolve_tmdb_posters(title_categories)
+                )
 
         result: dict[str, dict] = {}
         for channel_id, (current, prime_time, second_part) in picks.items():
@@ -155,14 +158,35 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         poster = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
         return programme.as_dict(poster=poster)
 
+    async def _background_resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
+        """Resolve TMDB posters in the background, then push a refresh once done.
+
+        Runs outside of _async_update_data's await chain so a large batch of
+        new titles (e.g. a whole day's guide on first setup) can never delay
+        or cancel config entry setup again.
+        """
+        await self._resolve_tmdb_posters(title_categories)
+        await self.async_request_refresh()
+
     async def _resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
-        """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre."""
-        for title, category in title_categories.items():
-            try:
-                self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title, category)
-            except Exception as err:  # noqa: BLE001
-                _LOGGER.debug("Echec de la recherche TMDB pour %s: %s", title, err)
-                self._tmdb_poster_cache[title] = None
+        """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre.
+
+        Runs lookups concurrently (bounded) instead of one at a time, since
+        this can now cover a full day's programmes instead of just 3 picks.
+        """
+        semaphore = asyncio.Semaphore(5)
+
+        async def _resolve_one(title: str, category: str | None) -> None:
+            async with semaphore:
+                try:
+                    self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title, category)
+                except Exception as err:  # noqa: BLE001
+                    _LOGGER.debug("Echec de la recherche TMDB pour %s: %s", title, err)
+                    self._tmdb_poster_cache[title] = None
+
+        await asyncio.gather(
+            *(_resolve_one(title, category) for title, category in title_categories.items())
+        )
 
     async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> str | None:
         if self._is_movie_category(category):
