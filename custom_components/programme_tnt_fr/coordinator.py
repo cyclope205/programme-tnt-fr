@@ -37,10 +37,11 @@ class _TmdbTransientError(Exception):
     """
 
 
+# "un"/"une" sont volontairement absents : ce sont des articles francais
+# omnipresents (ex: "Un diner presque parfait"), pas seulement des nombres -
+# les convertir en "1" corromprait la comparaison de la plupart des titres.
 _FR_NUMBER_WORDS = {
     "zero": "0",
-    "un": "1",
-    "une": "1",
     "deux": "2",
     "trois": "3",
     "quatre": "4",
