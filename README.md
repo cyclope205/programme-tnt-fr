@@ -12,6 +12,7 @@ Integration Home Assistant qui recupere le programme TV des chaines francaises (
 ## Sommaire
 
 - [Fonctionnalites](#fonctionnalites)
+- [Captures d'ecran](#captures-decran)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Utilisation dans un tableau de bord](#utilisation-dans-un-tableau-de-bord)
@@ -32,9 +33,25 @@ Le guide propose trois filtres, combinables :
 - **Jour** : fleches precedent/suivant pour changer de journee de diffusion.
 - **Horaire** : un menu pour n'afficher que les programmes d'une plage donnee (00h-06h, 06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement un moment de la journee sans faire defiler toute la liste.
 
-<!-- SCREENSHOT: Guide TV avec le filtre horaire -->
-
 Un clic sur "Carrousel" dans l'entete revient a la vue de depart.
+
+## Captures d'ecran
+
+Ecran de configuration des chaines suivies :
+
+![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
+
+Vue "En ce moment" / "1ere partie de soiree" avec jaquettes TMDB :
+
+![Rendu de la carte avec jaquettes TMDB](https://github.com/user-attachments/assets/ee3804a9-a729-4b10-820b-aa1d210eba1b)
+
+Vue "2eme partie de soiree" :
+
+![Vue 2eme partie de soiree](https://github.com/user-attachments/assets/39e629c2-02e7-43a5-bd89-fc73f2d7f03d)
+
+Guide TV, avec le filtre horaire :
+
+<!-- SCREENSHOT: Guide TV avec le filtre horaire -->
 
 ## Installation
 
