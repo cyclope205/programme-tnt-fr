@@ -167,6 +167,9 @@
       this.appendChild(style);
 
       var card = document.createElement("ha-card");
+      card.style.touchAction = "pan-y";
+      card.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+      card.addEventListener("touchmove", function (e) { e.stopPropagation(); }, { passive: true });
       this.appendChild(card);
 
       var header = document.createElement("div");
