@@ -109,6 +109,38 @@ entities:
 Cliquez sur un programme pour ouvrir le detail (sous-titre, description,
 genre, note CSA...).
 
+## Guide TV (facultatif)
+
+En plus du carrousel, l integration fournit une seconde carte type Guide
+TV (deux chaines visibles a la fois, defilement vertical pour voir les
+programmes suivants de la chaine, horizontal pour changer de chaine,
+recherche et selecteur de jour) :
+
+```yaml
+type: custom:programme-tnt-fr-guide-card
+title: Guide TV
+```
+
+Elle est pensee pour rester masquee par defaut et s ouvrir depuis le lien
+"Guide TV" en haut du carrousel. Ce lien bascule un interrupteur dedie
+(`switch.guide_tv`, cree automatiquement par l integration). Pour que le
+clic affiche vraiment la carte, enveloppez-la dans une carte
+conditionnelle native de Home Assistant :
+
+```yaml
+type: conditional
+conditions:
+  - entity: switch.guide_tv
+    state: "on"
+card:
+  type: custom:programme-tnt-fr-guide-card
+  title: Guide TV
+```
+
+Placez cette carte conditionnelle juste apres le carrousel dans le meme
+tableau de bord : le lien du carrousel l ouvre et la referme a chaque
+clic.
+
 ## Modifier les chaines suivies
 
 **Paramètres > Appareils et services > Programme TNT FR > Configurer**
