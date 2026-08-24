@@ -29,6 +29,8 @@
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; flex-shrink: 0; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.35); }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
+    ".poster-bg--contain { object-fit: contain; position: relative; z-index: 1; background: transparent; }",
+    ".poster-bg-fill { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(20px) brightness(0.55); transform: scale(1.15); z-index: 0; }",
     ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.16; }",
     ".poster-watermark img { width: 52%; height: 52%; object-fit: contain; filter: brightness(0) invert(1); }",
     ".poster-channel-badge { position: absolute; bottom: 10px; left: 10px; width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
@@ -83,6 +85,8 @@
     ".guide-item.is-live { outline: 2px solid #e0263f; outline-offset: -2px; }",
     ".guide-item-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; flex-shrink: 0; }",
     ".guide-item-img { width: 100%; height: 100%; object-fit: cover; display: block; }",
+    ".guide-item-img--contain { object-fit: contain; position: relative; z-index: 1; background: transparent; }",
+    ".guide-item-bg-fill { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(16px) brightness(0.55); transform: scale(1.15); z-index: 0; }",
     ".guide-item-img[hidden] { display: none; }",
     ".guide-item-live-badge { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.62em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 9px 4px 7px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
     ".guide-item-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
@@ -434,6 +438,13 @@
         img.src = artUrl;
         img.loading = "lazy";
         img.alt = "";
+        if (!prog.poster) {
+          img.className = "poster-bg poster-bg--contain";
+          var bgFill = document.createElement("div");
+          bgFill.className = "poster-bg-fill";
+          bgFill.style.backgroundImage = "url(" + JSON.stringify(artUrl) + ")";
+          imageWrap.insertBefore(bgFill, imageWrap.firstChild);
+        }
         img.addEventListener("error", function () {
           img.remove();
           if (channelIcon) {
@@ -810,6 +821,13 @@
         img.src = artUrl;
         img.loading = "lazy";
         img.alt = "";
+        if (!prog.poster) {
+          img.className = "guide-item-img guide-item-img--contain";
+          var guideBgFill = document.createElement("div");
+          guideBgFill.className = "guide-item-bg-fill";
+          guideBgFill.style.backgroundImage = "url(" + JSON.stringify(artUrl) + ")";
+          imageWrap.insertBefore(guideBgFill, imageWrap.firstChild);
+        }
         img.addEventListener("error", function () {
           img.hidden = true;
         });
