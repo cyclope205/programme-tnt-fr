@@ -734,7 +734,7 @@
       var live = isProgLive(prog);
       if (live) item.classList.add("is-live");
 
-      var artUrl = prog.icon || channelIcon || null;
+      var artUrl = prog.poster || prog.icon || channelIcon || null;
       if (artUrl) {
         var img = document.createElement("img");
         img.className = "guide-item-img";
