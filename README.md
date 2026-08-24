@@ -11,7 +11,7 @@
 
 </td>
 <td width="110" align="right">
-<img src="custom_components/programme_tnt_fr/brand/logo.png" width="90" alt="logo">
+<img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" width="90" alt="logo">
 </td>
 </tr>
 </table>
@@ -111,11 +111,22 @@ genre, note CSA...).
 
 ## Guide TV
 
-La carte inclut aussi une vue Guide TV façon Free : deux chaines visibles
-a la fois, defilement vertical pour voir les programmes suivants d une
-meme chaine, horizontal pour changer de chaine, recherche et selecteur de
-jour. Un bouton "Guide TV" dans l en-tete de la carte bascule entre les
-deux vues, sans carte ni configuration supplementaire.
+La carte inclut aussi une vue Guide TV façon Free, accessible via le
+bouton "Guide TV" dans l'en-tete de la carte (aucune carte ni
+configuration supplementaire, ca bascule simplement l'affichage) :
+
+- **Deux chaines visibles a la fois**, avec defilement horizontal pour
+en voir d'autres : au doigt sur mobile/tablette, ou avec les fleches
+precedent/suivant qui apparaissent sur les cotes a la souris (PC).
+- **Defilement vertical par chaine** pour parcourir tous les programmes
+de la chaine au fil de la journee.
+- **Recherche par chaine** : le champ en haut filtre les colonnes par
+nom de chaine au fur et a mesure de la saisie.
+- **Selecteur de jour** : les fleches et le libelle du jour (ex. "Lundi
+24/08") permettent de consulter le programme de n'importe quel autre
+jour couvert par le flux XMLTV, pas seulement aujourd'hui.
+- Cliquer sur un programme ouvre le meme detail (sous-titre, description,
+genre...) que dans la vue carrousel.
 
 ## Modifier les chaines suivies
 
