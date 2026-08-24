@@ -1,5 +1,21 @@
 # Programme TNT FR
 
+<table>
+<tr>
+<td>
+
+[![release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr?label=release&color=blue)](https://github.com/cyclope205/programme-tnt-fr/releases)
+[![build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
+[![license](https://img.shields.io/github/license/cyclope205/programme-tnt-fr?color=green)](LICENSE)
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+
+</td>
+<td width="110" align="right">
+<img src="custom_components/programme_tnt_fr/brand/logo.png" width="90" alt="logo">
+</td>
+</tr>
+</table>
+
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
 
