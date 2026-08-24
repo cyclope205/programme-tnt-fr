@@ -349,7 +349,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         day_end = day_start + timedelta(days=1)
 
         return [
-            p.as_dict()
+            self._programme_dict(p)
             for p in self._programmes_by_channel[channel_id]
             if p.start < day_end and p.stop > day_start
         ]
