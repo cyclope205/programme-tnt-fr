@@ -299,7 +299,27 @@
         return;
       }
 
+      var dataSig = this._computeDataSig();
+      if (this._dataSig !== dataSig) {
+        this._dataSig = dataSig;
+        if (this._guideBuilt) {
+          this._guideCache = {};
+          if (this._guideOpen) {
+            this._goToDate(this._guideDate);
+          }
+        }
+      }
+
       this._renderBody();
+    }
+
+    _computeDataSig() {
+      var hass = this._hass;
+      var ids = this._resolveEntities();
+      return ids.map(function (id) {
+        var st = hass.states[id];
+        return id + ":" + (st ? st.last_changed + ":" + JSON.stringify(st.attributes) : "");
+      }).join("|");
     }
 
     _renderBody() {
