@@ -14,7 +14,7 @@
     ".slot-section:last-child { margin-bottom: 0; }",
     ".slot-title-header { font-size: 1.1em; font-weight: 700; margin-bottom: 8px; color: var(--primary-text-color); }",
     ".carousel-wrap { position: relative; }",
-    ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
+    ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
     ".poster-card { position: relative; flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: transparent; font-family: inherit; text-align: left; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }",
@@ -216,6 +216,8 @@
       var wrap = document.createElement("div");
       wrap.className = "carousel-wrap";
       wrap.appendChild(carousel);
+      carousel.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
+      carousel.addEventListener("touchmove", function (e) { e.stopPropagation(); }, { passive: true });
 
       var prevBtn = document.createElement("button");
       prevBtn.type = "button";
