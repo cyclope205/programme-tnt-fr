@@ -77,7 +77,7 @@
     ".guide-col-lcn { font-size: 0.65em; opacity: 0.6; font-weight: 600; }",
     ".guide-col-name { font-size: 0.9em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
     ".guide-col-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 60vh; padding: 2px 2px 8px; }",
-    ".guide-item { display: flex; flex-direction: column; text-align: left; border: none; padding: 0; margin: 0; cursor: pointer; font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, #232323); }",
+    ".guide-item { display: flex; flex-direction: column; flex-shrink: 0; text-align: left; border: none; padding: 0; margin: 0; cursor: pointer; font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, #232323); }",
     ".guide-item.is-live { outline: 2px solid #e0263f; outline-offset: -2px; }",
     ".guide-item-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); }",
     ".guide-item-img[hidden] { display: none; }",
@@ -318,6 +318,16 @@
     _renderCarousel() {
       var hass = this._hass;
       var els = this._els;
+
+      var carIds = this._resolveEntities();
+      var carSig = carIds.map(function (id) {
+        var st = hass.states[id];
+        return id + ":" + (st ? st.last_changed + ":" + JSON.stringify(st.attributes) : "");
+      }).join("|");
+      if (this._carouselSig === carSig && els.body.children.length) {
+        return;
+      }
+      this._carouselSig = carSig;
 
       var previousScroll = Array.prototype.map.call(
         els.body.querySelectorAll(".carousel"),
