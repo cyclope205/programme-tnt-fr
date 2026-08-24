@@ -27,6 +27,32 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+_FR_NUMBER_WORDS = {
+    "zero": "0",
+    "un": "1",
+    "une": "1",
+    "deux": "2",
+    "trois": "3",
+    "quatre": "4",
+    "cinq": "5",
+    "six": "6",
+    "sept": "7",
+    "huit": "8",
+    "neuf": "9",
+    "dix": "10",
+    "onze": "11",
+    "douze": "12",
+    "treize": "13",
+    "quatorze": "14",
+    "quinze": "15",
+    "seize": "16",
+    "vingt": "20",
+    "trente": "30",
+    "quarante": "40",
+    "cinquante": "50",
+    "soixante": "60",
+}
+
 
 def _parse_xmltv_datetime(value: str | None):
     """Parse a XMLTV datetime such as '20260821000500 +0200'."""
@@ -260,7 +286,15 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         """
         normalized = unicodedata.normalize("NFD", value or "")
         normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
-        return normalized.lower().strip()
+        normalized = normalized.lower().strip()
+        normalized = (
+            normalized.replace("dix-sept", "17")
+            .replace("dix-huit", "18")
+            .replace("dix-neuf", "19")
+            .replace("-", " ")
+        )
+        words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split(" ")]
+        return " ".join(words)
 
     async def _fetch_and_parse(self) -> None:
         resp = await self._session.get(XMLTV_URL, timeout=30)
