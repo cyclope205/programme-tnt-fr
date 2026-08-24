@@ -123,11 +123,12 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
         if self._tmdb_api_key:
             title_categories: dict[str, str | None] = {}
-            for slots in picks.values():
-                for programme in slots:
+            for channel_id in self._channels:
+                for programme in self._programmes_by_channel.get(channel_id, []):
                     if (
                         programme is not None
                         and programme.title
+                        and programme.stop > now
                         and programme.title not in self._tmdb_poster_cache
                         and programme.title not in title_categories
                     ):
