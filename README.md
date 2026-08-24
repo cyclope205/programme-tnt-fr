@@ -51,8 +51,7 @@ Vue "2eme partie de soiree" :
 
 Guide TV, avec le filtre horaire :
 
-<!-- SCREENSHOT: Guide TV avec le filtre horaire -->
-<img width="460" height="736" alt="Capture d&#39;écran 2026-08-24 215214" src="https://github.com/user-attachments/assets/98a1f583-0055-4581-b30b-198ba1e46160" />
+<!-- SCREENSHOT: Guide TV avec le filtre horaire (a remplacer ici) -->
 
 ## Installation
 
