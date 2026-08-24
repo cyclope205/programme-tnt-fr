@@ -1,6 +1,6 @@
-/* Carte Lovelace "Programme TNT FR" - carrousel + Guide TV integres.
- * Servie automatiquement par l'integration Home Assistant du meme nom :
- * aucune configuration de ressource Lovelace manuelle n'est necessaire.
+/* Carte Lovelace "Programme TNT FR" - carrousel + Guide TV intégrés.
+ * Servie automatiquement par l'intégration Home Assistant du même nom :
+ * aucune configuration de ressource Lovelace manuelle n'est nécessaire.
  * Utilisation minimale dans un tableau de bord :
  * type: custom:programme-tnt-fr-card
  */
@@ -93,9 +93,9 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment a la tele", "live"],
-    ["prime_time", "Programmes tele en 1ere partie de soiree", "prime"],
-    ["second_part", "Programmes tele en 2eme partie de soiree", "second"]
+    ["current", "En ce moment à la télé", "live"],
+    ["prime_time", "Programmes télé en 1ère partie de soirée", "prime"],
+    ["second_part", "Programmes télé en 2ème partie de soirée", "second"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
@@ -295,7 +295,7 @@
     _render() {
       this._ensureDom();
       var els = this._els;
-      els.headerTitle.textContent = this._config.title || "Programme TV : que regarder ce soir ?";
+      els.headerTitle.textContent = this._config.title || "Qu'est-ce qu'on regarde à la TV ?";
 
       if (!this._hass) {
         els.body.innerHTML = "";
@@ -511,7 +511,7 @@
       var prevBtn = document.createElement("button");
       prevBtn.type = "button";
       prevBtn.className = "carousel-nav prev";
-      prevBtn.setAttribute("aria-label", "Precedent");
+      prevBtn.setAttribute("aria-label", "Précédent");
       prevBtn.innerHTML = CHEVRON_LEFT;
 
       var nextBtn = document.createElement("button");
@@ -554,7 +554,7 @@
       var search = document.createElement("input");
       search.type = "text";
       search.className = "guide-search";
-      search.placeholder = "Rechercher une chaine";
+      search.placeholder = "Rechercher une chaîne";
       root.appendChild(search);
 
       var daybar = document.createElement("div");
@@ -564,7 +564,7 @@
       prevBtn.type = "button";
       prevBtn.className = "guide-day-btn";
       prevBtn.innerHTML = CHEVRON_LEFT;
-      prevBtn.setAttribute("aria-label", "Jour precedent");
+      prevBtn.setAttribute("aria-label", "Jour précédent");
 
       var dayLabel = document.createElement("button");
       dayLabel.type = "button";
@@ -850,7 +850,7 @@
     }
 
     static getStubConfig() {
-      return { title: "Programme TV : que regarder ce soir ?" };
+      return { title: "Qu'est-ce qu'on regarde à la TV ?" };
     }
   }
 
@@ -860,6 +860,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaines francaises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soiree), avec un bouton Guide TV dans l entete qui bascule vers une vue guide (2 chaines visibles, defilement par chaine, recherche, selecteur de jour)."
+    description: "Programme TV des chaînes françaises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirée), avec un bouton Guide TV dans l'en-tête qui bascule vers une vue guide (2 chaînes visibles, défilement par chaîne, recherche, sélecteur de jour)."
   });
 })();
