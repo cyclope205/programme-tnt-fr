@@ -24,7 +24,7 @@
     ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 0 0 230px; width: 230px; aspect-ratio: 2 / 3; border-radius: 18px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); box-shadow: 0 10px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); transition: transform 0.15s ease, box-shadow 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
+    ".poster-card { position: relative; flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); aspect-ratio: 2 / 3; border-radius: 18px; overflow: hidden; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); box-shadow: 0 10px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); transition: transform 0.15s ease, box-shadow 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
     ".poster-card:active { transform: scale(0.97); }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
@@ -355,6 +355,7 @@
 
         var carousel = document.createElement("div");
         carousel.className = "carousel";
+        carousel.id = "slider";
         entities.forEach(function (entityId) {
           var attrs = hass.states[entityId].attributes || {};
           var channelLabel = attrs.channel_name || entityId;
@@ -396,7 +397,7 @@
         return btn;
       }
 
-      var artUrl = prog.icon || null;
+      var artUrl = prog.poster || prog.icon || null;
       if (artUrl) {
         var img = document.createElement("img");
         img.className = "poster-bg";
@@ -565,7 +566,8 @@
 
       var columns = document.createElement("div");
       columns.className = "guide-columns";
-      root.appendChild(columns);
+      columns.id = "slider";
+      root.appendChild(self._buildCarouselWrap(columns));
 
       var colRefs = {};
       entities.forEach(function (entityId) {
