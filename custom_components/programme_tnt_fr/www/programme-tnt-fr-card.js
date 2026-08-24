@@ -79,7 +79,7 @@
     ".guide-col-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 60vh; padding: 2px 2px 8px; }",
     ".guide-item { display: flex; flex-direction: column; flex-shrink: 0; text-align: left; border: none; padding: 0; margin: 0; cursor: pointer; font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, #232323); }",
     ".guide-item.is-live { outline: 2px solid #e0263f; outline-offset: -2px; }",
-    ".guide-item-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); }",
+    ".guide-item-img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; display: block; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); }",
     ".guide-item-img[hidden] { display: none; }",
     ".guide-item-body { padding: 8px 10px 10px; }",
     ".guide-item-time { font-size: 0.72em; opacity: 0.65; font-weight: 700; display: flex; align-items: center; gap: 6px; }",
