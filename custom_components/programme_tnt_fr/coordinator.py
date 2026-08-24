@@ -27,6 +27,16 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+
+class _TmdbTransientError(Exception):
+    """Raised for TMDB failures that should be retried, not cached as no-poster.
+
+    Covers auth failures (revoked/invalid API key), rate limiting, and
+    server errors - none of these mean "this title has no TMDB match", so
+    they must not be cached as such in _tmdb_poster_cache.
+    """
+
+
 _FR_NUMBER_WORDS = {
     "zero": "0",
     "un": "1",
@@ -123,6 +133,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
         # (toutes les 5 min) pour un programme deja resolu.
         self._tmdb_poster_cache: dict[str, str | None] = {}
+        # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
+        # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
+        self._tmdb_auth_warned = False
 
     async def _async_update_data(self) -> dict:
         now = dt_util.now()
@@ -206,10 +219,14 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         async def _resolve_one(title: str, category: str | None) -> None:
             async with semaphore:
                 try:
-                    self._tmdb_poster_cache[title] = await self._lookup_tmdb_poster(title, category)
+                    poster = await self._lookup_tmdb_poster(title, category)
                 except Exception as err:  # noqa: BLE001
-                    _LOGGER.debug("Echec de la recherche TMDB pour %s: %s", title, err)
-                    self._tmdb_poster_cache[title] = None
+                    # Erreur temporaire (reseau, cle invalide, rate limit...) :
+                    # on ne met PAS en cache pour que ce titre soit retente au
+                    # prochain cycle, plutot que fige a tort sur "aucune affiche".
+                    _LOGGER.debug("Recherche TMDB reportee pour %s (erreur temporaire): %s", title, err)
+                    return
+                self._tmdb_poster_cache[title] = poster
 
         await asyncio.gather(
             *(_resolve_one(title, category) for title, category in title_categories.items())
@@ -258,6 +275,21 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "include_adult": "false",
         }
         resp = await self._session.get(url, params=params, timeout=10)
+        if resp.status in (401, 403):
+            if not self._tmdb_auth_warned:
+                self._tmdb_auth_warned = True
+                _LOGGER.warning(
+                    "TMDB a rejete la requete (cle API invalide ou revoquee, code %s) : "
+                    "les affiches TMDB resteront indisponibles tant que ce n'est pas "
+                    "corrige. Vous pouvez renseigner votre propre cle TMDB dans les "
+                    "options de l'integration.",
+                    resp.status,
+                )
+            raise _TmdbTransientError(f"TMDB auth error {resp.status}")
+        if resp.status == 429:
+            raise _TmdbTransientError("TMDB rate limited (429)")
+        if resp.status >= 500:
+            raise _TmdbTransientError(f"TMDB server error {resp.status}")
         if resp.status != 200:
             return None
         data = await resp.json()
@@ -268,11 +300,20 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         for result in results:
             candidate = result.get("title") or result.get("name") or ""
             candidate_norm = self._normalize_title(candidate)
-            if not candidate_norm:
-                continue
-            if query_norm.startswith(candidate_norm) or candidate_norm.startswith(query_norm):
+            if candidate_norm and self._titles_match(query_norm, candidate_norm):
                 return result.get("poster_path")
         return None
+
+    @staticmethod
+    def _titles_match(query_norm: str, candidate_norm: str) -> bool:
+        """Return True if a normalized TMDB candidate matches a normalized query.
+
+        A prefix match in either direction: handles XMLTV titles with episode
+        suffixes (ex: "Koh-Lanta - S29E01" matching TMDB's "Koh-Lanta") while
+        rejecting loose full-text matches where neither is a prefix of the
+        other (ex: "Meteo" vs "Miss Meteo").
+        """
+        return query_norm.startswith(candidate_norm) or candidate_norm.startswith(query_norm)
 
     @staticmethod
     def _normalize_title(value: str) -> str:
