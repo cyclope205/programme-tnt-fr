@@ -7,10 +7,11 @@ from pathlib import Path
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 
 from .const import CONF_CHANNELS, DEFAULT_CHANNELS, DOMAIN
 from .coordinator import ProgrammeTntFrCoordinator
+from .ws_api import async_register_websocket_api
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +19,9 @@ PLATFORMS = ["sensor"]
 
 CARD_FILENAME = "programme-tnt-fr-card.js"
 CARD_URL_PATH = f"/programme_tnt_fr/{CARD_FILENAME}"
-CARD_VERSION = "2.0.0"
+CARD_VERSION = "2.1.0"
 _CARD_REGISTERED_KEY = f"{DOMAIN}_card_registered"
+_WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -33,6 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     await _async_register_card(hass)
+    _async_register_ws_api(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -62,6 +65,14 @@ async def _async_register_card(hass: HomeAssistant) -> None:
     )
     add_extra_js_url(hass, f"{CARD_URL_PATH}?v={CARD_VERSION}")
     hass.data[_CARD_REGISTERED_KEY] = True
+
+@callback
+def _async_register_ws_api(hass: HomeAssistant) -> None:
+    """Register the Guide TV card websocket API (once)."""
+    if hass.data.get(_WS_API_REGISTERED_KEY):
+        return
+    async_register_websocket_api(hass)
+    hass.data[_WS_API_REGISTERED_KEY] = True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
