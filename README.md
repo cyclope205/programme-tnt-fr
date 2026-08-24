@@ -1,159 +1,66 @@
 # Programme TNT FR
 
-<table>
-<tr>
-<td>
-
 [![release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr?label=release&color=blue)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
-[![license](https://img.shields.io/github/license/cyclope205/programme-tnt-fr?color=green)](LICENSE)
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![license](https://img.shields.io/github/license/cyclope205/programme-tnt-fr)](LICENSE)
+[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-</td>
-<td width="110" align="right">
-<img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" width="90" alt="logo">
-</td>
-</tr>
-</table>
+<img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" alt="Programme TNT FR" width="120">
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
+Integration Home Assistant qui recupere le programme TV des chaines francaises (TNT + une selection de chaines supplementaires) et l'affiche dans une carte Lovelace : carrousel "que regarder ce soir" et guide TV complet par chaine.
 
-Intégration Home Assistant + carte Lovelace pour suivre le programme TV des
-chaines de la TNT française : ce qui passe en ce moment, la première partie
-de soirée et la deuxième partie de soirée, chaine par chaine, avec le détail
-complet (description, genre, casting...) accessible en un clic.
+## Sommaire
 
-**Depuis la v2.0.0**, en plus des 30 chaines de la TNT, l'integration propose
-en option une soixantaine de chaines supplementaires (Canal+/Cine+, sport,
-jeunesse, documentaire, musique, divertissement...), selectionnables au
-meme endroit que les chaines TNT lors de la configuration.
+- [Fonctionnalites](#fonctionnalites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Utilisation dans un tableau de bord](#utilisation-dans-un-tableau-de-bord)
+- [A savoir](#a-savoir)
 
-Aucune ressource Lovelace a ajouter a la main : la carte est servie et
-enregistrée automatiquement par l'intégration.
+## Fonctionnalites
 
-## Captures d'écran
+### Carrousel
 
-Ecran de configuration des chaines suivies :
+Pour chaque chaine suivie, la carte affiche jusqu'a 3 programmes : celui en cours, la premiere partie de soiree et la deuxieme partie de soiree. Chaque vignette montre l'affiche du programme (recuperee sur TMDB quand une correspondance fiable est trouvee, sinon l'icone fournie par le flux TV), le titre, la categorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le detail du programme.
 
-![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
+### Guide TV
 
-Vue "En ce moment" / "1ere partie de soiree" avec jaquettes TMDB :
+Le bouton "Guide TV" dans l'entete de la carte bascule vers un guide complet, inspire de l'application Free : deux colonnes de chaines visibles a la fois, defilement horizontal pour changer de chaine (fleches sur ordinateur, glissement au doigt sur mobile/tablette) et defilement vertical pour parcourir la grille chronologique d'une chaine.
 
-![Rendu de la carte avec jaquettes TMDB](https://github.com/user-attachments/assets/ee3804a9-a729-4b10-820b-aa1d210eba1b)
+Le guide propose trois filtres, combinables :
+- **Recherche** : un champ texte pour ne garder que les chaines dont le nom correspond.
+- **Jour** : fleches precedent/suivant pour changer de journee de diffusion.
+- **Horaire** : un menu pour n'afficher que les programmes d'une plage donnee (00h-06h, 06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement un moment de la journee sans faire defiler toute la liste.
 
-Vue "2eme partie de soirée" :
+<!-- SCREENSHOT: Guide TV avec le filtre horaire -->
 
-![Vue "2eme partie de soiree"](https://github.com/user-attachments/assets/39e629c2-02e7-43a5-bd89-fc73f2d7f03d)
-
-## Fonctionnement
-
-L'intégration récupère le flux XMLTV public de
-[xmltvfr.fr](https://xmltvfr.fr) (projet
-[racacax/XML-TV-Fr](https://github.com/racacax/XML-TV-Fr)), qui publie le
-programme complet des chaines de la TNT française. Pour chaque chaine
-sélectionnée, elle calcule :
-
-- **En ce moment** : le programme en cours de diffusion.
-- **1re partie de soirée** : le programme diffuse a partir d'environ 21h15.
-- **2e partie de soirée** : le programme diffuse a partir d'environ 22h40.
-
-Le flux complet n'est retélécharge qu'une fois par heure maximum ; le calcul
-"en ce moment" est lui rafraichi toutes les 5 minutes a partir des données
-déjà en cache.
-
-Une affiche/jaquette TMDB est recherchée automatiquement pour chaque programme
-(films et séries). Si aucune correspondance n'est trouvée sur TMDB, c'est
-l'image du flux XMLTV (visuel de la chaine) qui est affichée a la place.
+Un clic sur "Carrousel" dans l'entete revient a la vue de depart.
 
 ## Installation
 
-### Via HACS (recommande)
+1. Dans HACS, ajouter ce depot comme depot personnalise (categorie *Integration*) : `https://github.com/cyclope205/programme-tnt-fr`.
+2. Installer **Programme TNT FR** depuis HACS.
+3. Redemarrer Home Assistant.
+4. Ajouter l'integration via **Parametres > Appareils et services > Ajouter une integration > Programme TNT FR**.
 
-1. Dans HACS, ouvrez le menu **...** puis **Dépôts personnalises**.
-2. Ajoutez `https://github.com/cyclope205/programme-tnt-fr` avec le type
-**Intégration**.
-3. Installez **Programme TNT FR**, puis redémarrez Home Assistant.
-4. Allez dans **Paramètres > Appareils et services > Ajouter une
-intégration**, cherchez **Programme TNT FR** et choisissez les chaines a
-suivre.
+La carte Lovelace est enregistree automatiquement par l'integration : aucune ressource a declarer a la main.
 
-### Installation manuelle
+## Configuration
 
-Copiez le dossier `custom_components/programme_tnt_fr` dans le dossier
-`custom_components` de votre configuration Home Assistant, puis
-redémarrez.
+A l'ajout de l'integration, une liste de chaines est proposee (les chaines de la TNT francaise sont selectionnees par defaut, une selection plus large de chaines est egalement disponible). La selection peut etre modifiee a tout moment depuis les options de l'integration, sans avoir a la reinstaller.
 
-## Utiliser la carte
+## Utilisation dans un tableau de bord
 
-Ajoutez une carte de type `custom:programme-tnt-fr-card` a un tableau de
-bord, par exemple en mode YAML :
+Ajouter une carte manuelle avec :
 
 ```yaml
 type: custom:programme-tnt-fr-card
-title: Programme TNT
 ```
 
-Sans configuration supplementaire, la carte affiche automatiquement toutes
-les chaines configurees dans l'integration. Vous pouvez aussi restreindre
-l'affichage a une liste precise :
+Aucune autre option n'est necessaire : la carte trouve elle-meme les chaines configurees.
 
-```yaml
-type: custom:programme-tnt-fr-card
-title: Programme TNT
-entities:
-- sensor.tf1
-- sensor.france_2
-```
+## A savoir
 
-Cliquez sur un programme pour ouvrir le detail (sous-titre, description,
-genre, note CSA...).
-
-## Guide TV
-
-La carte inclut aussi une vue Guide TV façon Free, accessible via le
-bouton "Guide TV" dans l'en-tete de la carte (aucune carte ni
-configuration supplementaire, ca bascule simplement l'affichage) :
-
-- **Deux chaines visibles a la fois**, avec defilement horizontal pour
-en voir d'autres : au doigt sur mobile/tablette, ou avec les fleches
-precedent/suivant qui apparaissent sur les cotes a la souris (PC).
-- **Defilement vertical par chaine** pour parcourir tous les programmes
-de la chaine au fil de la journee.
-- **Recherche par chaine** : le champ en haut filtre les colonnes par
-nom de chaine au fur et a mesure de la saisie.
-- **Selecteur de jour** : les fleches et le libelle du jour (ex. "Lundi
-24/08") permettent de consulter le programme de n'importe quel autre
-jour couvert par le flux XMLTV, pas seulement aujourd'hui.
-- **Filtre par horaire** : le menu a cote du selecteur de jour permet de
-n'afficher que les programmes d'une plage horaire donnee (00h-06h,
-06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement
-un moment de la journee sans scroller toute la liste.
-- Cliquer sur un programme ouvre le meme detail (sous-titre, description,
-genre...) que dans la vue carrousel.
-
-## Modifier les chaines suivies
-
-**Paramètres > Appareils et services > Programme TNT FR > Configurer**
-permet de changer la liste des chaines a tout moment, sans réinstaller
-l'integration.
-
-## Credits
-
-- Donnees TV : [xmltvfr.fr](https://xmltvfr.fr) / [XML TV Fr](https://github.com/racacax/XML-TV-Fr).
-- Jaquettes/posters : This product uses the TMDB API but is not endorsed or certified by TMDB.
-- Cette integration n'est ni affiliee ni soutenue par les chaines de
-television citees.
-
-## Licence
-
-Voir [LICENSE](LICENSE).
-
-## ☕ Vous aimez cette integration ?
-
-EN - If it saves you time, consider buying me a coffee. It keeps this project maintained and new features coming.
-
-FR - Si cette intégration te fait gagner du temps, un petit don est toujours apprécie : ca m'aide a maintenir le projet et à ajouter de nouvelles fonctionnalités.
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
+- Le flux de programmes est actualise au maximum une fois par heure.
+- La recherche d'affiches sur TMDB se fait en arriere-plan apres chaque actualisation : juste apres un redemarrage de Home Assistant, certaines vignettes peuvent afficher l'icone du flux TV le temps que TMDB reponde, puis se mettre a jour d'elles-memes.
+- Les problemes et demandes d'evolution se signalent via l'onglet **Issues** du depot.
