@@ -24,6 +24,11 @@ chaines de la TNT française : ce qui passe en ce moment, la première partie
 de soirée et la deuxième partie de soirée, chaine par chaine, avec le détail
 complet (description, genre, casting...) accessible en un clic.
 
+**Depuis la v2.0.0**, en plus des 30 chaines de la TNT, l'integration propose
+en option une soixantaine de chaines supplementaires (Canal+/Cine+, sport,
+jeunesse, documentaire, musique, divertissement...), selectionnables au
+meme endroit que les chaines TNT lors de la configuration.
+
 Aucune ressource Lovelace a ajouter a la main : la carte est servie et
 enregistrée automatiquement par l'intégration.
 
