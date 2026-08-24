@@ -8,6 +8,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    ALL_CHANNELS,
     CONF_CHANNELS,
     DEFAULT_CHANNELS,
     DOMAIN,
@@ -18,7 +19,7 @@ from .const import (
 def _schema(channels_default: list[str]) -> vol.Schema:
     options = [
         selector.SelectOptionDict(value=channel_id, label=name)
-        for channel_id, name in TNT_CHANNELS.items()
+        for channel_id, name in ALL_CHANNELS.items()
     ]
     return vol.Schema(
         {
