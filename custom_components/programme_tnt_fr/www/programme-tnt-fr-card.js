@@ -219,6 +219,7 @@
       var wrap = document.createElement("div");
       wrap.className = "carousel-wrap";
       wrap.appendChild(carousel);
+      carousel.id = "slider";
       carousel.addEventListener("touchstart", function (e) { e.stopPropagation(); }, { passive: true });
       carousel.addEventListener("touchmove", function (e) { e.stopPropagation(); }, { passive: true });
 
