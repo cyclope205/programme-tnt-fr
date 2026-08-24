@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import unicodedata
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
@@ -237,7 +238,29 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         results = data.get("results") or []
         if not results:
             return None
-        return results[0].get("poster_path")
+        query_norm = self._normalize_title(title)
+        for result in results:
+            candidate = result.get("title") or result.get("name") or ""
+            candidate_norm = self._normalize_title(candidate)
+            if not candidate_norm:
+                continue
+            if query_norm.startswith(candidate_norm) or candidate_norm.startswith(query_norm):
+                return result.get("poster_path")
+        return None
+
+    @staticmethod
+    def _normalize_title(value: str) -> str:
+        """Normalise un titre pour comparaison (minuscules, sans accents).
+
+        Utilise pour verifier qu'un resultat TMDB correspond vraiment au
+        titre recherche avant d'accepter son affiche, plutot que de
+        prendre le premier resultat les yeux fermes : une recherche
+        plein texte comme "Meteo" matchait a tort la serie "Miss Meteo"
+        alors que le bulletin meteo generique n'a pas de fiche TMDB.
+        """
+        normalized = unicodedata.normalize("NFD", value or "")
+        normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+        return normalized.lower().strip()
 
     async def _fetch_and_parse(self) -> None:
         resp = await self._session.get(XMLTV_URL, timeout=30)
