@@ -125,6 +125,10 @@ nom de chaine au fur et a mesure de la saisie.
 - **Selecteur de jour** : les fleches et le libelle du jour (ex. "Lundi
 24/08") permettent de consulter le programme de n'importe quel autre
 jour couvert par le flux XMLTV, pas seulement aujourd'hui.
+- **Filtre par horaire** : le menu a cote du selecteur de jour permet de
+n'afficher que les programmes d'une plage horaire donnee (00h-06h,
+06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement
+un moment de la journee sans scroller toute la liste.
 - Cliquer sur un programme ouvre le meme detail (sous-titre, description,
 genre...) que dans la vue carrousel.
 
