@@ -5,7 +5,7 @@ DOMAIN = "programme_tnt_fr"
 
 # XML TV Fr - flux dedie aux chaines de la TNT francaise.
 # Source et credits : https://github.com/racacax/XML-TV-Fr
-XMLTV_URL = "https://xmltvfr.fr/xmltv/xmltv_tnt.xml"
+XMLTV_URL = "https://xmltvfr.fr/xmltv/xmltv_fr.xml"
 
 CONF_CHANNELS = "channels"
 
@@ -80,3 +80,78 @@ TNT_CHANNELS = {
 
 # Par defaut, l'integration suit TOUTES les chaines de la liste ci-dessus.
 DEFAULT_CHANNELS = list(TNT_CHANNELS.keys())
+
+# Chaines supplementaires (hors TNT) proposees en option, issues du guide
+# complet xmltvfr.fr (https://xmltvfr.fr/channels.php?guide=france). Tri
+# manuel : chaines francaises nationales grand public uniquement (pas de
+# regional/local, pas de flux multiplex numerotes, pas de Belgique/Suisse,
+# pas de contenu adulte).
+EXTRA_CHANNELS = {
+    "CanalPlusSeries.fr": "Canal+ Series",
+    "CanalPlusDocs.fr": "Canal+ Docs",
+    "CanalPlusKIDS.fr": "Canal+ Kids",
+    "CanalPlusGrandEcran.fr": "Canal+ Grand Ecran",
+    "CanalPlusBoxOffice.fr": "Canal+ Box Office",
+    "CanalPlusFoot.fr": "Canal+ Foot",
+    "CanalPlusSport360.fr": "Canal+ Sport 360",
+    "CanalPlusLigue1.fr": "Canal+ Ligue 1",
+    "CanalPlusPremierLeague.fr": "Canal+ Premier League",
+    "CinePlusPremier.fr": "OCS",
+    "CinePlusClassic.fr": "Cine+ Classic",
+    "CinePlusClub.fr": "Cine+ Festival",
+    "CinePlusEmotion.fr": "Cine+ Emotion",
+    "CinePlusFamiz.fr": "Cine+ Family",
+    "CinePlusFrisson.fr": "Cine+ Frisson",
+    "Eurosport1.fr": "Eurosport 1",
+    "Eurosport2.fr": "Eurosport 2",
+    "beINSPORTS1.fr": "beIN Sports 1",
+    "beINSPORTS2.fr": "beIN Sports 2",
+    "beINSPORTS3.fr": "beIN Sports 3",
+    "RMCSport1.fr": "RMC Sport 1",
+    "RMCSport2.fr": "RMC Sport 2",
+    "RMCSport3.fr": "RMC Sport 3",
+    "DAZN.fr": "DAZN 1",
+    "InfosportPlus.fr": "Infosport+",
+    "GolfPlus.fr": "Golf+",
+    "ChasseEtPeche.fr": "Chasse et Peche",
+    "Equidia.fr": "Equidia",
+    "ChevalTV.fr": "Cheval TV",
+    "DiscoveryChannel.fr": "Discovery Channel",
+    "DiscoveryInvestigation.fr": "Discovery Investigation",
+    "DiscoveryScience.fr": "TLC",
+    "NatGeoWild.fr": "NatGeoWild",
+    "NationalGeographic.fr": "National Geographic",
+    "Histoire.fr": "Histoire",
+    "TouteHistoire.fr": "Toute l'Histoire",
+    "UshuaiaTV.fr": "Ushuaia TV",
+    "Animaux.fr": "Animaux",
+    "Seasons.fr": "Seasons",
+    "DisneyChannel.fr": "Disney Channel",
+    "DisneyJunior.fr": "Disney Junior",
+    "DisneyXD.fr": "Disney XD",
+    "Nickelodeon.fr": "Nickelodeon",
+    "NickelodeonJunior.fr": "Nickelodeon Junior",
+    "Nickelodeon4Teen.fr": "Nickelodeon Teen",
+    "CartoonNetwork.fr": "Cartoon Network",
+    "Boomerang.fr": "Boomerang",
+    "CanalJ.fr": "Canal J",
+    "PIWI.fr": "Piwi+",
+    "TIJI.fr": "TiJi",
+    "Mangas.fr": "Mangas",
+    "TeleToonPlus.fr": "TeleToon+",
+    "MTV.fr": "MTV",
+    "MCM.fr": "MCM",
+    "M6Music.fr": "M6 Music",
+    "NRJHits.fr": "NRJ Hits",
+    "Mezzo.fr": "Mezzo",
+    "ComediePlus.fr": "Comedie+",
+    "ComedyCentral.fr": "Comedy Central",
+    "CrimeDistrict.fr": "Crime District",
+    "WarnerTV.fr": "WarnerTV",
+    "Syfy.fr": "Syfy",
+    "Euronews.fr": "Euronews",
+    "France24.fr": "France 24",
+}
+
+# Union des deux listes pour le formulaire de selection des chaines.
+ALL_CHANNELS = {**TNT_CHANNELS, **EXTRA_CHANNELS}
