@@ -218,6 +218,22 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         resp = await self._session.get(XMLTV_URL, timeout=30)
         resp.raise_for_status()
         text = await resp.text()
+
+        # Le flux complet (xmltv_fr.xml) pese plusieurs dizaines de Mo : on
+        # deporte le parsing XML (CPU-bound) dans un thread pour ne pas
+        # bloquer la boucle evenementielle de Home Assistant.
+        channels_meta, programmes = await self.hass.async_add_executor_job(
+            self._parse_xmltv, text, set(self._channels)
+        )
+
+        self._programmes_by_channel = programmes
+        self._channels_meta = channels_meta
+
+    @staticmethod
+    def _parse_xmltv(
+        text: str, wanted: set[str]
+    ) -> tuple[dict[str, dict], dict[str, list[Programme]]]:
+        """Parse le flux XMLTV (CPU-bound, execute dans un executor thread)."""
         root = ET.fromstring(text)
 
         channels_meta: dict[str, dict] = {}
@@ -232,7 +248,6 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 "icon": icon_el.get("src") if icon_el is not None else None,
             }
 
-        wanted = set(self._channels)
         programmes: dict[str, list[Programme]] = {}
         for prog in root.findall("programme"):
             channel_id = prog.get("channel")
@@ -263,8 +278,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         for progs in programmes.values():
             progs.sort(key=lambda p: p.start)
 
-        self._programmes_by_channel = programmes
-        self._channels_meta = channels_meta
+        return channels_meta, programmes
 
     def _pick_slots(
         self, channel_id: str, now
