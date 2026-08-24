@@ -90,9 +90,9 @@
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment", "live"],
-    ["prime_time", "1re partie de soiree", "prime"],
-    ["second_part", "2e partie de soiree", "second"]
+    ["current", "En ce moment a la tele", "live"],
+    ["prime_time", "Programmes tele en 1ere partie de soiree", "prime"],
+    ["second_part", "Programmes tele en 2eme partie de soiree", "second"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
@@ -445,11 +445,6 @@
       var content = document.createElement("div");
       content.className = "poster-content";
 
-      var chanEl = document.createElement("div");
-      chanEl.className = "poster-channel-name";
-      chanEl.textContent = channelLabel;
-      content.appendChild(chanEl);
-
       var titleEl = document.createElement("div");
       titleEl.className = "poster-title";
       titleEl.textContent = prog.title || "";
@@ -457,7 +452,11 @@
 
       var timeEl = document.createElement("div");
       timeEl.className = "poster-time";
-      timeEl.textContent = (startFmt || "?") + " - " + (stopFmt || "?");
+      var metaParts = [];
+      if (prog.category) metaParts.push(prog.category);
+      metaParts.push(channelLabel);
+      metaParts.push((startFmt || "?") + " - " + (stopFmt || "?"));
+      timeEl.textContent = metaParts.join(" \u2022 ");
       content.appendChild(timeEl);
       btn.appendChild(content);
 
