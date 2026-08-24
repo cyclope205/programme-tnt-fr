@@ -82,12 +82,12 @@
   };
 
   function channelName(hass, entityId) {
-    var attrs = hass.states[entityId].attributes || {};
+    var attrs = (hass.states[entityId] || {}).attributes || {};
     return attrs.channel_name || entityId;
   }
 
   function channelRank(hass, entityId) {
-    var attrs = hass.states[entityId].attributes || {};
+    var attrs = (hass.states[entityId] || {}).attributes || {};
     var cid = attrs.channel_id;
     if (cid && Object.prototype.hasOwnProperty.call(CHANNEL_ORDER, cid)) {
       return CHANNEL_ORDER[cid];
@@ -467,7 +467,7 @@
       SLOT_DEFS.forEach(function (def) {
         var slotKey = def[0];
         entities.forEach(function (entityId) {
-          var attrs = hass.states[entityId].attributes || {};
+          var attrs = (hass.states[entityId] || {}).attributes || {};
           var channelLabel = attrs.channel_name || entityId;
           var channelIcon = attrs.channel_icon || null;
           var prog = attrs[slotKey];
