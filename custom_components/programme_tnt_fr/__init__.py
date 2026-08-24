@@ -26,6 +26,9 @@ _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Programme TNT FR from a config entry."""
+    await _async_register_card(hass)
+    _async_register_ws_api(hass)
+
     channels = entry.options.get(
         CONF_CHANNELS, entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS)
     )
@@ -33,9 +36,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
-
-    await _async_register_card(hass)
-    _async_register_ws_api(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
