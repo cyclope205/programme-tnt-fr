@@ -67,6 +67,7 @@
     ".guide-day-btn svg { width: 18px; height: 18px; }",
     ".guide-day-label { flex: 1; text-align: center; padding: 8px 12px; border-radius: 999px; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.92em; text-transform: capitalize; }",
     ".guide-day-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }",
+    ".guide-hour-filter { flex-shrink: 0; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-weight: 600; font-size: 0.78em; padding: 0 10px; border-radius: 999px; font-family: inherit; cursor: pointer; height: 36px; max-width: 92px; }",
     ".guide-columns { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".guide-columns::-webkit-scrollbar { display: none; }",
     ".guide-columns { scrollbar-width: none; }",
@@ -183,6 +184,7 @@
       this._guideBuilt = false;
       this._guideCache = {};
       this._guideDate = new Date();
+      this._guideHourFilter = "";
       this._render();
     }
 
@@ -586,10 +588,28 @@
       nextBtn.innerHTML = CHEVRON_RIGHT;
       nextBtn.setAttribute("aria-label", "Jour suivant");
 
+      var hourFilter = document.createElement("select");
+      hourFilter.className = "guide-hour-filter";
+      [
+        ["", "Toute la journee"],
+        ["0-6", "00h-06h"],
+        ["6-12", "06h-12h"],
+        ["12-16", "12h-16h"],
+        ["16-19", "16h-19h"],
+        ["19-21", "19h-21h"],
+        ["21-24", "21h-00h"]
+      ].forEach(function (opt) {
+        var option = document.createElement("option");
+        option.value = opt[0];
+        option.textContent = opt[1];
+        hourFilter.appendChild(option);
+      });
+
       daybar.appendChild(prevBtn);
       daybar.appendChild(dayLabel);
       daybar.appendChild(dayInput);
       daybar.appendChild(nextBtn);
+      daybar.appendChild(hourFilter);
       root.appendChild(daybar);
 
       var columns = document.createElement("div");
@@ -650,11 +670,15 @@
         colRefs[channelId] = { column: col, list: list, label: label, icon: icon };
       });
 
-      this._guideEls = { dayLabel: dayLabel, dayInput: dayInput, search: search, columns: columns };
+      this._guideEls = { dayLabel: dayLabel, dayInput: dayInput, search: search, columns: columns, hourFilter: hourFilter };
       this._guideColRefs = colRefs;
 
       search.addEventListener("input", function () {
         self._applySearch(search.value);
+      });
+      hourFilter.addEventListener("change", function () {
+        self._guideHourFilter = hourFilter.value;
+        self._applyHourFilter();
       });
       prevBtn.addEventListener("click", function () {
         self._goToDate(new Date(self._guideDate.getTime() - 86400000));
@@ -688,6 +712,21 @@
       cols.forEach(function (col) {
         var match = !norm || col.dataset.search.indexOf(norm) !== -1;
         col.classList.toggle("tntfr-hidden", !match);
+      });
+    }
+
+    _applyHourFilter() {
+      var range = this._guideHourFilter;
+      var bounds = range ? range.split("-").map(Number) : null;
+      var items = this._guideEls.columns.querySelectorAll(".guide-item");
+      items.forEach(function (item) {
+        if (!bounds || item.dataset.hour === "") {
+          item.classList.remove("tntfr-hidden");
+          return;
+        }
+        var hour = Number(item.dataset.hour);
+        var inRange = hour >= bounds[0] && hour < bounds[1];
+        item.classList.toggle("tntfr-hidden", !inRange);
       });
     }
 
@@ -753,6 +792,7 @@
           ref.list.appendChild(self._buildGuideItem(prog, ref.label, ref.icon));
         });
       });
+      self._applyHourFilter();
     }
 
     _buildGuideItem(prog, channelLabel, channelIcon) {
@@ -760,6 +800,7 @@
       var item = document.createElement("button");
       item.type = "button";
       item.className = "guide-item";
+      item.dataset.hour = prog.start ? String(new Date(prog.start).getHours()) : "";
       var live = isProgLive(prog);
       if (live) item.classList.add("is-live");
 
