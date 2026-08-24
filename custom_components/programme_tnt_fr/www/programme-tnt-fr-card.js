@@ -79,13 +79,16 @@
     ".guide-col-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 60vh; padding: 2px 2px 8px; }",
     ".guide-item { display: flex; flex-direction: column; flex-shrink: 0; text-align: left; border: none; padding: 0; margin: 0; cursor: pointer; font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; border-radius: 12px; overflow: hidden; background: var(--secondary-background-color, #232323); }",
     ".guide-item.is-live { outline: 2px solid #e0263f; outline-offset: -2px; }",
-    ".guide-item-img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; display: block; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); }",
+    ".guide-item-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; flex-shrink: 0; background: linear-gradient(160deg, #5b4fc4 0%, #2c2560 55%, #12102b 100%); }",
+    ".guide-item-img { width: 100%; height: 100%; object-fit: cover; display: block; }",
     ".guide-item-img[hidden] { display: none; }",
+    ".guide-item-live-badge { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.62em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 9px 4px 7px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
+    ".guide-item-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
+    ".guide-item-progress-track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,0.25); }",
+    ".guide-item-progress-fill { position: absolute; left: 0; bottom: 0; height: 3px; background: #e0263f; }",
     ".guide-item-body { padding: 8px 10px 10px; }",
-    ".guide-item-time { font-size: 0.72em; opacity: 0.65; font-weight: 700; display: flex; align-items: center; gap: 6px; }",
-    ".guide-item-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #e0263f; animation: tntfr-pulse 1.6s infinite; }",
-    ".guide-item-title { font-size: 0.92em; font-weight: 700; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
-    ".guide-item-desc { font-size: 0.78em; opacity: 0.65; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }",
+    ".guide-item-title { font-size: 0.92em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
+    ".guide-item-meta { font-size: 0.72em; font-weight: 600; opacity: 0.78; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
     ".guide-empty, .guide-loading { padding: 20px 8px; text-align: center; opacity: 0.6; font-size: 0.85em; font-style: italic; }"
   ].join("\n");
 
@@ -754,6 +757,10 @@
       var live = isProgLive(prog);
       if (live) item.classList.add("is-live");
 
+      var imageWrap = document.createElement("div");
+      imageWrap.className = "guide-item-image-wrap";
+      item.appendChild(imageWrap);
+
       var artUrl = prog.poster || prog.icon || channelIcon || null;
       if (artUrl) {
         var img = document.createElement("img");
@@ -764,34 +771,46 @@
         img.addEventListener("error", function () {
           img.hidden = true;
         });
-        item.appendChild(img);
+        imageWrap.appendChild(img);
+      }
+
+      if (live) {
+        var liveBadge = document.createElement("div");
+        liveBadge.className = "guide-item-live-badge";
+        var dot = document.createElement("span");
+        dot.className = "guide-item-live-dot";
+        liveBadge.appendChild(dot);
+        liveBadge.appendChild(document.createTextNode("Direct"));
+        imageWrap.appendChild(liveBadge);
+
+        var frac = liveFraction(prog);
+        if (frac !== null) {
+          var track = document.createElement("div");
+          track.className = "guide-item-progress-track";
+          var fill = document.createElement("div");
+          fill.className = "guide-item-progress-fill";
+          fill.style.width = (frac * 100).toFixed(1) + "%";
+          track.appendChild(fill);
+          imageWrap.appendChild(track);
+        }
       }
 
       var body = document.createElement("div");
       body.className = "guide-item-body";
-
-      var timeEl = document.createElement("div");
-      timeEl.className = "guide-item-time";
-      if (live) {
-        var dot = document.createElement("span");
-        dot.className = "guide-item-live-dot";
-        timeEl.appendChild(dot);
-      }
-      timeEl.appendChild(document.createTextNode((formatTime(prog.start) || "?") + " - " + (formatTime(prog.stop) || "?")));
-      body.appendChild(timeEl);
 
       var titleEl = document.createElement("div");
       titleEl.className = "guide-item-title";
       titleEl.textContent = prog.title || "";
       body.appendChild(titleEl);
 
-      var descText = prog.subtitle || prog.description || "";
-      if (descText) {
-        var descEl = document.createElement("div");
-        descEl.className = "guide-item-desc";
-        descEl.textContent = descText;
-        body.appendChild(descEl);
-      }
+      var metaEl = document.createElement("div");
+      metaEl.className = "guide-item-meta";
+      var metaParts = [];
+      if (prog.category) metaParts.push(prog.category);
+      metaParts.push(channelLabel);
+      metaParts.push((formatTime(prog.start) || "?") + " - " + (formatTime(prog.stop) || "?"));
+      metaEl.textContent = metaParts.join(" \u2022 ");
+      body.appendChild(metaEl);
 
       item.appendChild(body);
       item.addEventListener("click", function () {
