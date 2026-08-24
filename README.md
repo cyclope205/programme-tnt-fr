@@ -56,8 +56,13 @@ Guide TV, avec le filtre horaire :
 
 ## Installation
 
-1. Dans HACS, ajouter ce depot comme depot personnalise (categorie *Integration*) : `https://github.com/cyclope205/programme-tnt-fr`.
-2. Installer **Programme TNT FR** depuis HACS.
+1. Ajouter ce depot a HACS comme depot personnalise :
+   1. Ouvrir **HACS** dans le menu lateral de Home Assistant.
+   2. Cliquer sur le menu **&#8942;** (trois points verticaux) en haut a droite de la page HACS, puis choisir **Depots personnalises** (*Custom repositories*).
+   3. Coller l'URL du depot dans le champ **Depot** (*Repository*) : `https://github.com/cyclope205/programme-tnt-fr`
+   4. Choisir **Integration** dans le menu deroulant **Type** (*Category*).
+   5. Cliquer sur **Ajouter** (*Add*), puis fermer la fenetre.
+2. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et telecharger des depots**) et l'installer.
 3. Redemarrer Home Assistant.
 4. Ajouter l'integration via **Parametres > Appareils et services > Ajouter une integration > Programme TNT FR**.
 
