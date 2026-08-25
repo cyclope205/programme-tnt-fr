@@ -38,8 +38,16 @@ _LOGGER = logging.getLogger(__name__)
 # TMDB, car la requete brute (bruitee de mots sans rapport avec le vrai
 # titre) degrade nettement la pertinence du moteur de recherche TMDB et
 # peut faire disparaitre le bon resultat de la premiere page de reponses.
-_EPISODE_SUFFIX_RE = re.compile(r"\s*\([^()]*\)\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", re.IGNORECASE)
-_SEASON_SUFFIX_RE = re.compile(r"\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", re.IGNORECASE)
+_EPISODE_SUFFIX_RE = re.compile(
+    r"\s*\([^()]*\)\s*S\d{1,2}\s*(?:\(\d+/\d+\)|\(n°\d+\))\s*$", re.IGNORECASE
+)
+_SEASON_SUFFIX_RE = re.compile(
+    r"\s*S\d{1,2}\s*(?:\(\d+/\d+\)|\(n°\d+\))\s*$", re.IGNORECASE
+)
+# Autre format d'episode rencontre sur le flux (ex: "Zig & Sharko - S04E61",
+# "Mr Bean - S04E14") : code saison+episode colle, precede d'un tiret, sans
+# parentheses ni fraction.
+_DASH_EPISODE_CODE_RE = re.compile(r"\s*-\s*S\d{1,2}E\d{1,3}\s*$", re.IGNORECASE)
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
@@ -381,6 +389,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         working = _EPISODE_SUFFIX_RE.sub("", working)
         if working == before:
             working = _SEASON_SUFFIX_RE.sub("", working)
+        if working == before:
+            working = _DASH_EPISODE_CODE_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
