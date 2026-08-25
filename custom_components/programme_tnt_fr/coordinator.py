@@ -306,6 +306,17 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 poster_path = await self._tmdb_search(url, clean_title, year)
                 if poster_path:
                     return TMDB_IMAGE_BASE_URL + poster_path
+        # Dernier repli : une description libre apres une virgule/deux-points
+        # (ex: "Nomade des mers, les escales de l'innovation", pas un format
+        # d'episode structure donc non couvert par _clean_search_query) peut a
+        # elle seule faire retourner zero resultat TMDB. On retente avec
+        # uniquement la partie avant, seulement en dernier recours.
+        truncated = self._truncate_at_first_separator(clean_title)
+        if truncated and truncated != clean_title:
+            for url in search_order:
+                poster_path = await self._tmdb_search(url, truncated)
+                if poster_path:
+                    return TMDB_IMAGE_BASE_URL + poster_path
         return None
 
     @staticmethod
@@ -382,6 +393,17 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             ):
                 return result.get("poster_path")
         return None
+
+    @staticmethod
+    def _truncate_at_first_separator(title: str) -> str | None:
+        """Retourne la partie avant la premiere virgule/deux-points d'un
+        titre, seulement s'il y a au moins deux mots avant ce separateur
+        (evite de tronquer des titres courts comme "Amour, gloire et
+        beaute" ou la virgule fait partie du vrai nom). None si aucun
+        separateur pertinent n'est trouve.
+        """
+        match = re.match(r"^(\S+\s+\S.*?)\s*[,:]\s", title or "")
+        return match.group(1) if match else None
 
     @staticmethod
     def _clean_search_query(title: str) -> tuple[str, str | None]:
