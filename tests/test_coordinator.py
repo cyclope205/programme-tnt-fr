@@ -160,3 +160,18 @@ def test_normalize_title_does_not_strip_article_mid_title():
     assert ProgrammeTntFrCoordinator._normalize_title(
         "L'amour est dans le pre"
     ) == "amour est dans le pre"
+
+
+def test_normalize_title_strips_tmdb_live_prefix():
+    # TMDB: "C dans l'air" est catalogue "LIVE: C dans l'air", sans
+    # equivalent dans le flux XMLTV.
+    query = ProgrammeTntFrCoordinator._normalize_title("C dans l'air")
+    candidate = ProgrammeTntFrCoordinator._normalize_title("LIVE: C dans l'air")
+    assert query == candidate
+    assert ProgrammeTntFrCoordinator._titles_match(query, candidate) is True
+
+
+def test_normalize_title_does_not_strip_live_without_colon():
+    # Un titre qui commence reellement par "Live" (sans le marqueur TMDB
+    # precis "LIVE:") ne doit pas etre touche.
+    assert ProgrammeTntFrCoordinator._normalize_title("Live Aid") == "live aid"
