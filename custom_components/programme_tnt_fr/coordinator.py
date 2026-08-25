@@ -57,6 +57,10 @@ _DASH_SAISON_WORD_RE = re.compile(r"\s*-\s*Saison\s+\d{1,2}\s*$", re.IGNORECASE)
 # fiche TMDB). Comme il est peu specifique, il n'est essaye que si aucun
 # des motifs plus precis ci-dessus n'a matche.
 _BARE_SEASON_SUFFIX_RE = re.compile(r"\s+S\d{1,2}\s*$")
+# Feuilletons quotidiens de tres longue duree, sans notion de saison :
+# double numero d'episode cumulatif en fin de titre (ex: "Amour, gloire et
+# beaute (9709) (n°9709)", verifie sur TMDB).
+_CUMULATIVE_EPISODE_RE = re.compile(r"\s*\(\d+\)\s*\(n°\d+\)\s*$")
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
@@ -404,6 +408,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _DASH_SAISON_WORD_RE.sub("", working)
         if working == before:
             working = _BARE_SEASON_SUFFIX_RE.sub("", working)
+        if working == before:
+            working = _CUMULATIVE_EPISODE_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
