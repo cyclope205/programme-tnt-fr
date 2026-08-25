@@ -126,3 +126,34 @@ def test_normalize_title_unifies_dash_and_colon():
 
 def test_normalize_title_collapses_whitespace_after_punctuation_strip():
     assert ProgrammeTntFrCoordinator._normalize_title("A : B, C - D") == "a b c d"
+
+
+def test_normalize_title_strips_leading_article_le():
+    assert ProgrammeTntFrCoordinator._normalize_title("Le Meilleur Patissier") == (
+        "meilleur patissier"
+    )
+    assert ProgrammeTntFrCoordinator._normalize_title("Meilleur Patissier") == (
+        "meilleur patissier"
+    )
+
+
+def test_normalize_title_strips_leading_article_la_les_l():
+    assert ProgrammeTntFrCoordinator._normalize_title("La Voix") == "voix"
+    assert ProgrammeTntFrCoordinator._normalize_title("Les Experts") == "experts"
+    assert ProgrammeTntFrCoordinator._normalize_title("L'amour est dans le pre") == (
+        "amour est dans le pre"
+    )
+
+
+def test_normalize_title_leading_article_matches_across_sources():
+    query = ProgrammeTntFrCoordinator._normalize_title("Grande Librairie")
+    candidate = ProgrammeTntFrCoordinator._normalize_title("La Grande Librairie")
+    assert query == candidate
+    assert ProgrammeTntFrCoordinator._titles_match(query, candidate) is True
+
+
+def test_normalize_title_does_not_strip_article_mid_title():
+    # "le"/"la"/"les" ailleurs qu'en tete ne doivent pas etre touches.
+    assert ProgrammeTntFrCoordinator._normalize_title(
+        "L'amour est dans le pre"
+    ) == "amour est dans le pre"
