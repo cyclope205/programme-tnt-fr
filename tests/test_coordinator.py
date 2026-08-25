@@ -302,3 +302,34 @@ def test_clean_search_query_strips_directors_cut_qualifier():
     )
     assert cleaned == "Rencontres du troisi\u00e8me type"
     assert year is None
+
+
+
+def test_normalize_title_unifies_ampersand_and_et_xmltv_side():
+    # XMLTV "Superman et Lo\u00efs" vs TMDB "Superman & Lo\u00efs" -
+    # verifie sur une vraie fiche TMDB.
+    xmltv = ProgrammeTntFrCoordinator._normalize_title("Superman et Lo\u00efs")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Superman & Lo\u00efs")
+    assert xmltv == tmdb
+
+
+def test_normalize_title_unifies_ampersand_and_et_tmdb_side():
+    # Cas inverse : XMLTV utilise "&", TMDB "et" (ex: "Tom & Jerry et le
+    # haricot geant" vs "Tom et Jerry et le haricot geant").
+    xmltv = ProgrammeTntFrCoordinator._normalize_title(
+        "Tom & Jerry et le haricot g\u00e9ant"
+    )
+    tmdb = ProgrammeTntFrCoordinator._normalize_title(
+        "Tom et Jerry et le haricot g\u00e9ant"
+    )
+    assert xmltv == tmdb
+
+
+def test_normalize_title_unifies_slash_separator():
+    # XMLTV "Superman / Batman : Apocalypse" vs TMDB
+    # "Superman/Batman: Apocalypse" - verifie sur une vraie fiche TMDB.
+    xmltv = ProgrammeTntFrCoordinator._normalize_title(
+        "Superman / Batman : Apocalypse"
+    )
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Superman/Batman: Apocalypse")
+    assert xmltv == tmdb
