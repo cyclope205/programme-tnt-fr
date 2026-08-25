@@ -17,8 +17,11 @@ def test_normalize_title_strips_accents_and_lowercases():
 
 
 def test_normalize_title_converts_french_spelled_out_numbers():
+    # "Les" est egalement retire (article de tete), voir
+    # test_normalize_title_strips_leading_article_* : "12 coups de midi" est
+    # le resultat attendu, pas "les 12 coups de midi".
     assert ProgrammeTntFrCoordinator._normalize_title("Les douze coups de midi") == (
-        "les 12 coups de midi"
+        "12 coups de midi"
     )
     assert ProgrammeTntFrCoordinator._normalize_title("Dix-sept ans") == "17 ans"
 
