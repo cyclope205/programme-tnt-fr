@@ -52,6 +52,14 @@ _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 # critere d'acceptation.
 _LEADING_ARTICLE_RE = re.compile(r"^(?:le|la|les)\s+|^l'")
 
+# TMDB prefixe certaines emissions "en direct/en continu" (ex: talk-shows
+# d'actualite) d'un marqueur "LIVE:" absent du titre XMLTV correspondant
+# (verifie sur TMDB : "C dans l'air" -> "LIVE: C dans l'air", avec une
+# vraie affiche). Retire uniquement ce marqueur precis en tete, pas le mot
+# "live" en general, pour eviter de perturber un titre qui commencerait
+# reellement par ce mot.
+_LIVE_PREFIX_RE = re.compile(r"^live\s*:\s*", re.IGNORECASE)
+
 
 class _TmdbTransientError(Exception):
     """Raised for TMDB failures that should be retried, not cached as no-poster.
@@ -397,6 +405,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         plein texte comme "Meteo" matchait a tort la serie "Miss Meteo"
         alors que le bulletin meteo generique n'a pas de fiche TMDB.
         """
+        value = _LIVE_PREFIX_RE.sub("", value or "")
         normalized = unicodedata.normalize("NFD", value or "")
         normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
         normalized = normalized.lower().strip()
