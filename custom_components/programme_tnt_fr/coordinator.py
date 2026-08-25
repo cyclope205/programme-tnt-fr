@@ -42,6 +42,16 @@ _EPISODE_SUFFIX_RE = re.compile(r"\s*\([^()]*\)\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", r
 _SEASON_SUFFIX_RE = re.compile(r"\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", re.IGNORECASE)
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
+# De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
+# systematiquement (ex: XMLTV "Meilleur Patissier" vs TMDB "Le Meilleur
+# Patissier" ; "Voix" vs "La Voix" ; "Grande Librairie" vs "La Grande
+# Librairie" - verifie sur des recherches TMDB reelles). On retire cet
+# article des DEUX cotes avant comparaison (symetrique, comme pour la
+# ponctuation) : la comparaison stricte par prefixe qui suit reste le
+# garde-fou contre les faux positifs, ce n'est pas un relachement du
+# critere d'acceptation.
+_LEADING_ARTICLE_RE = re.compile(r"^(?:le|la|les)\s+|^l'")
+
 
 class _TmdbTransientError(Exception):
     """Raised for TMDB failures that should be retried, not cached as no-poster.
@@ -405,7 +415,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         for separator in ("-", ":", ",", ";", "!", "?"):
             normalized = normalized.replace(separator, " ")
         words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split()]
-        return " ".join(words)
+        result = " ".join(words)
+        return _LEADING_ARTICLE_RE.sub("", result, count=1)
 
     async def _fetch_and_parse(self) -> None:
         resp = await self._session.get(XMLTV_URL, timeout=30)
