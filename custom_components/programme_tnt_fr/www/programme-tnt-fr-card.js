@@ -369,7 +369,15 @@
       var entities = this._resolveEntities();
       var self = this;
 
-      SLOT_DEFS.forEach(function (def, index) {
+      var activeSlotDefs = SLOT_DEFS.filter(function (def) {
+        var key = def[0];
+        if (key === "current" && self._config.show_current === false) return false;
+        if (key === "prime_time" && self._config.show_prime_time === false) return false;
+        if (key === "second_part" && self._config.show_second_part === false) return false;
+        return true;
+      });
+
+      activeSlotDefs.forEach(function (def, index) {
         var slotKey = def[0], sectionTitle = def[1], colorClass = def[2];
 
         var section = document.createElement("div");
@@ -912,7 +920,64 @@
     static getStubConfig() {
       return { title: "Qu'est-ce qu'on regarde à la TV ?" };
     }
+
+    static getConfigElement() {
+      return document.createElement("programme-tnt-fr-card-editor");
+    }
   }
+
+  class ProgrammeTntFrCardEditor extends HTMLElement {
+    setConfig(config) {
+      this._config = config || {};
+      this._render();
+    }
+
+    set hass(hass) {
+      this._hass = hass;
+    }
+
+    connectedCallback() {
+      this._render();
+    }
+
+    _render() {
+      if (!this._config) return;
+      this.innerHTML = "";
+      var self = this;
+      var wrap = document.createElement("div");
+      wrap.style.padding = "12px 16px";
+
+      function addToggle(key, label) {
+        var row = document.createElement("ha-formfield");
+        row.setAttribute("label", label);
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.padding = "6px 0";
+        var sw = document.createElement("ha-switch");
+        sw.checked = self._config[key] !== false;
+        sw.addEventListener("change", function (ev) {
+          var newConfig = Object.assign({}, self._config);
+          newConfig[key] = ev.target.checked;
+          self._config = newConfig;
+          self.dispatchEvent(new CustomEvent("config-changed", {
+            detail: { config: newConfig },
+            bubbles: true,
+            composed: true
+          }));
+        });
+        row.appendChild(sw);
+        wrap.appendChild(row);
+      }
+
+      addToggle("show_current", "Afficher l''En ce moment''");
+      addToggle("show_prime_time", "Afficher la 1re partie de soiree");
+      addToggle("show_second_part", "Afficher la 2e partie de soiree");
+
+      this.appendChild(wrap);
+    }
+  }
+
+  customElements.define("programme-tnt-fr-card-editor", ProgrammeTntFrCardEditor);
 
   customElements.define("programme-tnt-fr-card", ProgrammeTntFrCard);
 
