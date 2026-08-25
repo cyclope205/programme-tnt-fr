@@ -160,6 +160,7 @@ content: |
 ```
 
 Aucune configuration necessaire : le template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` presents chez l'utilisateur, quelles que soient les chaines selectionnees a la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de theatre sous `tmdb_media_type: movie`, ce croisement avec la categorie XMLTV evite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-meme pour en savoir plus.
+<img width="451" height="385" alt="image" src="https://github.com/user-attachments/assets/bc666b44-88ef-496e-bdc7-4ed6f4cabf75" />
 
 ## A savoir
 
