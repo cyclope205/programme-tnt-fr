@@ -182,6 +182,14 @@ def test_normalize_title_does_not_strip_article_mid_title():
     ) == "amour est dans le pre"
 
 
+def test_normalize_title_strips_leading_english_article():
+    # XMLTV "Big Bang Theory" vs TMDB "The Big Bang Theory" - verifie sur
+    # une recherche TMDB reelle (meme fiche, poster reel).
+    xmltv = ProgrammeTntFrCoordinator._normalize_title("Big Bang Theory")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("The Big Bang Theory")
+    assert xmltv == tmdb
+
+
 def test_normalize_title_strips_tmdb_live_prefix():
     # TMDB: "C dans l'air" est catalogue "LIVE: C dans l'air", sans
     # equivalent dans le flux XMLTV.
@@ -276,3 +284,21 @@ def test_truncate_at_first_separator_protects_short_titles():
 
 def test_truncate_at_first_separator_no_separator_returns_none():
     assert ProgrammeTntFrCoordinator._truncate_at_first_separator("Kon-Tiki") is None
+
+
+def test_clean_search_query_strips_version_qualifier():
+    # "Le bateau (version realisateur)" a une vraie fiche TMDB sous "Le
+    # Bateau" ; le qualificatif de version n'existe pas cote TMDB.
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Le bateau (version r\u00e9alisateur)"
+    )
+    assert cleaned == "Le bateau"
+    assert year is None
+
+
+def test_clean_search_query_strips_directors_cut_qualifier():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Rencontres du troisi\u00e8me type (Director's Cut)"
+    )
+    assert cleaned == "Rencontres du troisi\u00e8me type"
+    assert year is None
