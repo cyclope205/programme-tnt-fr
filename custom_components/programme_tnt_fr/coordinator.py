@@ -394,9 +394,17 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             normalized.replace("dix-sept", "17")
             .replace("dix-huit", "18")
             .replace("dix-neuf", "19")
-            .replace("-", " ")
         )
-        words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split(" ")]
+        # XMLTV et TMDB ne separent pas titre/sous-titre avec la meme
+        # ponctuation pour le meme programme (ex: XMLTV "Sisteron : citadelle
+        # de tous les defis" vs TMDB "Sisteron, la citadelle de tous les
+        # defis" ; "Irish Celtic : le chemin des legendes" vs TMDB "Irish
+        # Celtic - Le Chemin des Legendes") : on normalise tous ces
+        # separateurs en simple espace pour que la comparaison ne depende pas
+        # du signe de ponctuation utilise par chaque source.
+        for separator in ("-", ":", ",", ";", "!", "?"):
+            normalized = normalized.replace(separator, " ")
+        words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split()]
         return " ".join(words)
 
     async def _fetch_and_parse(self) -> None:
