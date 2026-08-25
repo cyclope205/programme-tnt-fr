@@ -11,6 +11,7 @@
     "ha-card { padding: 16px; overflow: hidden; }",
     ".header { font-size: 1.2em; font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }",
     ".header-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
+    ".header-actions { display: flex; gap: 6px; flex-shrink: 0; }",
     ".header-guide-link { flex-shrink: 0; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-size: 0.62em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }",
     ".header-guide-link:active { transform: scale(0.96); }",
     ".slot-section { margin-bottom: 26px; }",
@@ -34,6 +35,8 @@
     ".poster-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.16; }",
     ".poster-watermark img { width: 52%; height: 52%; object-fit: contain; filter: brightness(0) invert(1); }",
     ".poster-channel-badge { position: absolute; bottom: 10px; left: 10px; width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
+    ".poster-favorite-badge { position: absolute; top: 10px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
+    ".poster-favorite-badge svg { width: 14px; height: 14px; }",
     ".poster-live-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.66em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
     ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
     "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }",
@@ -69,6 +72,8 @@
     ".guide-day-label { flex: 1; text-align: center; padding: 8px 12px; border-radius: 999px; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.92em; text-transform: capitalize; }",
     ".guide-day-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }",
     ".guide-hour-filter { flex-shrink: 0; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-weight: 600; font-size: 0.78em; padding: 0 10px; border-radius: 999px; font-family: inherit; cursor: pointer; height: 36px; max-width: 92px; }",
+    ".guide-genre-bar { margin-bottom: 12px; }",
+    ".guide-genre-filter { width: 100%; box-sizing: border-box; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-weight: 600; font-size: 0.85em; padding: 9px 14px; border-radius: 999px; font-family: inherit; cursor: pointer; }",
     ".tntfr-hidden { display: none !important; }",
     ".guide-columns { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".guide-columns::-webkit-scrollbar { display: none; }",
@@ -95,7 +100,13 @@
     ".guide-item-body { padding: 8px 10px 10px; }",
     ".guide-item-title { font-size: 0.92em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
     ".guide-item-meta { font-size: 0.72em; font-weight: 600; opacity: 0.78; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
-    ".guide-empty, .guide-loading { padding: 20px 8px; text-align: center; opacity: 0.6; font-size: 0.85em; font-style: italic; }"
+    ".guide-empty, .guide-loading { padding: 20px 8px; text-align: center; opacity: 0.6; font-size: 0.85em; font-style: italic; }",
+    ".films-list { display: flex; flex-direction: column; gap: 12px; }",
+    ".film-row { display: flex; gap: 12px; text-decoration: none; color: inherit; background: var(--secondary-background-color, #2a2a2a); border-radius: 14px; padding: 8px; align-items: center; }",
+    ".film-poster { width: 56px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: rgba(127,127,127,0.2); }",
+    ".film-info { min-width: 0; }",
+    ".film-title { font-weight: 700; font-size: 0.98em; line-height: 1.3; }",
+    ".film-meta { font-size: 0.8em; opacity: 0.75; margin-top: 4px; }"
   ].join("\n");
 
   var SLOT_DEFS = [
@@ -106,6 +117,7 @@
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
   var CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+  var STAR_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.771l-7.416 3.642 1.48-8.279L0 9.306l8.332-1.151z"/></svg>';
 
   var CHANNEL_ORDER = {
     "TF1.fr": 1, "France2.fr": 2, "France3.fr": 3,
@@ -178,16 +190,37 @@
     var f = liveFraction(prog);
     return f !== null && f > 0 && f < 1;
   }
+
+  function pickPrimeTimeProgramme(progs, thresholdDate) {
+    var sorted = (progs || []).slice().sort(function (a, b) {
+      return new Date(a.start).getTime() - new Date(b.start).getTime();
+    });
+    var t = thresholdDate.getTime();
+    for (var i = 0; i < sorted.length; i++) {
+      var s = new Date(sorted[i].start).getTime();
+      var e = new Date(sorted[i].stop).getTime();
+      if (s <= t && t < e) return sorted[i];
+    }
+    for (var j = 0; j < sorted.length; j++) {
+      if (new Date(sorted[j].start).getTime() >= t) return sorted[j];
+    }
+    return null;
+  }
+
   class ProgrammeTntFrCard extends HTMLElement {
     setConfig(config) {
       this._config = config || {};
       this._entities = this._config.entities || null;
       this._built = false;
-      this._guideOpen = false;
+      this._view = "carousel";
       this._guideBuilt = false;
       this._guideCache = {};
       this._guideDate = new Date();
       this._guideHourFilter = "";
+      this._guideGenreFilter = "";
+      this._filmsBuilt = false;
+      this._filmsCache = {};
+      this._filmsDate = new Date();
       this._render();
     }
 
@@ -220,6 +253,24 @@
         if (ra !== rb) return ra - rb;
         return channelName(hass, a).localeCompare(channelName(hass, b), "fr", { sensitivity: "base" });
       });
+
+      var favorites = this._config.favorite_channels;
+      if (favorites && favorites.length) {
+        var favSet = {};
+        favorites.forEach(function (cid) { favSet[cid] = true; });
+        var favIds = [];
+        var restIds = [];
+        ids.forEach(function (id) {
+          var cid = hass.states[id].attributes.channel_id;
+          if (cid && favSet[cid]) {
+            favIds.push(id);
+          } else {
+            restIds.push(id);
+          }
+        });
+        ids = favIds.concat(restIds);
+      }
+
       return ids;
     }
 
@@ -242,16 +293,32 @@
       headerTitle.className = "header-title";
       header.appendChild(headerTitle);
 
+      var actions = document.createElement("div");
+      actions.className = "header-actions";
+
       var guideLink = document.createElement("button");
       guideLink.type = "button";
       guideLink.className = "header-guide-link";
       guideLink.textContent = "Guide TV";
       guideLink.addEventListener("click", function () {
-        self._guideOpen = !self._guideOpen;
-        guideLink.textContent = self._guideOpen ? "Carrousel" : "Guide TV";
+        self._view = self._view === "guide" ? "carousel" : "guide";
+        self._updateHeaderButtons();
         self._renderBody();
       });
-      header.appendChild(guideLink);
+      actions.appendChild(guideLink);
+
+      var filmsLink = document.createElement("button");
+      filmsLink.type = "button";
+      filmsLink.className = "header-guide-link";
+      filmsLink.textContent = "Top films";
+      filmsLink.addEventListener("click", function () {
+        self._view = self._view === "topfilms" ? "carousel" : "topfilms";
+        self._updateHeaderButtons();
+        self._renderBody();
+      });
+      actions.appendChild(filmsLink);
+
+      header.appendChild(actions);
       card.appendChild(header);
 
       var body = document.createElement("div");
@@ -262,6 +329,11 @@
       guideRoot.className = "guide-root";
       guideRoot.hidden = true;
       card.appendChild(guideRoot);
+
+      var filmsRoot = document.createElement("div");
+      filmsRoot.className = "films-root";
+      filmsRoot.hidden = true;
+      card.appendChild(filmsRoot);
 
       var overlay = document.createElement("div");
       overlay.className = "overlay";
@@ -288,8 +360,10 @@
         header: header,
         headerTitle: headerTitle,
         guideLink: guideLink,
+        filmsLink: filmsLink,
         body: body,
         guideRoot: guideRoot,
+        filmsRoot: filmsRoot,
         overlay: overlay,
         modalIcon: overlay.querySelector(".modal-icon"),
         modalTitle: overlay.querySelector(".modal-title"),
@@ -299,6 +373,13 @@
       };
       this._built = true;
     }
+
+    _updateHeaderButtons() {
+      var els = this._els;
+      els.guideLink.textContent = this._view === "guide" ? "Carrousel" : "Guide TV";
+      els.filmsLink.textContent = this._view === "topfilms" ? "Carrousel" : "Top films";
+    }
+
     _render() {
       this._ensureDom();
       var els = this._els;
@@ -314,8 +395,14 @@
         this._dataSig = dataSig;
         if (this._guideBuilt) {
           this._guideCache = {};
-          if (this._guideOpen) {
+          if (this._view === "guide") {
             this._goToDate(this._guideDate);
+          }
+        }
+        if (this._filmsBuilt) {
+          this._filmsCache = {};
+          if (this._view === "topfilms") {
+            this._goToFilmsDate(this._filmsDate);
           }
         }
       }
@@ -334,13 +421,15 @@
 
     _renderBody() {
       var els = this._els;
-      if (this._guideOpen) {
-        els.body.hidden = true;
-        els.guideRoot.hidden = false;
+      els.body.hidden = this._view !== "carousel";
+      els.guideRoot.hidden = this._view !== "guide";
+      els.filmsRoot.hidden = this._view !== "topfilms";
+
+      if (this._view === "guide") {
         this._ensureGuideBuilt();
+      } else if (this._view === "topfilms") {
+        this._ensureFilmsBuilt();
       } else {
-        els.body.hidden = false;
-        els.guideRoot.hidden = true;
         this._renderCarousel();
       }
     }
@@ -368,6 +457,13 @@
 
       var entities = this._resolveEntities();
       var self = this;
+
+      var favorites = this._config.favorite_channels;
+      var favSet = null;
+      if (favorites && favorites.length) {
+        favSet = {};
+        favorites.forEach(function (cid) { favSet[cid] = true; });
+      }
 
       var activeSlotDefs = SLOT_DEFS.filter(function (def) {
         var key = def[0];
@@ -399,7 +495,8 @@
           var channelLabel = attrs.channel_name || entityId;
           var channelIcon = attrs.channel_icon || null;
           var prog = attrs[slotKey];
-          var card = self._buildPosterCard(channelLabel, slotKey, prog, channelIcon);
+          var isFavorite = !!(favSet && attrs.channel_id && favSet[attrs.channel_id]);
+          var card = self._buildPosterCard(channelLabel, slotKey, prog, channelIcon, isFavorite);
           carousel.appendChild(card);
         });
 
@@ -412,7 +509,7 @@
       });
     }
 
-    _buildPosterCard(channelLabel, slotKey, prog, channelIcon) {
+    _buildPosterCard(channelLabel, slotKey, prog, channelIcon, isFavorite) {
       var self = this;
       var btn = document.createElement("button");
       btn.type = "button";
@@ -428,6 +525,13 @@
         badge.src = channelIcon;
         badge.alt = "";
         imageWrap.appendChild(badge);
+      }
+
+      if (isFavorite) {
+        var favBadge = document.createElement("div");
+        favBadge.className = "poster-favorite-badge";
+        favBadge.innerHTML = STAR_ICON;
+        imageWrap.appendChild(favBadge);
       }
 
       if (!prog) {
@@ -501,7 +605,7 @@
       if (prog.category) metaParts.push(prog.category);
       metaParts.push(channelLabel);
       metaParts.push((startFmt || "?") + " - " + (stopFmt || "?"));
-      timeEl.textContent = metaParts.join(" \u2022 ");
+      timeEl.textContent = metaParts.join(" • ");
       content.appendChild(timeEl);
       btn.appendChild(content);
 
@@ -563,6 +667,7 @@
       requestAnimationFrame(updateNav);
       return wrap;
     }
+
     _ensureGuideBuilt() {
       if (this._guideBuilt) return;
       var hass = this._hass;
@@ -626,6 +731,17 @@
       daybar.appendChild(hourFilter);
       root.appendChild(daybar);
 
+      var genreBar = document.createElement("div");
+      genreBar.className = "guide-genre-bar";
+      var genreFilter = document.createElement("select");
+      genreFilter.className = "guide-genre-filter";
+      var defaultGenreOpt = document.createElement("option");
+      defaultGenreOpt.value = "";
+      defaultGenreOpt.textContent = "Tous les genres";
+      genreFilter.appendChild(defaultGenreOpt);
+      genreBar.appendChild(genreFilter);
+      root.appendChild(genreBar);
+
       var columns = document.createElement("div");
       columns.className = "guide-columns";
       columns.id = "slider";
@@ -684,7 +800,7 @@
         colRefs[channelId] = { column: col, list: list, label: label, icon: icon };
       });
 
-      this._guideEls = { dayLabel: dayLabel, dayInput: dayInput, search: search, columns: columns, hourFilter: hourFilter };
+      this._guideEls = { dayLabel: dayLabel, dayInput: dayInput, search: search, columns: columns, hourFilter: hourFilter, genreFilter: genreFilter };
       this._guideColRefs = colRefs;
 
       search.addEventListener("input", function () {
@@ -692,7 +808,11 @@
       });
       hourFilter.addEventListener("change", function () {
         self._guideHourFilter = hourFilter.value;
-        self._applyHourFilter();
+        self._applyFilters();
+      });
+      genreFilter.addEventListener("change", function () {
+        self._guideGenreFilter = genreFilter.value;
+        self._applyFilters();
       });
       prevBtn.addEventListener("click", function () {
         self._goToDate(new Date(self._guideDate.getTime() - 86400000));
@@ -729,18 +849,19 @@
       });
     }
 
-    _applyHourFilter() {
-      var range = this._guideHourFilter;
-      var bounds = range ? range.split("-").map(Number) : null;
+    _applyFilters() {
+      var hourRange = this._guideHourFilter;
+      var hourBounds = hourRange ? hourRange.split("-").map(Number) : null;
+      var genre = this._guideGenreFilter;
       var items = this._guideEls.columns.querySelectorAll(".guide-item");
       items.forEach(function (item) {
-        if (!bounds || item.dataset.hour === "") {
-          item.classList.remove("tntfr-hidden");
-          return;
+        var hourOk = true;
+        if (hourBounds && item.dataset.hour !== "") {
+          var hour = Number(item.dataset.hour);
+          hourOk = hour >= hourBounds[0] && hour < hourBounds[1];
         }
-        var hour = Number(item.dataset.hour);
-        var inRange = hour >= bounds[0] && hour < bounds[1];
-        item.classList.toggle("tntfr-hidden", !inRange);
+        var genreOk = !genre || item.dataset.category === genre;
+        item.classList.toggle("tntfr-hidden", !(hourOk && genreOk));
       });
     }
 
@@ -791,6 +912,7 @@
     _renderGuideDay(dateStr) {
       var self = this;
       var dayData = this._guideCache[dateStr] || {};
+      var categories = {};
       Object.keys(this._guideColRefs).forEach(function (channelId) {
         var ref = self._guideColRefs[channelId];
         var progs = dayData[channelId] || [];
@@ -803,10 +925,36 @@
           return;
         }
         progs.forEach(function (prog) {
+          if (prog.category) categories[prog.category] = true;
           ref.list.appendChild(self._buildGuideItem(prog, ref.label, ref.icon));
         });
       });
-      self._applyHourFilter();
+      this._updateGenreOptions(Object.keys(categories).sort(function (a, b) {
+        return a.localeCompare(b, "fr");
+      }));
+      self._applyFilters();
+    }
+
+    _updateGenreOptions(categories) {
+      var select = this._guideEls.genreFilter;
+      var current = this._guideGenreFilter;
+      select.innerHTML = "";
+      var defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "Tous les genres";
+      select.appendChild(defaultOpt);
+      categories.forEach(function (cat) {
+        var opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+      });
+      if (categories.indexOf(current) !== -1) {
+        select.value = current;
+      } else {
+        this._guideGenreFilter = "";
+        select.value = "";
+      }
     }
 
     _buildGuideItem(prog, channelLabel, channelIcon) {
@@ -815,6 +963,7 @@
       item.type = "button";
       item.className = "guide-item";
       item.dataset.hour = prog.start ? String(new Date(prog.start).getHours()) : "";
+      item.dataset.category = prog.category || "";
       var live = isProgLive(prog);
       if (live) item.classList.add("is-live");
 
@@ -877,7 +1026,7 @@
       if (prog.category) metaParts.push(prog.category);
       metaParts.push(channelLabel);
       metaParts.push((formatTime(prog.start) || "?") + " - " + (formatTime(prog.stop) || "?"));
-      metaEl.textContent = metaParts.join(" \u2022 ");
+      metaEl.textContent = metaParts.join(" • ");
       body.appendChild(metaEl);
 
       item.appendChild(body);
@@ -886,6 +1035,217 @@
       });
       return item;
     }
+
+    _ensureFilmsBuilt() {
+      if (this._filmsBuilt) return;
+      var self = this;
+      var root = this._els.filmsRoot;
+      root.innerHTML = "";
+
+      var daybar = document.createElement("div");
+      daybar.className = "guide-daybar";
+
+      var prevBtn = document.createElement("button");
+      prevBtn.type = "button";
+      prevBtn.className = "guide-day-btn";
+      prevBtn.innerHTML = CHEVRON_LEFT;
+      prevBtn.setAttribute("aria-label", "Jour précédent");
+
+      var dayLabel = document.createElement("button");
+      dayLabel.type = "button";
+      dayLabel.className = "guide-day-label";
+
+      var dayInput = document.createElement("input");
+      dayInput.type = "date";
+      dayInput.className = "guide-day-input";
+
+      var nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "guide-day-btn";
+      nextBtn.innerHTML = CHEVRON_RIGHT;
+      nextBtn.setAttribute("aria-label", "Jour suivant");
+
+      daybar.appendChild(prevBtn);
+      daybar.appendChild(dayLabel);
+      daybar.appendChild(dayInput);
+      daybar.appendChild(nextBtn);
+      root.appendChild(daybar);
+
+      var list = document.createElement("div");
+      list.className = "films-list";
+      root.appendChild(list);
+
+      this._filmsEls = { dayLabel: dayLabel, dayInput: dayInput, list: list };
+
+      prevBtn.addEventListener("click", function () {
+        self._goToFilmsDate(new Date(self._filmsDate.getTime() - 86400000));
+      });
+      nextBtn.addEventListener("click", function () {
+        self._goToFilmsDate(new Date(self._filmsDate.getTime() + 86400000));
+      });
+      dayLabel.addEventListener("click", function () {
+        dayInput.value = isoDateLocal(self._filmsDate);
+        if (dayInput.showPicker) {
+          dayInput.showPicker();
+        } else {
+          dayInput.focus();
+          dayInput.click();
+        }
+      });
+      dayInput.addEventListener("change", function () {
+        if (!dayInput.value) return;
+        var parts = dayInput.value.split("-");
+        var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        self._goToFilmsDate(d);
+      });
+
+      this._filmsBuilt = true;
+      this._goToFilmsDate(this._filmsDate);
+    }
+
+    _filmsDayLabel(date) {
+      var dateStr = isoDateLocal(date);
+      var todayStr = isoDateLocal(new Date());
+      if (dateStr === todayStr) return "Ce soir";
+      var tomorrowStr = isoDateLocal(new Date(Date.now() + 86400000));
+      if (dateStr === tomorrowStr) return "Demain";
+      return dayLabelFr(date);
+    }
+
+    _goToFilmsDate(date) {
+      this._filmsDate = date;
+      this._filmsEls.dayLabel.textContent = this._filmsDayLabel(date);
+      var dateStr = isoDateLocal(date);
+      if (this._filmsCache[dateStr]) {
+        this._renderFilmsDay(dateStr);
+      } else {
+        this._fetchFilmsDay(dateStr);
+      }
+    }
+
+    _fetchFilmsDay(dateStr) {
+      var self = this;
+      var hass = this._hass;
+      var els = this._filmsEls;
+      els.list.innerHTML = "";
+      var loading = document.createElement("div");
+      loading.className = "guide-loading";
+      loading.textContent = "Chargement...";
+      els.list.appendChild(loading);
+
+      var entities = this._resolveEntities();
+      var channelIds = entities
+        .map(function (id) { return hass.states[id].attributes.channel_id; })
+        .filter(Boolean);
+
+      if (!channelIds.length) {
+        els.list.innerHTML = "";
+        return;
+      }
+
+      this._hass.connection
+        .sendMessagePromise({
+          type: "programme_tnt_fr/programmes",
+          channels: channelIds,
+          date: dateStr
+        })
+        .then(function (resp) {
+          var programmesByChannel = (resp && resp.programmes) || {};
+          self._filmsCache[dateStr] = self._computeTopFilms(programmesByChannel, entities, hass, dateStr);
+          self._renderFilmsDay(dateStr);
+        })
+        .catch(function (err) {
+          console.error("programme-tnt-fr-card: films fetch failed", err);
+          els.list.innerHTML = "";
+          var msg = document.createElement("div");
+          msg.className = "guide-empty";
+          msg.textContent = "Erreur de chargement";
+          els.list.appendChild(msg);
+        });
+    }
+
+    _computeTopFilms(programmesByChannel, entities, hass, dateStr) {
+      var parts = dateStr.split("-");
+      var threshold = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 21, 15, 0);
+
+      var films = [];
+      entities.forEach(function (entityId) {
+        var attrs = hass.states[entityId].attributes || {};
+        var cid = attrs.channel_id;
+        if (!cid) return;
+        var progs = programmesByChannel[cid] || [];
+        var pick = pickPrimeTimeProgramme(progs, threshold);
+        if (!pick) return;
+
+        var category = pick.category || "";
+        var mediaType = pick.tmdb_media_type || "";
+        var rating = Number(pick.tmdb_rating || 0);
+        if (category === "Film" && mediaType === "movie" && rating > 0) {
+          films.push({
+            title: pick.title,
+            channel: attrs.channel_name || cid,
+            start: pick.start,
+            rating: rating,
+            votes: pick.tmdb_votes || 0,
+            tmdbId: pick.tmdb_id,
+            poster: pick.poster
+          });
+        }
+      });
+
+      films.sort(function (a, b) { return b.rating - a.rating; });
+      return films.slice(0, 3);
+    }
+
+    _renderFilmsDay(dateStr) {
+      var els = this._filmsEls;
+      var films = this._filmsCache[dateStr] || [];
+      els.list.innerHTML = "";
+
+      if (!films.length) {
+        var empty = document.createElement("div");
+        empty.className = "guide-empty";
+        empty.textContent = "Aucun film noté trouvé pour cette soirée.";
+        els.list.appendChild(empty);
+        return;
+      }
+
+      var medals = ["🥇", "🥈", "🥉"];
+      films.forEach(function (film, index) {
+        var row = document.createElement("a");
+        row.className = "film-row";
+        row.href = film.tmdbId ? ("https://www.themoviedb.org/movie/" + film.tmdbId) : "#";
+        row.target = "_blank";
+        row.rel = "noopener noreferrer";
+
+        if (film.poster) {
+          var img = document.createElement("img");
+          img.className = "film-poster";
+          img.src = film.poster;
+          img.loading = "lazy";
+          img.alt = "";
+          row.appendChild(img);
+        }
+
+        var info = document.createElement("div");
+        info.className = "film-info";
+
+        var titleRow = document.createElement("div");
+        titleRow.className = "film-title";
+        titleRow.textContent = (medals[index] || "") + " " + (film.title || "");
+        info.appendChild(titleRow);
+
+        var metaRow = document.createElement("div");
+        metaRow.className = "film-meta";
+        var timeFmt = formatTime(film.start);
+        metaRow.textContent = film.channel + " • " + (timeFmt || "?") + " • " + film.rating.toFixed(1) + "/10 (" + film.votes + " votes)";
+        info.appendChild(metaRow);
+
+        row.appendChild(info);
+        els.list.appendChild(row);
+      });
+    }
+
     _openModal(channelLabel, prog) {
       var els = this._els;
       if (prog.icon) {
@@ -933,7 +1293,11 @@
     }
 
     set hass(hass) {
+      var hadHass = !!this._hass;
       this._hass = hass;
+      if (!hadHass) {
+        this._render();
+      }
     }
 
     connectedCallback() {
@@ -973,6 +1337,69 @@
       addToggle("show_prime_time", "Afficher la 1re partie de soiree");
       addToggle("show_second_part", "Afficher la 2e partie de soiree");
 
+      if (self._hass) {
+        var hass = self._hass;
+        var ids;
+        var entities = self._config.entities || null;
+        if (entities && entities.length) {
+          ids = entities.filter(function (id) { return !!hass.states[id]; });
+        } else {
+          ids = Object.keys(hass.states).filter(function (id) {
+            var st = hass.states[id];
+            return id.indexOf("sensor.") === 0 && st.attributes && st.attributes.channel_id;
+          });
+        }
+        ids.sort(function (a, b) {
+          var ra = channelRank(hass, a);
+          var rb = channelRank(hass, b);
+          if (ra !== rb) return ra - rb;
+          return channelName(hass, a).localeCompare(channelName(hass, b), "fr", { sensitivity: "base" });
+        });
+
+        if (ids.length) {
+          var favTitle = document.createElement("div");
+          favTitle.textContent = "Chaînes favorites (épinglées en premier)";
+          favTitle.style.fontWeight = "600";
+          favTitle.style.margin = "14px 0 4px";
+          wrap.appendChild(favTitle);
+
+          var currentFavorites = self._config.favorite_channels || [];
+          var favSet = {};
+          currentFavorites.forEach(function (cid) { favSet[cid] = true; });
+
+          ids.forEach(function (id) {
+            var attrs = hass.states[id].attributes || {};
+            var cid = attrs.channel_id;
+            if (!cid) return;
+            var row = document.createElement("ha-formfield");
+            row.setAttribute("label", attrs.channel_name || id);
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.padding = "4px 0";
+            var sw = document.createElement("ha-switch");
+            sw.checked = !!favSet[cid];
+            sw.addEventListener("change", function (ev) {
+              var current = (self._config.favorite_channels || []).slice();
+              var idx = current.indexOf(cid);
+              if (ev.target.checked) {
+                if (idx === -1) current.push(cid);
+              } else if (idx !== -1) {
+                current.splice(idx, 1);
+              }
+              var newConfig = Object.assign({}, self._config, { favorite_channels: current });
+              self._config = newConfig;
+              self.dispatchEvent(new CustomEvent("config-changed", {
+                detail: { config: newConfig },
+                bubbles: true,
+                composed: true
+              }));
+            });
+            row.appendChild(sw);
+            wrap.appendChild(row);
+          });
+        }
+      }
+
       this.appendChild(wrap);
     }
   }
@@ -985,6 +1412,6 @@
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaînes françaises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirée), avec un bouton Guide TV dans l'en-tête qui bascule vers une vue guide (2 chaînes visibles, défilement par chaîne, recherche, sélecteur de jour)."
+    description: "Programme TV des chaînes françaises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirée), avec chaînes favorites épinglables, un bouton Guide TV (recherche, jour, horaire, genre) et un bouton Top films pour voir le classement des films les mieux notés sur plusieurs jours."
   });
 })();
