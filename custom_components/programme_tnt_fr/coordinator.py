@@ -61,6 +61,14 @@ _BARE_SEASON_SUFFIX_RE = re.compile(r"\s+S\d{1,2}\s*$")
 # double numero d'episode cumulatif en fin de titre (ex: "Amour, gloire et
 # beaute (9709) (n°9709)", verifie sur TMDB).
 _CUMULATIVE_EPISODE_RE = re.compile(r"\s*\(\d+\)\s*\(n°\d+\)\s*$")
+# Sous-titre d'episode descriptif suivi du marqueur "(n°N)", sans marqueur
+# de saison entre les deux (ex: "Cuisines des terroirs (La Macedoine du
+# Nord) (n°311)" -> "Cuisines des terroirs", "Tom et Jerry Show
+# (Chat-acombes) (n°224)" -> "Tom et Jerry Show" - tous verifies avec de
+# vraies fiches TMDB). Chevauche partiellement _CUMULATIVE_EPISODE_RE
+# (sans-objet ici puisque ce dernier est tente en premier) mais couvre en
+# plus les sous-titres non numeriques que celui-ci ne capture pas.
+_SUBTITLE_NUMBER_MARKER_RE = re.compile(r"\s*\([^()]*\)\s*\(n°\d+\)\s*$")
 # Qualificatif de version en fin de titre, absent de la fiche TMDB (ex:
 # "Le bateau (version realisateur)" -> "Le Bateau", "Rencontres du
 # troisieme type (Director's Cut)" -> "Rencontres du troisieme type" -
@@ -452,6 +460,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _BARE_SEASON_SUFFIX_RE.sub("", working)
         if working == before:
             working = _CUMULATIVE_EPISODE_RE.sub("", working)
+        if working == before:
+            working = _SUBTITLE_NUMBER_MARKER_RE.sub("", working)
         if working == before:
             working = _VERSION_QUALIFIER_RE.sub("", working)
         working = working.strip()
