@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import unicodedata
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
@@ -26,6 +27,20 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# Bruit frequent dans les titres du flux XMLTV pour les series : sous-titre
+# d'episode entre parentheses, numero de saison, position dans la saison
+# (ex: "Candice Renoir (Faute avouee a demi-pardonnee) S5 (1/10)"), et
+# marqueur d'annee pour distinguer un reboot (ex: "Magnum *2018" du Magnum
+# original des annees 1980). Verifie sur le flux xmltvfr.fr reel : environ
+# un quart des titres suivent ce format. On les retire avant d'interroger
+# TMDB, car la requete brute (bruitee de mots sans rapport avec le vrai
+# titre) degrade nettement la pertinence du moteur de recherche TMDB et
+# peut faire disparaitre le bon resultat de la premiere page de reponses.
+_EPISODE_SUFFIX_RE = re.compile(r"\s*\([^()]*\)\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", re.IGNORECASE)
+_SEASON_SUFFIX_RE = re.compile(r"\s*S\d{1,2}\s*\(\d+/\d+\)\s*$", re.IGNORECASE)
+_YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 
 class _TmdbTransientError(Exception):
@@ -234,16 +249,25 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         )
 
     async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> str | None:
+        clean_title, year = self._clean_search_query(title)
         if self._is_movie_category(category):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
         else:
             search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
-        poster_path = await self._tmdb_search(search_order[0], title)
-        if not poster_path:
-            poster_path = await self._tmdb_search(search_order[1], title)
-        if not poster_path:
-            return None
-        return TMDB_IMAGE_BASE_URL + poster_path
+        for url in search_order:
+            poster_path = await self._tmdb_search(url, clean_title)
+            if poster_path:
+                return TMDB_IMAGE_BASE_URL + poster_path
+        # Repli avec filtre par annee, uniquement si un marqueur "*AAAA" a ete
+        # trouve et que rien n'a matche sans lui (ex: distinguer le Magnum de
+        # 2018 de l'original) - tente en plus, ne remplace jamais les essais
+        # ci-dessus, donc ne peut pas faire regresser un match qui marchait deja.
+        if year:
+            for url in search_order:
+                poster_path = await self._tmdb_search(url, clean_title, year)
+                if poster_path:
+                    return TMDB_IMAGE_BASE_URL + poster_path
+        return None
 
     @staticmethod
     def _is_movie_category(category: str | None) -> bool:
@@ -268,13 +292,18 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         )
         return any(keyword in normalized for keyword in movie_keywords)
 
-    async def _tmdb_search(self, url: str, title: str) -> str | None:
+    async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> str | None:
         params = {
             "api_key": self._tmdb_api_key,
             "query": title,
             "language": "fr-FR",
             "include_adult": "false",
         }
+        if year:
+            if url == TMDB_SEARCH_TV_URL:
+                params["first_air_date_year"] = year
+            elif url == TMDB_SEARCH_MOVIE_URL:
+                params["primary_release_year"] = year
         resp = await self._session.get(url, params=params, timeout=10)
         if resp.status in (401, 403):
             if not self._tmdb_auth_warned:
@@ -303,7 +332,39 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             candidate_norm = self._normalize_title(candidate)
             if candidate_norm and self._titles_match(query_norm, candidate_norm):
                 return result.get("poster_path")
+            # Repli sur le titre original (non localise) : le titre fr-FR peut
+            # diverger du nom XMLTV alors que le titre original correspond.
+            original = result.get("original_title") or result.get("original_name") or ""
+            original_norm = self._normalize_title(original)
+            if (
+                original_norm
+                and original_norm != candidate_norm
+                and self._titles_match(query_norm, original_norm)
+            ):
+                return result.get("poster_path")
         return None
+
+    @staticmethod
+    def _clean_search_query(title: str) -> tuple[str, str | None]:
+        """Retire le bruit episode/saison d'un titre XMLTV avant de le
+        soumettre a TMDB (voir les regex ci-dessus pour des exemples reels).
+        Retourne (titre_nettoye, annee) : annee (extraite d'un marqueur
+        "*AAAA") aide a distinguer un reboot de l'original du meme nom.
+        Si aucun motif ne correspond, retourne le titre original inchange -
+        aucun effet de bord pour les titres deja propres (films, etc.).
+        """
+        working = title or ""
+        year = None
+        year_match = _YEAR_MARKER_RE.search(working)
+        if year_match:
+            year = year_match.group(1)
+            working = _YEAR_MARKER_RE.sub("", working)
+        before = working
+        working = _EPISODE_SUFFIX_RE.sub("", working)
+        if working == before:
+            working = _SEASON_SUFFIX_RE.sub("", working)
+        working = working.strip()
+        return (working or title or "", year)
 
     @staticmethod
     def _titles_match(query_norm: str, candidate_norm: str) -> bool:
