@@ -6,6 +6,7 @@ import logging
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
@@ -147,6 +148,22 @@ def _parse_xmltv_datetime(value: str | None):
         return None
 
 
+@dataclass(frozen=True)
+class TmdbMatch:
+    """Une correspondance TMDB unique : affiche + donnees de notation.
+
+    Regroupees dans un seul objet (plutot que de faire grossir le cache en
+    plusieurs dicts paralleles) pour que _tmdb_poster_cache reste une simple
+    map titre -> resultat, comme avant l'ajout de la notation.
+    """
+
+    poster: str
+    tmdb_id: int | None
+    media_type: str | None
+    rating: float
+    votes: int
+
+
 class Programme:
     """A single TV programme entry."""
 
@@ -170,7 +187,14 @@ class Programme:
         self.icon = icon
         self.rating = rating
 
-    def as_dict(self, poster: str | None = None) -> dict:
+    def as_dict(
+        self,
+        poster: str | None = None,
+        tmdb_id: int | None = None,
+        tmdb_media_type: str | None = None,
+        tmdb_rating: float = 0,
+        tmdb_votes: int = 0,
+    ) -> dict:
         return {
             "title": self.title,
             "subtitle": self.subtitle,
@@ -178,6 +202,10 @@ class Programme:
             "category": self.category,
             "icon": self.icon,
             "poster": poster,
+            "tmdb_id": tmdb_id,
+            "tmdb_media_type": tmdb_media_type,
+            "tmdb_rating": tmdb_rating,
+            "tmdb_votes": tmdb_votes,
             "rating": self.rating,
             "start": self.start.isoformat() if self.start else None,
             "stop": self.stop.isoformat() if self.stop else None,
@@ -205,7 +233,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # Cache titre -> URL d'affiche TMDB (ou None si aucune correspondance
         # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
         # (toutes les 5 min) pour un programme deja resolu.
-        self._tmdb_poster_cache: dict[str, str | None] = {}
+        self._tmdb_poster_cache: dict[str, TmdbMatch | None] = {}
         # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
         # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
         self._tmdb_auth_warned = False
@@ -268,8 +296,16 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     def _programme_dict(self, programme: Programme | None) -> dict | None:
         if programme is None:
             return None
-        poster = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
-        return programme.as_dict(poster=poster)
+        match = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
+        if match is None:
+            return programme.as_dict()
+        return programme.as_dict(
+            poster=match.poster,
+            tmdb_id=match.tmdb_id,
+            tmdb_media_type=match.media_type,
+            tmdb_rating=match.rating,
+            tmdb_votes=match.votes,
+        )
 
     async def _background_resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
         """Resolve TMDB posters in the background, then push a refresh once done.
@@ -292,38 +328,38 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         async def _resolve_one(title: str, category: str | None) -> None:
             async with semaphore:
                 try:
-                    poster = await self._lookup_tmdb_poster(title, category)
+                    match = await self._lookup_tmdb_poster(title, category)
                 except Exception as err:  # noqa: BLE001
                     # Erreur temporaire (reseau, cle invalide, rate limit...) :
                     # on ne met PAS en cache pour que ce titre soit retente au
                     # prochain cycle, plutot que fige a tort sur "aucune affiche".
                     _LOGGER.debug("Recherche TMDB reportee pour %s (erreur temporaire): %s", title, err)
                     return
-                self._tmdb_poster_cache[title] = poster
+                self._tmdb_poster_cache[title] = match
 
         await asyncio.gather(
             *(_resolve_one(title, category) for title, category in title_categories.items())
         )
 
-    async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> str | None:
+    async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> TmdbMatch | None:
         clean_title, year = self._clean_search_query(title)
         if self._is_movie_category(category):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
         else:
             search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
         for url in search_order:
-            poster_path = await self._tmdb_search(url, clean_title)
-            if poster_path:
-                return TMDB_IMAGE_BASE_URL + poster_path
+            match = await self._tmdb_search(url, clean_title)
+            if match:
+                return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
         # Repli avec filtre par annee, uniquement si un marqueur "*AAAA" a ete
         # trouve et que rien n'a matche sans lui (ex: distinguer le Magnum de
         # 2018 de l'original) - tente en plus, ne remplace jamais les essais
         # ci-dessus, donc ne peut pas faire regresser un match qui marchait deja.
         if year:
             for url in search_order:
-                poster_path = await self._tmdb_search(url, clean_title, year)
-                if poster_path:
-                    return TMDB_IMAGE_BASE_URL + poster_path
+                match = await self._tmdb_search(url, clean_title, year)
+                if match:
+                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
         # Dernier repli : une description libre apres une virgule/deux-points
         # (ex: "Nomade des mers, les escales de l'innovation", pas un format
         # d'episode structure donc non couvert par _clean_search_query) peut a
@@ -332,9 +368,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         truncated = self._truncate_at_first_separator(clean_title)
         if truncated and truncated != clean_title:
             for url in search_order:
-                poster_path = await self._tmdb_search(url, truncated)
-                if poster_path:
-                    return TMDB_IMAGE_BASE_URL + poster_path
+                match = await self._tmdb_search(url, truncated)
+                if match:
+                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
         return None
 
     @staticmethod
@@ -360,7 +396,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         )
         return any(keyword in normalized for keyword in movie_keywords)
 
-    async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> str | None:
+    async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> TmdbMatch | None:
         params = {
             "api_key": self._tmdb_api_key,
             "query": title,
@@ -395,6 +431,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         if not results:
             return None
         query_norm = self._normalize_title(title)
+        media_type = "movie" if url == TMDB_SEARCH_MOVIE_URL else "tv"
         # TMDB peut lister plusieurs fiches homonymes exactes (ex: un film
         # rejoue plusieurs annees de suite genere 3 fiches "Fini de rire",
         # dont deux sans affiche uploadee cote TMDB) : s'arreter a la
@@ -407,7 +444,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             candidate_norm = self._normalize_title(candidate)
             if candidate_norm and self._titles_match(query_norm, candidate_norm):
                 if result.get("poster_path"):
-                    return result.get("poster_path")
+                    return self._build_tmdb_match(result, media_type)
                 continue
             # Repli sur le titre original (non localise) : le titre fr-FR peut
             # diverger du nom XMLTV alors que le titre original correspond.
@@ -419,8 +456,24 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 and self._titles_match(query_norm, original_norm)
                 and result.get("poster_path")
             ):
-                return result.get("poster_path")
+                return self._build_tmdb_match(result, media_type)
         return None
+
+    @staticmethod
+    def _build_tmdb_match(result: dict, media_type: str) -> TmdbMatch:
+        """Construit un TmdbMatch a partir d'un resultat brut de l'API TMDB.
+
+        Isole la conversion (valeurs par defaut, casts) du reste de
+        _tmdb_search pour rester testable sans appel reseau, comme les
+        autres methodes statiques de matching de ce module.
+        """
+        return TmdbMatch(
+            poster=result.get("poster_path") or "",
+            tmdb_id=result.get("id"),
+            media_type=media_type,
+            rating=float(result.get("vote_average") or 0),
+            votes=int(result.get("vote_count") or 0),
+        )
 
     @staticmethod
     def _truncate_at_first_separator(title: str) -> str | None:
