@@ -99,6 +99,16 @@ show_second_part: true
 
 Ces options sont egalement disponibles directement dans l'editeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'edition de la carte depuis le tableau de bord, l'editeur graphique propose les trois bascules sans avoir a ecrire de YAML.
 
+Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_current: false
+```
+<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
+
+
+
 ## Attributs disponibles
 
 Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
