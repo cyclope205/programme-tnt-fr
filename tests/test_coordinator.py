@@ -101,3 +101,28 @@ def test_clean_search_query_leaves_clean_titles_unchanged():
 def test_clean_search_query_empty_and_none():
     assert ProgrammeTntFrCoordinator._clean_search_query("") == ("", None)
     assert ProgrammeTntFrCoordinator._clean_search_query(None) == ("", None)
+
+
+def test_normalize_title_unifies_punctuation_separators():
+    # Meme documentaire, ponctuation differente entre XMLTV et TMDB.
+    xmltv = ProgrammeTntFrCoordinator._normalize_title(
+        "Giscard et l'Europe, chronique d'un reve inacheve"
+    )
+    tmdb = ProgrammeTntFrCoordinator._normalize_title(
+        "Giscard et l'Europe : chronique d'un reve inacheve"
+    )
+    assert xmltv == tmdb
+
+
+def test_normalize_title_unifies_dash_and_colon():
+    xmltv = ProgrammeTntFrCoordinator._normalize_title(
+        "Irish Celtic : le chemin des legendes"
+    )
+    tmdb = ProgrammeTntFrCoordinator._normalize_title(
+        "Irish Celtic - Le Chemin des Legendes"
+    )
+    assert xmltv == tmdb
+
+
+def test_normalize_title_collapses_whitespace_after_punctuation_strip():
+    assert ProgrammeTntFrCoordinator._normalize_title("A : B, C - D") == "a b c d"
