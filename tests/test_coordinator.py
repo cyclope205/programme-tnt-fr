@@ -238,3 +238,21 @@ def test_clean_search_query_strips_cumulative_episode_numbering():
     )
     assert cleaned == "Amour, gloire et beaute"
     assert year is None
+
+
+def test_truncate_at_first_separator_strips_descriptive_tagline():
+    assert ProgrammeTntFrCoordinator._truncate_at_first_separator(
+        "Nomade des mers, les escales de l'innovation"
+    ) == "Nomade des mers"
+
+
+def test_truncate_at_first_separator_protects_short_titles():
+    # "Amour" seul avant la virgule : pas assez specifique, on ne tronque
+    # pas (la virgule fait partie du vrai titre "Amour, gloire et beaute").
+    assert ProgrammeTntFrCoordinator._truncate_at_first_separator(
+        "Amour, gloire et beaute"
+    ) is None
+
+
+def test_truncate_at_first_separator_no_separator_returns_none():
+    assert ProgrammeTntFrCoordinator._truncate_at_first_separator("Kon-Tiki") is None
