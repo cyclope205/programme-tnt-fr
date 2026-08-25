@@ -479,6 +479,13 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         alors que le bulletin meteo generique n'a pas de fiche TMDB.
         """
         value = _LIVE_PREFIX_RE.sub("", value or "")
+        # "&" et "et" sont utilises indifferemment d'une source a l'autre
+        # pour le meme titre, dans les deux sens (ex: XMLTV "Superman et
+        # Loïs" vs TMDB "Superman & Loïs" ; XMLTV "Tom & Jerry et le
+        # haricot geant" vs TMDB "Tom et Jerry et le haricot geant" -
+        # verifies avec de vraies fiches TMDB). On unifie vers "et" des
+        # les deux cotes (meme normalisation, donc pas de faux positif).
+        value = (value or "").replace("&", " et ")
         normalized = unicodedata.normalize("NFD", value or "")
         normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
         normalized = normalized.lower().strip()
@@ -494,7 +501,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # Celtic - Le Chemin des Legendes") : on normalise tous ces
         # separateurs en simple espace pour que la comparaison ne depende pas
         # du signe de ponctuation utilise par chaque source.
-        for separator in ("-", ":", ",", ";", "!", "?", "."):
+        for separator in ("-", ":", ",", ";", "!", "?", ".", "/"):
             normalized = normalized.replace(separator, " ")
         words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split()]
         result = " ".join(words)
