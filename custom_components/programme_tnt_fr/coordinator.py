@@ -48,6 +48,9 @@ _SEASON_SUFFIX_RE = re.compile(
 # "Mr Bean - S04E14") : code saison+episode colle, precede d'un tiret, sans
 # parentheses ni fraction.
 _DASH_EPISODE_CODE_RE = re.compile(r"\s*-\s*S\d{1,2}E\d{1,3}\s*$", re.IGNORECASE)
+# Autre variante rencontree (ex: "Planete chefs - Saison 1") : "Saison"
+# ecrit en toutes lettres plutot que "S<n>", sans numero d'episode.
+_DASH_SAISON_WORD_RE = re.compile(r"\s*-\s*Saison\s+\d{1,2}\s*$", re.IGNORECASE)
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
@@ -391,6 +394,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _SEASON_SUFFIX_RE.sub("", working)
         if working == before:
             working = _DASH_EPISODE_CODE_RE.sub("", working)
+        if working == before:
+            working = _DASH_SAISON_WORD_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
