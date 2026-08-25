@@ -19,6 +19,7 @@ Integration Home Assistant qui recupere le programme TV des chaines francaises (
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Utilisation dans un tableau de bord](#utilisation-dans-un-tableau-de-bord)
+- [Attributs disponibles](#attributs-disponibles)
 - [A savoir](#a-savoir)
 
 ## Fonctionnalites
@@ -83,6 +84,43 @@ type: custom:programme-tnt-fr-card
 ```
 
 Aucune autre option n'est necessaire : la carte trouve elle-meme les chaines configurees.
+
+## Attributs disponibles
+
+Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
+
+| Attribut | Description |
+| --- | --- |
+| `title` | Titre du programme |
+| `subtitle` | Sous-titre / episode |
+| `description` | Resume |
+| `category` | Categorie XMLTV |
+| `icon` | Icone associee |
+| `rating` | Classification (ex. age) fournie par le flux XMLTV |
+| `start` / `stop` | Horaires de diffusion (ISO 8601) |
+| `poster` | URL de l'affiche recuperee sur TMDB (`null` si aucune correspondance) |
+| `tmdb_id` | Identifiant TMDB du film ou de la serie (`null` si aucune correspondance) |
+| `tmdb_media_type` | `movie` ou `tv` selon le type de contenu (`null` si aucune correspondance) |
+| `tmdb_rating` | Note moyenne TMDB, sur 10 (`0` si aucune correspondance) |
+| `tmdb_votes` | Nombre de votes ayant etabli cette note (`0` si aucune correspondance) |
+
+Exemple, pour l'attribut `prime_time` :
+
+```yaml
+prime_time:
+  title: Le Fabuleux Destin d'Amelie Poulain
+  subtitle: null
+  category: Film
+  poster: https://image.tmdb.org/t/p/w500/xxxxxx.jpg
+  tmdb_id: 194
+  tmdb_media_type: movie
+  tmdb_rating: 7.6
+  tmdb_votes: 8500
+  start: "2026-08-25T21:05:00+02:00"
+  stop: "2026-08-25T23:10:00+02:00"
+```
+
+Ces donnees permettent par exemple de comparer automatiquement les notes TMDB des films diffuses en prime time sur plusieurs chaines, pour ne notifier que le mieux note.
 
 ## A savoir
 
