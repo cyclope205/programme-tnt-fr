@@ -145,7 +145,7 @@ content: |
   {% endfor %}
   {% set top3 = ns.films | sort(attribute='rating', reverse=true) | list %}
   {% set medals = ['🥇', '🥈', '🥉'] %}
-  ## 🏆 Top 3 films suggeres ce soir
+  ## 🏆 Top {{ top3 | length }} film{{ 's' if top3 | length > 1 else '' }} suggere{{ 's' if top3 | length > 1 else '' }} ce soir
 
   {% if top3 | length > 0 %}
   {% for film in top3[:3] %}
