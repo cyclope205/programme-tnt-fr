@@ -89,3 +89,14 @@ Aucune autre option n'est necessaire : la carte trouve elle-meme les chaines con
 - Le flux de programmes est actualise au maximum une fois par heure.
 - La recherche d'affiches sur TMDB se fait en arriere-plan apres chaque actualisation : juste apres un redemarrage de Home Assistant, certaines vignettes peuvent afficher l'icone du flux TV le temps que TMDB reponde, puis se mettre a jour d'elles-memes.
 - Les problemes et demandes d'evolution se signalent via l'onglet **Issues** du depot.
+
+<div align="center">
+
+### ☕ Cette intégration te plaît ?
+
+Si elle te fait gagner du temps, un petit don est toujours apprécié : ça m'aide à maintenir le projet et à ajouter de nouvelles fonctionnalités.
+
+<a href="https://buymeacoffee.com/cyclope205"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
+<a href="https://paypal.me/cyclope205"><img src="https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal"></a>
+
+</div>
