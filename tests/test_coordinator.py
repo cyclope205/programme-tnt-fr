@@ -357,3 +357,13 @@ def test_clean_search_query_strips_subtitle_marker_does_not_break_cumulative():
     )
     assert cleaned == "Amour, gloire et beaut\u00e9"
     assert year is None
+
+
+
+def test_normalize_title_unifies_curly_and_straight_apostrophe():
+    # XMLTV "Le combat d'Alice" (apostrophe droite) vs TMDB
+    # "Le combat d’Alice" (apostrophe courbe typographique) - verifie
+    # sur une vraie fiche TMDB.
+    xmltv = ProgrammeTntFrCoordinator._normalize_title("Le combat d'Alice")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat d’Alice")
+    assert xmltv == tmdb
