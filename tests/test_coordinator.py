@@ -175,3 +175,29 @@ def test_normalize_title_does_not_strip_live_without_colon():
     # Un titre qui commence reellement par "Live" (sans le marqueur TMDB
     # precis "LIVE:") ne doit pas etre touche.
     assert ProgrammeTntFrCoordinator._normalize_title("Live Aid") == "live aid"
+
+
+def test_clean_search_query_strips_n_degree_episode_marker():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Lucas l'araignee (Derriere la porte) S1 (n°72)"
+    )
+    assert cleaned == "Lucas l'araignee"
+    assert year is None
+
+
+def test_clean_search_query_strips_dash_season_episode_code():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Zig & Sharko - S04E61"
+    )
+    assert cleaned == "Zig & Sharko"
+    assert year is None
+    cleaned2, _ = ProgrammeTntFrCoordinator._clean_search_query("Mr Bean - S04E14")
+    assert cleaned2 == "Mr Bean"
+
+
+def test_clean_search_query_dash_episode_code_does_not_affect_clean_titles():
+    # Un titre avec un tiret qui ne ressemble pas a un code SxxEyy doit
+    # rester intact.
+    assert ProgrammeTntFrCoordinator._clean_search_query("Spider-Man") == (
+        "Spider-Man", None
+    )
