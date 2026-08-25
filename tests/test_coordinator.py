@@ -201,3 +201,11 @@ def test_clean_search_query_dash_episode_code_does_not_affect_clean_titles():
     assert ProgrammeTntFrCoordinator._clean_search_query("Spider-Man") == (
         "Spider-Man", None
     )
+
+
+def test_clean_search_query_strips_spelled_out_saison_suffix():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Planete chefs - Saison 1"
+    )
+    assert cleaned == "Planete chefs"
+    assert year is None
