@@ -333,3 +333,27 @@ def test_normalize_title_unifies_slash_separator():
     )
     tmdb = ProgrammeTntFrCoordinator._normalize_title("Superman/Batman: Apocalypse")
     assert xmltv == tmdb
+
+
+
+def test_clean_search_query_strips_descriptive_subtitle_before_number_marker():
+    # "Cuisines des terroirs (La Mac\u00e9doine du Nord) (n\u00b0311)" a
+    # une vraie fiche TMDB sous "Cuisines des terroirs" ; sans marqueur de
+    # saison entre les deux parentheses, aucun tier existant ne
+    # s'appliquait avant ce correctif.
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Cuisines des terroirs (La Mac\u00e9doine du Nord) (n\u00b0311)"
+    )
+    assert cleaned == "Cuisines des terroirs"
+    assert year is None
+
+
+def test_clean_search_query_strips_subtitle_marker_does_not_break_cumulative():
+    # Le nouveau tier chevauche _CUMULATIVE_EPISODE_RE (sous-titre
+    # purement numerique) sans le remplacer : ce dernier est tente en
+    # premier, donc le resultat reste identique.
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Amour, gloire et beaut\u00e9 (9709) (n\u00b09709)"
+    )
+    assert cleaned == "Amour, gloire et beaut\u00e9"
+    assert year is None
