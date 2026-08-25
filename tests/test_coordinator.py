@@ -127,6 +127,26 @@ def test_normalize_title_unifies_dash_and_colon():
     assert xmltv == tmdb
 
 
+def test_normalize_title_unifies_periods():
+    # XMLTV "Dr Pimple Popper" vs TMDB "Dr. Pimple Popper" - verifie sur
+    # une recherche TMDB reelle (meme fiche, poster reel).
+    xmltv = ProgrammeTntFrCoordinator._normalize_title("Dr Pimple Popper")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Dr. Pimple Popper")
+    assert xmltv == tmdb
+
+
+def test_normalize_title_unifies_periods_in_initialism():
+    # XMLTV "R.I.S. Police scientifique" vs TMDB "R.I.S, police scientifique"
+    # - meme serie, ponctuation differente autour de l'initialisme.
+    xmltv = ProgrammeTntFrCoordinator._normalize_title(
+        "R.I.S. Police scientifique"
+    )
+    tmdb = ProgrammeTntFrCoordinator._normalize_title(
+        "R.I.S, police scientifique"
+    )
+    assert xmltv == tmdb
+
+
 def test_normalize_title_collapses_whitespace_after_punctuation_strip():
     assert ProgrammeTntFrCoordinator._normalize_title("A : B, C - D") == "a b c d"
 
