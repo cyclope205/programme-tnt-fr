@@ -472,7 +472,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # Celtic - Le Chemin des Legendes") : on normalise tous ces
         # separateurs en simple espace pour que la comparaison ne depende pas
         # du signe de ponctuation utilise par chaque source.
-        for separator in ("-", ":", ",", ";", "!", "?"):
+        for separator in ("-", ":", ",", ";", "!", "?", "."):
             normalized = normalized.replace(separator, " ")
         words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split()]
         result = " ".join(words)
