@@ -6,7 +6,10 @@ category/title matching, which is exactly the logic that has caused real
 regressions in the past (French spelled-out numbers vs digits in v2.1.17,
 "Meteo" vs "Miss Meteo" false-positive matches fixed in v2.1.15).
 """
-from custom_components.programme_tnt_fr.coordinator import ProgrammeTntFrCoordinator
+from custom_components.programme_tnt_fr.coordinator import (
+    ProgrammeTntFrCoordinator,
+    TmdbMatch,
+)
 
 
 def test_normalize_title_strips_accents_and_lowercases():
@@ -367,3 +370,38 @@ def test_normalize_title_unifies_curly_and_straight_apostrophe():
     xmltv = ProgrammeTntFrCoordinator._normalize_title("Le combat d'Alice")
     tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat d’Alice")
     assert xmltv == tmdb
+
+
+
+def test_build_tmdb_match_extracts_rating_and_votes():
+    result = {
+        "id": 123456,
+        "poster_path": "/abc.jpg",
+        "vote_average": 8.234,
+        "vote_count": 15432,
+    }
+    match = ProgrammeTntFrCoordinator._build_tmdb_match(result, "movie")
+    assert match == TmdbMatch(
+        poster="/abc.jpg",
+        tmdb_id=123456,
+        media_type="movie",
+        rating=8.234,
+        votes=15432,
+    )
+
+
+def test_build_tmdb_match_defaults_missing_rating_and_votes_to_zero():
+    # Certaines fiches TMDB (notamment les tres recentes) n'ont pas encore
+    # de note ni de votes : doit degrader proprement vers 0, pas planter ni
+    # renvoyer None (l'automatisation HA doit pouvoir comparer sans erreur).
+    result = {"id": 42, "poster_path": "/xyz.jpg"}
+    match = ProgrammeTntFrCoordinator._build_tmdb_match(result, "tv")
+    assert match == TmdbMatch(
+        poster="/xyz.jpg", tmdb_id=42, media_type="tv", rating=0, votes=0
+    )
+
+
+def test_build_tmdb_match_preserves_media_type():
+    result = {"id": 1, "poster_path": "/a.jpg"}
+    assert ProgrammeTntFrCoordinator._build_tmdb_match(result, "movie").media_type == "movie"
+    assert ProgrammeTntFrCoordinator._build_tmdb_match(result, "tv").media_type == "tv"
