@@ -57,3 +57,47 @@ def test_is_movie_category_false_cases():
     assert ProgrammeTntFrCoordinator._is_movie_category("") is False
     assert ProgrammeTntFrCoordinator._is_movie_category("Action") is False
     assert ProgrammeTntFrCoordinator._is_movie_category("Serie") is False
+
+
+def test_clean_search_query_strips_episode_subtitle_and_season():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Candice Renoir (Faute avouee a demi-pardonnee) S5 (1/10)"
+    )
+    assert cleaned == "Candice Renoir"
+    assert year is None
+
+
+def test_clean_search_query_extracts_reboot_year_marker():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Magnum *2018 (La passagere) S5 (1/20)"
+    )
+    assert cleaned == "Magnum"
+    assert year == "2018"
+
+
+def test_clean_search_query_strips_season_suffix_without_parens():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "In Flight S1 (1/6)"
+    )
+    assert cleaned == "In Flight"
+    assert year is None
+
+
+def test_clean_search_query_preserves_colon_in_real_title():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Toronto : Section criminelle (La vraie Eve) S1 (3/10)"
+    )
+    assert cleaned == "Toronto : Section criminelle"
+    assert year is None
+
+
+def test_clean_search_query_leaves_clean_titles_unchanged():
+    # Titres de films (sans metadonnees d'episode) : aucun effet de bord.
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query("Kon-Tiki")
+    assert cleaned == "Kon-Tiki"
+    assert year is None
+
+
+def test_clean_search_query_empty_and_none():
+    assert ProgrammeTntFrCoordinator._clean_search_query("") == ("", None)
+    assert ProgrammeTntFrCoordinator._clean_search_query(None) == ("", None)
