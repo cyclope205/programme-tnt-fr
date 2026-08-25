@@ -230,3 +230,11 @@ def test_clean_search_query_bare_season_is_last_resort_only():
     assert cleaned == "Candice Renoir"
     cleaned2, _ = ProgrammeTntFrCoordinator._clean_search_query("Zig & Sharko - S04E61")
     assert cleaned2 == "Zig & Sharko"
+
+
+def test_clean_search_query_strips_cumulative_episode_numbering():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
+        "Amour, gloire et beaute (9709) (n°9709)"
+    )
+    assert cleaned == "Amour, gloire et beaute"
+    assert year is None
