@@ -51,6 +51,12 @@ _DASH_EPISODE_CODE_RE = re.compile(r"\s*-\s*S\d{1,2}E\d{1,3}\s*$", re.IGNORECASE
 # Autre variante rencontree (ex: "Planete chefs - Saison 1") : "Saison"
 # ecrit en toutes lettres plutot que "S<n>", sans numero d'episode.
 _DASH_SAISON_WORD_RE = re.compile(r"\s*-\s*Saison\s+\d{1,2}\s*$", re.IGNORECASE)
+# Repli le plus large, tente en dernier seulement : simple marqueur de
+# saison en fin de titre, sans parentheses ni tiret (ex: "90' Enquetes S17",
+# "Reporters S1", "Appels d'urgence S22" - tous verifies avec une vraie
+# fiche TMDB). Comme il est peu specifique, il n'est essaye que si aucun
+# des motifs plus precis ci-dessus n'a matche.
+_BARE_SEASON_SUFFIX_RE = re.compile(r"\s+S\d{1,2}\s*$")
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
@@ -396,6 +402,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _DASH_EPISODE_CODE_RE.sub("", working)
         if working == before:
             working = _DASH_SAISON_WORD_RE.sub("", working)
+        if working == before:
+            working = _BARE_SEASON_SUFFIX_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
