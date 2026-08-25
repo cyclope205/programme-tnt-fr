@@ -86,6 +86,19 @@ type: custom:programme-tnt-fr-card
 
 Aucune autre option n'est necessaire : la carte trouve elle-meme les chaines configurees.
 
+### Options d'affichage
+
+Par defaut, les trois sections (En ce moment / 1ere partie de soiree / 2eme partie de soiree) sont toutes affichees. Chacune peut etre masquee individuellement avec les options suivantes (toutes a `true` par defaut) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_current: true
+show_prime_time: true
+show_second_part: true
+```
+
+Ces options sont egalement disponibles directement dans l'editeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'edition de la carte depuis le tableau de bord, l'editeur graphique propose les trois bascules sans avoir a ecrire de YAML.
+
 ## Attributs disponibles
 
 Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
