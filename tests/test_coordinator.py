@@ -209,3 +209,24 @@ def test_clean_search_query_strips_spelled_out_saison_suffix():
     )
     assert cleaned == "Planete chefs"
     assert year is None
+
+
+def test_clean_search_query_strips_bare_trailing_season():
+    cleaned, year = ProgrammeTntFrCoordinator._clean_search_query("90' Enquetes S17")
+    assert cleaned == "90' Enquetes"
+    assert year is None
+    cleaned2, _ = ProgrammeTntFrCoordinator._clean_search_query("Reporters S1")
+    assert cleaned2 == "Reporters"
+    cleaned3, _ = ProgrammeTntFrCoordinator._clean_search_query("Appels d'urgence S22")
+    assert cleaned3 == "Appels d'urgence"
+
+
+def test_clean_search_query_bare_season_is_last_resort_only():
+    # Les motifs plus specifiques (parentheses, tiret+code) doivent gagner
+    # sur le repli generique "S<n>" en fin de titre.
+    cleaned, _ = ProgrammeTntFrCoordinator._clean_search_query(
+        "Candice Renoir (Pas de fumee sans feu) S4 (8/10)"
+    )
+    assert cleaned == "Candice Renoir"
+    cleaned2, _ = ProgrammeTntFrCoordinator._clean_search_query("Zig & Sharko - S04E61")
+    assert cleaned2 == "Zig & Sharko"
