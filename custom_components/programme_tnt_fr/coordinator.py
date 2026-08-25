@@ -496,6 +496,13 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # verifies avec de vraies fiches TMDB). On unifie vers "et" des
         # les deux cotes (meme normalisation, donc pas de faux positif).
         value = (value or "").replace("&", " et ")
+        # TMDB utilise parfois l'apostrophe courbe typographique (’)
+        # la ou XMLTV utilise l'apostrophe droite ASCII (ex: TMDB "Le
+        # combat d’Alice" vs XMLTV "Le combat d'Alice" - verifie sur une
+        # vraie fiche TMDB). On unifie vers l'apostrophe droite des les
+        # deux cotes.
+        for curly in ("’", "‘", "‛"):
+            value = value.replace(curly, "'")
         normalized = unicodedata.normalize("NFD", value or "")
         normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
         normalized = normalized.lower().strip()
