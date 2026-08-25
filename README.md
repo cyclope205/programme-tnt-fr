@@ -123,6 +123,44 @@ prime_time:
 
 Ces donnees permettent par exemple de comparer automatiquement les notes TMDB des films diffuses en prime time sur plusieurs chaines, pour ne notifier que le mieux note.
 
+### Exemple : Top 3 films du soir (carte Markdown)
+
+Une carte `type: markdown` standard de Home Assistant suffit a afficher un classement des films les mieux notes en 1ere partie de soiree, toutes chaines confondues :
+
+```yaml
+type: markdown
+content: |
+  {% set ns = namespace(films=[]) %}
+  {% for entity in states.sensor | selectattr('entity_id', 'search', 'programme_tnt_fr_') | map(attribute='entity_id') | list %}
+    {% set program = state_attr(entity, 'prime_time') %}
+    {% if program is mapping %}
+      {% set category = program.category | default('') %}
+      {% set media_type = program.tmdb_media_type | default('') %}
+      {% set rating = program.tmdb_rating | default(0) | float(0) %}
+      {% set votes = program.tmdb_votes | default(0) | int(0) %}
+      {% if category == 'Film' and media_type == 'movie' and rating > 0 %}
+        {% set ns.films = ns.films + [{'title': program.title, 'channel': state_attr(entity, 'channel_name'), 'start': program.start, 'rating': rating, 'votes': votes, 'tmdb_id': program.tmdb_id}] %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% set top3 = ns.films | sort(attribute='rating', reverse=true) | list %}
+  {% set medals = ['🥇', '🥈', '🥉'] %}
+  ## 🏆 Top 3 films suggeres ce soir
+
+  {% if top3 | length > 0 %}
+  {% for film in top3[:3] %}
+  {{ medals[loop.index0] }} **[{{ film.title }}](https://www.themoviedb.org/movie/{{ film.tmdb_id }})**
+
+  📺 {{ film.channel }} — 🕙 {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} — ⭐ {{ film.rating }}/10 ({{ film.votes }} votes)
+
+  {% endfor %}
+  {% else %}
+  Aucun film note trouve pour ce soir.
+  {% endif %}
+```
+
+Aucune configuration necessaire : le template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` presents chez l'utilisateur, quelles que soient les chaines selectionnees a la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de theatre sous `tmdb_media_type: movie`, ce croisement avec la categorie XMLTV evite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-meme pour en savoir plus.
+
 ## A savoir
 
 - Le flux de programmes est actualise au maximum une fois par heure.
