@@ -61,6 +61,15 @@ _BARE_SEASON_SUFFIX_RE = re.compile(r"\s+S\d{1,2}\s*$")
 # double numero d'episode cumulatif en fin de titre (ex: "Amour, gloire et
 # beaute (9709) (n°9709)", verifie sur TMDB).
 _CUMULATIVE_EPISODE_RE = re.compile(r"\s*\(\d+\)\s*\(n°\d+\)\s*$")
+# Qualificatif de version en fin de titre, absent de la fiche TMDB (ex:
+# "Le bateau (version realisateur)" -> "Le Bateau", "Rencontres du
+# troisieme type (Director's Cut)" -> "Rencontres du troisieme type" -
+# tous verifies avec une vraie fiche TMDB).
+_VERSION_QUALIFIER_RE = re.compile(
+    r"\s*\((?:version (?:réalisateur|restaurée|longue|intégrale|non censurée)"
+    r"|director'?s cut|extended(?: cut)?|uncut)\)\s*$",
+    re.IGNORECASE,
+)
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
@@ -70,8 +79,9 @@ _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
 # article des DEUX cotes avant comparaison (symetrique, comme pour la
 # ponctuation) : la comparaison stricte par prefixe qui suit reste le
 # garde-fou contre les faux positifs, ce n'est pas un relachement du
-# critere d'acceptation.
-_LEADING_ARTICLE_RE = re.compile(r"^(?:le|la|les)\s+|^l'")
+# critere d'acceptation. Meme logique pour l'anglais "the" (ex: XMLTV
+# "Big Bang Theory" vs TMDB "The Big Bang Theory" - verifie en direct).
+_LEADING_ARTICLE_RE = re.compile(r"^(?:le|la|les|the)\s+|^l'")
 
 # TMDB prefixe certaines emissions "en direct/en continu" (ex: talk-shows
 # d'actualite) d'un marqueur "LIVE:" absent du titre XMLTV correspondant
@@ -377,11 +387,20 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         if not results:
             return None
         query_norm = self._normalize_title(title)
+        # TMDB peut lister plusieurs fiches homonymes exactes (ex: un film
+        # rejoue plusieurs annees de suite genere 3 fiches "Fini de rire",
+        # dont deux sans affiche uploadee cote TMDB) : s'arreter a la
+        # premiere correspondance de titre, meme sans affiche, faisait
+        # perdre une affiche bel et bien disponible sur une fiche suivante.
+        # On continue donc de chercher une affiche parmi TOUTES les fiches
+        # dont le titre correspond avant d'abandonner.
         for result in results:
             candidate = result.get("title") or result.get("name") or ""
             candidate_norm = self._normalize_title(candidate)
             if candidate_norm and self._titles_match(query_norm, candidate_norm):
-                return result.get("poster_path")
+                if result.get("poster_path"):
+                    return result.get("poster_path")
+                continue
             # Repli sur le titre original (non localise) : le titre fr-FR peut
             # diverger du nom XMLTV alors que le titre original correspond.
             original = result.get("original_title") or result.get("original_name") or ""
@@ -390,6 +409,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 original_norm
                 and original_norm != candidate_norm
                 and self._titles_match(query_norm, original_norm)
+                and result.get("poster_path")
             ):
                 return result.get("poster_path")
         return None
@@ -432,6 +452,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _BARE_SEASON_SUFFIX_RE.sub("", working)
         if working == before:
             working = _CUMULATIVE_EPISODE_RE.sub("", working)
+        if working == before:
+            working = _VERSION_QUALIFIER_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
