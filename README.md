@@ -10,7 +10,7 @@
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
 
-Integration Home Assistant qui recupere le programme TV des chaines francaises (TNT + une selection de chaines supplementaires) et l'affiche dans une carte Lovelace : carrousel "que regarder ce soir" et guide TV complet par chaine.
+Intégration Home Assistant qui récupère le programme TV des chaines françaises (TNT + une sélection de chaines supplémentaires) et l'affiche dans une carte Lovelace : carrousel "Qu'est-ce qu'on regarde?", guide TV complet par chaine et classement des films les mieux notes.
 
 ## Sommaire
 
@@ -24,58 +24,98 @@ Integration Home Assistant qui recupere le programme TV des chaines francaises (
 
 ## Fonctionnalites
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Carrousel
 
-Pour chaque chaine suivie, la carte affiche jusqu'a 3 programmes : celui en cours, la premiere partie de soiree et la deuxieme partie de soiree. Chaque vignette montre l'affiche du programme (recuperee sur TMDB quand une correspondance fiable est trouvee, sinon l'icone fournie par le flux TV), le titre, la categorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le detail du programme.
+Pour chaque chaine suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxieme partie de soirée. Chaque vignette montre l'affiche du programme (recuperée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**Chaines favorites** : une chaine marquee comme favorite (option `favorite_channels`) est epinglee en tete du carrousel et affiche une etoile sur ses vignettes, pour la retrouver immediatement sans faire defiler toutes les chaines suivies.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Guide TV
 
-Le bouton "Guide TV" dans l'entete de la carte bascule vers un guide complet, inspire de l'application Free : deux colonnes de chaines visibles a la fois, defilement horizontal pour changer de chaine (fleches sur ordinateur, glissement au doigt sur mobile/tablette) et defilement vertical pour parcourir la grille chronologique d'une chaine.
+Le bouton "Guide TV" dans l'entête de la carte bascule vers un guide complet, inspire de l'application Free : deux colonnes de chaines visibles à la fois, défilement horizontal pour changer de chaine (flèches sur ordinateur, glissement au doigt sur mobile/tablette) et défilement vertical pour parcourir la grille chronologique d'une chaine.
 
-Le guide propose trois filtres, combinables :
+Le guide propose quatre filtres, combinables :
 - **Recherche** : un champ texte pour ne garder que les chaines dont le nom correspond.
-- **Jour** : fleches precedent/suivant pour changer de journee de diffusion.
-- **Horaire** : un menu pour n'afficher que les programmes d'une plage donnee (00h-06h, 06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement un moment de la journee sans faire defiler toute la liste.
+- **Jour** : flèches précédente/suivant pour changer de journée de diffusion.
+- **Horaire** : un menu pour n'afficher que les programmes d'une plage donnée (00h-06h, 06h-12h, 12h-16h, 16h-19h, 19h-21h, 21h-00h), pour retrouver rapidement un moment de la journée sans faire défiler toute la liste.
+- **Genre** : un menu pour ne garder que les programmes d'un type donne (Film, Série, Sport, etc.).
 
-Un clic sur "Carrousel" dans l'entete revient a la vue de depart.
+Un clic sur "Carrousel" dans l'entête revient a la vue de départ.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Top films
+
+Un bouton dans l'entête de la carte ouvre le classement des films les mieux notes (TMDB) en 1ere partie de soirée, navigable jour par jour sur environ une semaine — la même logique que la carte markdown ci-dessous, mais sans se limiter au soir même.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Captures d'ecran
 
 Ecran de configuration des chaines suivies :
 
 ![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
 
-Vue "En ce moment" / "1ere partie de soiree" avec jaquettes TMDB :
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
 
 ![Rendu de la carte avec jaquettes TMDB](https://github.com/user-attachments/assets/ee3804a9-a729-4b10-820b-aa1d210eba1b)
 
-Vue "2eme partie de soiree" :
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Vue "2eme partie de soirée" :
 
 ![Vue 2eme partie de soiree](https://github.com/user-attachments/assets/39e629c2-02e7-43a5-bd89-fc73f2d7f03d)
 
-Guide TV, avec le filtre horaire :
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Guide TV, avec le "filtre horaire" :
 
-<!-- SCREENSHOT: Guide TV avec le filtre horaire (a remplacer ici) --><img width="462" height="792" alt="Capture d&#39;écran 2026-08-24 233655" src="https://github.com/user-attachments/assets/0e81bb5e-13af-473d-9f47-d30d67ddb0d9" />
+<img width="184" height="320" alt="Capture d-ecran 2026-08-26 a 22 09 20" src="https://github.com/user-attachments/assets/c32927eb-80a2-4eba-b5c5-d9c87cb4be66" />
 
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Configuration des chaines favorites:
+
+<img width="1286" height="812" alt="image" src="https://github.com/user-attachments/assets/9625d200-f72b-44ee-9e38-63572ff7416e" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Carrousel avec une chaine favorite épinglée et son étoile:
+
+<img width="1271" height="777" alt="image" src="https://github.com/user-attachments/assets/b705a916-4f02-4c8c-bc93-4062756b2231" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Guide TV avec le filtre "Genre" appliqué:
+
+<img width="184" height="320" alt="Capture d-ecran 2026-08-26 a 22 08 04" src="https://github.com/user-attachments/assets/95a1fffc-ad10-49c1-a3d2-ae9cf68a7758" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Vue Top films avec la navigation jour par jour:
+
+<img width="460" height="552" alt="image" src="https://github.com/user-attachments/assets/53121b73-6221-4704-b054-36fe7cdcc835" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Installation
 
 1. Ajouter ce depot a HACS comme depot personnalise :
-   1. Ouvrir **HACS** dans le menu lateral de Home Assistant.
-   2. Cliquer sur le menu **&#8942;** (trois points verticaux) en haut a droite de la page HACS, puis choisir **Depots personnalises** (*Custom repositories*).
-   3. Coller l'URL du depot dans le champ **Depot** (*Repository*) : `https://github.com/cyclope205/programme-tnt-fr`
+   1. Ouvrir **HACS** dans le menu latéral de Home Assistant.
+   2. Cliquer sur le menu **&#8942;** (trois points verticaux) en haut a droite de la page HACS, puis choisir **Dépôts personnalisés** (*Custom repositories*).
+   3. Coller l'URL du depot dans le champ **Dépôt** (*Repository*) : `https://github.com/cyclope205/programme-tnt-fr`
    4. Choisir **Integration** dans le menu deroulant **Type** (*Category*).
    5. Cliquer sur **Ajouter** (*Add*), puis fermer la fenetre.
-2. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et telecharger des depots**) et l'installer.
-3. Redemarrer Home Assistant.
-4. Ajouter l'integration via **Parametres > Appareils et services > Ajouter une integration > Programme TNT FR**.
+2. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et télécharger des dépôts**) et l'installer.
+3. Redémarrer Home Assistant.
+4. Ajouter l'integration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
-La carte Lovelace est enregistree automatiquement par l'integration : aucune ressource a declarer a la main.
+La carte Lovelace est enregistrée automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Configuration
 
-A l'ajout de l'integration, une liste de chaines est proposee (les chaines de la TNT francaise sont selectionnees par defaut, une selection plus large de chaines est egalement disponible). La selection peut etre modifiee a tout moment depuis les options de l'integration, sans avoir a la reinstaller.
+A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller.
 
+Les chaines favorites se choisissent également depuis les options de l'intégration : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Utilisation dans un tableau de bord
 
 Ajouter une carte manuelle avec :
@@ -84,11 +124,12 @@ Ajouter une carte manuelle avec :
 type: custom:programme-tnt-fr-card
 ```
 
-Aucune autre option n'est necessaire : la carte trouve elle-meme les chaines configurees.
+Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines configurées.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Options d'affichage
 
-Par defaut, les trois sections (En ce moment / 1ere partie de soiree / 2eme partie de soiree) sont toutes affichees. Chacune peut etre masquee individuellement avec les options suivantes (toutes a `true` par defaut) :
+Par défaut, les trois sections (En ce moment / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
 
 ```yaml
 type: custom:programme-tnt-fr-card
@@ -97,7 +138,7 @@ show_prime_time: true
 show_second_part: true
 ```
 
-Ces options sont egalement disponibles directement dans l'editeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'edition de la carte depuis le tableau de bord, l'editeur graphique propose les trois bascules sans avoir a ecrire de YAML.
+Ces options sont également disponibles directement dans l'éditeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les trois bascules sans avoir a écrire de YAML.
 
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
@@ -107,11 +148,21 @@ show_current: false
 ```
 <img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
 
+Les chaines favorites, épinglées en tête du carrousel avec une étoile, se configurent avec `favorite_channels` :
 
+```yaml
+type: custom:programme-tnt-fr-card
+favorite_channels:
+  - TF1
+  - France 2
+```
 
+Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
 
-Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
+Chaque capteur `sensor.programme_tnt_fr_<chaine>` éxpose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
 
 | Attribut | Description |
 | --- | --- |
@@ -144,11 +195,12 @@ prime_time:
   stop: "2026-08-25T23:10:00+02:00"
 ```
 
-Ces donnees permettent par exemple de comparer automatiquement les notes TMDB des films diffuses en prime time sur plusieurs chaines, pour ne notifier que le mieux note.
+Ces données permettent par exemple de comparer automatiquement les notes TMDB des films diffusés en prime time sur plusieurs chaines, pour ne notifier que le mieux noté.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Exemple : Top 3 films du soir (carte Markdown)
 
-Une carte `type: markdown` standard de Home Assistant suffit a afficher un classement des films les mieux notes en 1ere partie de soiree, toutes chaines confondues :
+Une carte `type: markdown` standard de Home Assistant suffit à afficher un classement des films les mieux notes en 1ere partie de soirée, toutes chaines confondues. Le titre du classement reprend désormais le nombre réel de films trouvés :
 
 ```yaml
 type: markdown
@@ -167,32 +219,36 @@ content: |
     {% endif %}
   {% endfor %}
   {% set top3 = ns.films | sort(attribute='rating', reverse=true) | list %}
+  {% set displayed = top3[:3] %}
   {% set medals = ['🥇', '🥈', '🥉'] %}
-  ## 🏆 Top {{ top3 | length }} film{{ 's' if top3 | length > 1 else '' }} suggér{{ 'és' if top3 | length > 1 else 'é' }} ce soir
-
-  {% if top3 | length > 0 %}
-  {% for film in top3[:3] %}
+  ## 🏆 Top {{ displayed | length }} film{{ 's' if displayed | length > 1 else '' }} suggér{{ 'és' if displayed | length > 1 else 'é' }} ce soir (1ère partie de soirée)
+  {% if displayed | length > 0 %}
+  {% for film in displayed %}
   {{ medals[loop.index0] }} **[{{ film.title }}](https://www.themoviedb.org/movie/{{ film.tmdb_id }})**
 
-  📺 {{ film.channel }} — 🕙 {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} — ⭐ {{ film.rating }}/10 ({{ film.votes }} votes)
+  📺 {{ film.channel }} — 🕘 {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} — ⭐ {{ film.rating }}/10 ({{ film.votes }} votes)
 
   {% endfor %}
   {% else %}
-  Aucun film note trouve pour ce soir.
+  Aucun film noté trouvé pour ce soir.
   {% endif %}
 ```
 
-Aucune configuration necessaire : le template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` presents chez l'utilisateur, quelles que soient les chaines selectionnees a la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de theatre sous `tmdb_media_type: movie`, ce croisement avec la categorie XMLTV evite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-meme pour en savoir plus.
+Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. 
+
 <img width="451" height="385" alt="image" src="https://github.com/user-attachments/assets/bc666b44-88ef-496e-bdc7-4ed6f4cabf75" />
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## A savoir
 
 - Le flux de programmes est actualise au maximum une fois par heure.
-- La recherche d'affiches sur TMDB se fait en arriere-plan apres chaque actualisation : juste apres un redemarrage de Home Assistant, certaines vignettes peuvent afficher l'icone du flux TV le temps que TMDB reponde, puis se mettre a jour d'elles-memes.
-- Les problemes et demandes d'evolution se signalent via l'onglet **Issues** du depot.
+- La recherche d'affiches sur TMDB se fait en arrière-plan après chaque actualisation : juste après un redémarrage de Home Assistant, certaines vignettes peuvent afficher l'icone du flux TV le temps que TMDB réponde, puis se mettre a jour d'elles-mêmes. Cela peut entrainer un temps de chargement qui affiche un message d'erreur de configuration. En patientant un court moment et en actualisant éventuellement la page ou la vue, celle-ci apparaitra.
+- Toutes les nouvelles options (`favorite_channels`, filtre Genre, vue Top films) sont facultatives : le comportement par défaut de la carte reste inchangé pour les configurations existantes.
+- Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
 
 <div align="center">
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### ☕ Cette intégration te plaît ?
 
 Si elle te fait gagner du temps, un petit don est toujours apprécié : ça m'aide à maintenir le projet et à ajouter de nouvelles fonctionnalités.
