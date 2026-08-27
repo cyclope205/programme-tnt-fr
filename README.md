@@ -27,10 +27,10 @@ Intégration Home Assistant qui récupère le programme TV des chaines français
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Carrousel
 
-Pour chaque chaine suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxieme partie de soirée. Chaque vignette montre l'affiche du programme (recuperée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme.
+Pour chaque chaîne suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxième partie de soirée. Chaque vignette montre l'affiche du programme récupérée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**Chaines favorites** : une chaine marquee comme favorite (option `favorite_channels`) est epinglee en tete du carrousel et affiche une etoile sur ses vignettes, pour la retrouver immediatement sans faire defiler toutes les chaines suivies.
+**Chaines favorites** : une chaine marquée comme favorite (option `favorite_channels`) est épinglée en tête du carrousel et affiche une étoile sur ses vignettes, pour la retrouver immédiatement sans faire défiler toutes les chaines suivies.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Guide TV
