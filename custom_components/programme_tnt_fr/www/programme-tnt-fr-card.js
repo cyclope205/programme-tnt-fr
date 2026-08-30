@@ -431,7 +431,7 @@
     _render() {
       this._ensureDom();
       var els = this._els;
-      els.headerTitle.textContent = this._config.title || "Qu'est-ce qu'on regarde à la TV ?";
+      els.headerTitle.textContent = this._config.title || "Qu'est-ce qu'on regarde ?";
 
       if (!this._hass) {
         els.body.innerHTML = "";
@@ -1354,7 +1354,7 @@
     }
 
     static getStubConfig() {
-      return { title: "Qu'est-ce qu'on regarde à la TV ?" };
+      return { title: "Qu'est-ce qu'on regarde ?" };
     }
 
     static getConfigElement() {
