@@ -14,6 +14,8 @@
     ".header-actions { display: flex; gap: 6px; flex-shrink: 0; }",
     ".header-guide-link { flex-shrink: 0; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-size: 0.62em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }",
     ".header-guide-link:active { transform: scale(0.96); }",
+    ".header-guide-link.active { background: var(--primary-color, #3f6fe0); color: #fff; }",
+    ".header-guide-link[hidden] { display: none; }",
     ".slot-section { margin-bottom: 26px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
     ".slot-title-header { font-size: 1.12em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); display: flex; align-items: center; gap: 9px; }",
@@ -63,7 +65,11 @@
     ".modal-subtitle { font-style: italic; opacity: 0.85; margin-bottom: 8px; }",
     ".modal-subtitle[hidden] { display: none; }",
     ".modal-meta { font-size: 0.85em; opacity: 0.7; margin-bottom: 12px; }",
+    ".modal-rating { font-size: 0.9em; font-weight: 700; margin-bottom: 12px; }",
+    ".modal-rating[hidden] { display: none; }",
     ".modal-desc { line-height: 1.45; white-space: pre-line; }",
+    ".modal-tmdb-link { display: block; margin-top: 16px; font-size: 0.85em; font-weight: 700; color: var(--primary-color, #3f6fe0); text-decoration: none; }",
+    ".modal-tmdb-link[hidden] { display: none; }",
     ".guide-header { margin-bottom: 10px; }",
     ".guide-search { width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 999px; border: none; background: var(--secondary-background-color, #2a2a2a); color: var(--primary-text-color); font-size: 0.95em; margin-bottom: 10px; font-family: inherit; }",
     ".guide-daybar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }",
@@ -113,6 +119,15 @@
     ["current", "En ce moment à la télé", "live"],
     ["prime_time", "Programmes télé en 1ère partie de soirée", "prime"],
     ["second_part", "Programmes télé en 2ème partie de soirée", "second"]
+  ];
+
+  // Vue : cle interne, libelle du bouton, cle de config pour l'afficher/masquer.
+  // Utilise a la fois pour construire les 3 boutons d'en-tete et pour piloter
+  // quelle vue est affichee (voir _isViewEnabled/_enabledViews/_firstEnabledView).
+  var VIEW_DEFS = [
+    ["carousel", "Carrousel", "show_carousel"],
+    ["guide", "Guide TV", "show_guide_tv"],
+    ["topfilms", "Top films", "show_top_films"]
   ];
 
   var CHEVRON_LEFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
@@ -212,7 +227,7 @@
       this._config = config || {};
       this._entities = this._config.entities || null;
       this._built = false;
-      this._view = "carousel";
+      this._view = this._firstEnabledView();
       this._guideBuilt = false;
       this._guideCache = {};
       this._guideDate = new Date();
@@ -274,6 +289,27 @@
       return ids;
     }
 
+    // Une vue est affichee sauf si sa cle de config vaut explicitement false
+    // (meme convention que show_current/show_prime_time/show_second_part).
+    _isViewEnabled(configKey) {
+      return this._config[configKey] !== false;
+    }
+
+    _enabledViews() {
+      var self = this;
+      return VIEW_DEFS.filter(function (def) {
+        return self._isViewEnabled(def[2]);
+      }).map(function (def) { return def[0]; });
+    }
+
+    // Vue de depart / repli : la premiere vue encore activee, ou "carousel"
+    // si l'utilisateur a (par erreur ou volontairement) tout masque - on
+    // prefere toujours afficher quelque chose plutot qu'une carte vide.
+    _firstEnabledView() {
+      var enabled = this._enabledViews();
+      return enabled.length ? enabled[0] : "carousel";
+    }
+
     _ensureDom() {
       if (this._built) return;
       this.innerHTML = "";
@@ -296,27 +332,25 @@
       var actions = document.createElement("div");
       actions.className = "header-actions";
 
-      var guideLink = document.createElement("button");
-      guideLink.type = "button";
-      guideLink.className = "header-guide-link";
-      guideLink.textContent = "Guide TV";
-      guideLink.addEventListener("click", function () {
-        self._view = self._view === "guide" ? "carousel" : "guide";
-        self._updateHeaderButtons();
-        self._renderBody();
+      // 3 boutons fixes (un par vue, cf VIEW_DEFS) plutot que 2 boutons a
+      // bascule : chacun mene directement a sa vue, et _updateHeaderButtons()
+      // se charge de les masquer/marquer actif selon la config et la vue
+      // courante. Reference stockee dans this._els sous <cle>+"Link".
+      var viewLinks = {};
+      VIEW_DEFS.forEach(function (def) {
+        var viewKey = def[0], label = def[1];
+        var link = document.createElement("button");
+        link.type = "button";
+        link.className = "header-guide-link";
+        link.textContent = label;
+        link.addEventListener("click", function () {
+          self._view = viewKey;
+          self._updateHeaderButtons();
+          self._renderBody();
+        });
+        actions.appendChild(link);
+        viewLinks[viewKey] = link;
       });
-      actions.appendChild(guideLink);
-
-      var filmsLink = document.createElement("button");
-      filmsLink.type = "button";
-      filmsLink.className = "header-guide-link";
-      filmsLink.textContent = "Top films";
-      filmsLink.addEventListener("click", function () {
-        self._view = self._view === "topfilms" ? "carousel" : "topfilms";
-        self._updateHeaderButtons();
-        self._renderBody();
-      });
-      actions.appendChild(filmsLink);
 
       header.appendChild(actions);
       card.appendChild(header);
@@ -345,7 +379,9 @@
         "<h3 class=\"modal-title\"></h3>" +
         "<div class=\"modal-subtitle\" hidden></div>" +
         "<div class=\"modal-meta\"></div>" +
+        "<div class=\"modal-rating\" hidden></div>" +
         "<div class=\"modal-desc\"></div>" +
+        "<a class=\"modal-tmdb-link\" hidden target=\"_blank\" rel=\"noopener noreferrer\">Voir la fiche TMDB</a>" +
         "</div>";
       this.appendChild(overlay);
 
@@ -359,8 +395,7 @@
       this._els = {
         header: header,
         headerTitle: headerTitle,
-        guideLink: guideLink,
-        filmsLink: filmsLink,
+        viewLinks: viewLinks,
         body: body,
         guideRoot: guideRoot,
         filmsRoot: filmsRoot,
@@ -369,15 +404,28 @@
         modalTitle: overlay.querySelector(".modal-title"),
         modalSubtitle: overlay.querySelector(".modal-subtitle"),
         modalMeta: overlay.querySelector(".modal-meta"),
-        modalDesc: overlay.querySelector(".modal-desc")
+        modalRating: overlay.querySelector(".modal-rating"),
+        modalDesc: overlay.querySelector(".modal-desc"),
+        modalTmdbLink: overlay.querySelector(".modal-tmdb-link")
       };
       this._built = true;
     }
 
     _updateHeaderButtons() {
-      var els = this._els;
-      els.guideLink.textContent = this._view === "guide" ? "Carrousel" : "Guide TV";
-      els.filmsLink.textContent = this._view === "topfilms" ? "Carrousel" : "Top films";
+      var self = this;
+      var enabled = this._enabledViews();
+      // Inutile d'afficher des boutons de navigation s'il n'y a qu'une seule
+      // vue activee (rien vers quoi basculer) : la carte se comporte alors
+      // comme avant l'ajout de cette fonctionnalite (aucun bouton visible).
+      var showButtons = enabled.length > 1;
+      VIEW_DEFS.forEach(function (def) {
+        var viewKey = def[0];
+        var link = self._els.viewLinks[viewKey];
+        if (!link) return;
+        var isEnabled = enabled.indexOf(viewKey) !== -1;
+        link.hidden = !showButtons || !isEnabled;
+        link.classList.toggle("active", self._view === viewKey);
+      });
     }
 
     _render() {
@@ -389,6 +437,15 @@
         els.body.innerHTML = "";
         return;
       }
+
+      // Si la vue courante vient d'etre masquee (changement de config en
+      // direct dans l'editeur, ex: decocher "Afficher le Guide TV" pendant
+      // qu'il est ouvert), on bascule vers la premiere vue encore activee
+      // plutot que de laisser la carte affichee sur une vue desormais cachee.
+      if (this._enabledViews().indexOf(this._view) === -1) {
+        this._view = this._firstEnabledView();
+      }
+      this._updateHeaderButtons();
 
       var dataSig = this._computeDataSig();
       if (this._dataSig !== dataSig) {
@@ -1269,7 +1326,26 @@
       if (prog.category) metaParts.push(prog.category);
       if (prog.rating) metaParts.push("CSA : " + prog.rating);
       els.modalMeta.textContent = metaParts.join(" • ");
+
+      if (prog.tmdb_rating) {
+        var votesTxt = prog.tmdb_votes ? " (" + prog.tmdb_votes + " votes)" : "";
+        els.modalRating.textContent = "⭐ " + Number(prog.tmdb_rating).toFixed(1) + "/10" + votesTxt + " — TMDB";
+        els.modalRating.hidden = false;
+      } else {
+        els.modalRating.hidden = true;
+      }
+
       els.modalDesc.textContent = prog.description || "";
+
+      if (prog.tmdb_id) {
+        var mediaPath = prog.tmdb_media_type === "tv" ? "tv" : "movie";
+        els.modalTmdbLink.href = "https://www.themoviedb.org/" + mediaPath + "/" + prog.tmdb_id;
+        els.modalTmdbLink.hidden = false;
+      } else {
+        els.modalTmdbLink.hidden = true;
+        els.modalTmdbLink.removeAttribute("href");
+      }
+
       els.overlay.hidden = false;
     }
 
@@ -1336,6 +1412,16 @@
       addToggle("show_current", "Afficher l''En ce moment''");
       addToggle("show_prime_time", "Afficher la 1re partie de soiree");
       addToggle("show_second_part", "Afficher la 2e partie de soiree");
+
+      var viewsTitle = document.createElement("div");
+      viewsTitle.textContent = "Vues disponibles";
+      viewsTitle.style.fontWeight = "600";
+      viewsTitle.style.margin = "14px 0 4px";
+      wrap.appendChild(viewsTitle);
+
+      addToggle("show_carousel", "Afficher le carrousel");
+      addToggle("show_guide_tv", "Afficher le Guide TV");
+      addToggle("show_top_films", "Afficher le Top films");
 
       if (self._hass) {
         var hass = self._hass;
@@ -1404,9 +1490,20 @@
     }
   }
 
-  customElements.define("programme-tnt-fr-card-editor", ProgrammeTntFrCardEditor);
+  // Garde defensive : si ce script s'execute deux fois dans la meme session
+  // (rechargement de carte, re-enregistrement de ressource...), un second
+  // appel a customElements.define() pour un tag deja enregistre leve une
+  // exception qui interrompt le reste du fichier - empechant potentiellement
+  // le second define() de s'executer et provoquant "Custom element doesn't
+  // exist: programme-tnt-fr-card" (voir issues #1 et #5 du depot). On ignore
+  // simplement un second enregistrement plutot que de planter.
+  if (!customElements.get("programme-tnt-fr-card-editor")) {
+    customElements.define("programme-tnt-fr-card-editor", ProgrammeTntFrCardEditor);
+  }
 
-  customElements.define("programme-tnt-fr-card", ProgrammeTntFrCard);
+  if (!customElements.get("programme-tnt-fr-card")) {
+    customElements.define("programme-tnt-fr-card", ProgrammeTntFrCard);
+  }
 
   window.customCards = window.customCards || [];
   window.customCards.push({
