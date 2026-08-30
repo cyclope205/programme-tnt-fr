@@ -107,12 +107,15 @@
     ".guide-item-title { font-size: 0.92em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
     ".guide-item-meta { font-size: 0.72em; font-weight: 600; opacity: 0.78; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
     ".guide-empty, .guide-loading { padding: 20px 8px; text-align: center; opacity: 0.6; font-size: 0.85em; font-style: italic; }",
-    ".films-list { display: flex; flex-direction: column; gap: 12px; }",
-    ".film-row { display: flex; gap: 12px; text-decoration: none; color: inherit; background: var(--secondary-background-color, #2a2a2a); border-radius: 14px; padding: 8px; align-items: center; }",
-    ".film-poster { width: 56px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: rgba(127,127,127,0.2); }",
-    ".film-info { min-width: 0; }",
-    ".film-title { font-weight: 700; font-size: 0.98em; line-height: 1.3; }",
-    ".film-meta { font-size: 0.8em; opacity: 0.75; margin-top: 4px; }"
+    ".films-list { display: flex; flex-wrap: wrap; gap: 12px; }",
+    ".film-row { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); display: flex; flex-direction: column; background: none; border: none; padding: 0; margin: 0; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; text-align: left; color: inherit; }",
+    ".film-row:active { transform: scale(0.97); }",
+    ".film-poster-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.35); background: rgba(127,127,127,0.2); }",
+    ".film-poster { width: 100%; height: 100%; object-fit: cover; display: block; }",
+    ".film-medal-badge { position: absolute; top: 6px; left: 6px; font-size: 1.4em; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }",
+    ".film-info { min-width: 0; margin-top: 6px; }",
+    ".film-title { font-weight: 700; font-size: 0.92em; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
+    ".film-meta { font-size: 0.75em; opacity: 0.75; margin-top: 3px; }"
   ].join("\n");
 
   var SLOT_DEFS = [
@@ -1245,7 +1248,8 @@
             rating: rating,
             votes: pick.tmdb_votes || 0,
             tmdbId: pick.tmdb_id,
-            poster: pick.poster
+            poster: pick.poster,
+            prog: pick
           });
         }
       });
@@ -1255,6 +1259,7 @@
     }
 
     _renderFilmsDay(dateStr) {
+      var self = this;
       var els = this._filmsEls;
       var films = this._filmsCache[dateStr] || [];
       els.list.innerHTML = "";
@@ -1269,33 +1274,50 @@
 
       var medals = ["🥇", "🥈", "🥉"];
       films.forEach(function (film, index) {
-        var row = document.createElement("a");
+        var row = document.createElement("div");
         row.className = "film-row";
-        row.href = film.tmdbId ? ("https://www.themoviedb.org/movie/" + film.tmdbId) : "#";
-        row.target = "_blank";
-        row.rel = "noopener noreferrer";
+        row.setAttribute("role", "button");
+        row.tabIndex = 0;
+        row.addEventListener("click", function () {
+          self._openModal(film.channel, film.prog || {});
+        });
+        row.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            self._openModal(film.channel, film.prog || {});
+          }
+        });
 
+        var posterWrap = document.createElement("div");
+        posterWrap.className = "film-poster-wrap";
         if (film.poster) {
           var img = document.createElement("img");
           img.className = "film-poster";
           img.src = film.poster;
           img.loading = "lazy";
           img.alt = "";
-          row.appendChild(img);
+          posterWrap.appendChild(img);
         }
+        if (medals[index]) {
+          var medalBadge = document.createElement("div");
+          medalBadge.className = "film-medal-badge";
+          medalBadge.textContent = medals[index];
+          posterWrap.appendChild(medalBadge);
+        }
+        row.appendChild(posterWrap);
 
         var info = document.createElement("div");
         info.className = "film-info";
 
         var titleRow = document.createElement("div");
         titleRow.className = "film-title";
-        titleRow.textContent = (medals[index] || "") + " " + (film.title || "");
+        titleRow.textContent = film.title || "";
         info.appendChild(titleRow);
 
         var metaRow = document.createElement("div");
         metaRow.className = "film-meta";
         var timeFmt = formatTime(film.start);
-        metaRow.textContent = film.channel + " • " + (timeFmt || "?") + " • " + film.rating.toFixed(1) + "/10 (" + film.votes + " votes)";
+        metaRow.textContent = film.channel + " • " + (timeFmt || "?") + " • " + film.rating.toFixed(1) + "/10";
         info.appendChild(metaRow);
 
         row.appendChild(info);
