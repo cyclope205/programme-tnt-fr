@@ -27,7 +27,7 @@ Intégration Home Assistant qui récupère le programme TV des chaines français
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Carrousel
 
-Pour chaque chaîne suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxième partie de soirée. Chaque vignette montre l'affiche du programme récupérée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme.
+Pour chaque chaîne suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxième partie de soirée. Chaque vignette montre l'affiche du programme récupérée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme (synopsis, et note TMDB avec lien vers la fiche quand une correspondance est trouvée).
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Chaines favorites** : une chaine marquée comme favorite (option `favorite_channels`) est épinglée en tête du carrousel et affiche une étoile sur ses vignettes, pour la retrouver immédiatement sans faire défiler toutes les chaines suivies.
@@ -140,6 +140,17 @@ show_second_part: true
 
 Ces options sont également disponibles directement dans l'éditeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les trois bascules sans avoir a écrire de YAML.
 
+Les trois vues de la carte (Carrousel, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_carousel: true
+show_guide_tv: true
+show_top_films: true
+```
+
+Ces trois bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
 ```yaml
@@ -214,7 +225,7 @@ content: |
       {% set rating = program.tmdb_rating | default(0) | float(0) %}
       {% set votes = program.tmdb_votes | default(0) | int(0) %}
       {% if category == 'Film' and media_type == 'movie' and rating > 0 %}
-        {% set ns.films = ns.films + [{'title': program.title, 'channel': state_attr(entity, 'channel_name'), 'start': program.start, 'rating': rating, 'votes': votes, 'tmdb_id': program.tmdb_id}] %}
+        {% set ns.films = ns.films + [{'title': program.title, 'channel': state_attr(entity, 'channel_name'), 'start': program.start, 'rating': rating, 'votes': votes, 'tmdb_id': program.tmdb_id, 'poster': program.poster}] %}
       {% endif %}
     {% endif %}
   {% endfor %}
@@ -224,7 +235,7 @@ content: |
   ## 🏆 Top {{ displayed | length }} film{{ 's' if displayed | length > 1 else '' }} suggér{{ 'és' if displayed | length > 1 else 'é' }} ce soir (1ère partie de soirée)
   {% if displayed | length > 0 %}
   {% for film in displayed %}
-  {{ medals[loop.index0] }} **[{{ film.title }}](https://www.themoviedb.org/movie/{{ film.tmdb_id }})**
+  {{ medals[loop.index0] }}{% if film.poster %} <img src="{{ film.poster }}" width="40" style="vertical-align:middle;border-radius:4px;margin-right:4px;">{% endif %} **[{{ film.title }}](https://www.themoviedb.org/movie/{{ film.tmdb_id }})**
 
   📺 {{ film.channel }} — 🕘 {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} — ⭐ {{ film.rating }}/10 ({{ film.votes }} votes)
 
@@ -234,7 +245,7 @@ content: |
   {% endif %}
 ```
 
-Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. 
+Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. La jaquette TMDB du film s'affiche désormais devant chaque titre, quand une correspondance est trouvée.
 
 <img width="451" height="385" alt="image" src="https://github.com/user-attachments/assets/bc666b44-88ef-496e-bdc7-4ed6f4cabf75" />
 
@@ -243,7 +254,8 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 
 - Le flux de programmes est actualise au maximum une fois par heure.
 - La recherche d'affiches sur TMDB se fait en arrière-plan après chaque actualisation : juste après un redémarrage de Home Assistant, certaines vignettes peuvent afficher l'icone du flux TV le temps que TMDB réponde, puis se mettre a jour d'elles-mêmes. Cela peut entrainer un temps de chargement qui affiche un message d'erreur de configuration. En patientant un court moment et en actualisant éventuellement la page ou la vue, celle-ci apparaitra.
-- Toutes les nouvelles options (`favorite_channels`, filtre Genre, vue Top films) sont facultatives : le comportement par défaut de la carte reste inchangé pour les configurations existantes.
+- Toutes les nouvelles options (`favorite_channels`, filtre Genre, vue Top films, `show_carousel`/`show_guide_tv`/`show_top_films`) sont facultatives : le comportement par défaut de la carte reste inchangé pour les configurations existantes.
+- La carte se protège désormais contre un double enregistrement du composant (garde `customElements.get()` avant `customElements.define()`), une cause possible de l'erreur "Custom element doesn't exist" rapportée occasionnellement par certains utilisateurs.
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
 
 <div align="center">
