@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 
 from homeassistant.components.frontend import add_extra_js_url
-from homeassistant.components.http import StaticPathConfig
+from aiohttp import web
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 
@@ -22,6 +22,11 @@ CARD_URL_PATH = f"/programme_tnt_fr/{CARD_FILENAME}"
 CARD_VERSION = "2.1.22"
 _CARD_REGISTERED_KEY = f"{DOMAIN}_card_registered"
 _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
+
+_NO_CACHE_HEADERS = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    "Pragma": "no-cache",
+}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -56,14 +61,19 @@ async def _async_register_card(hass: HomeAssistant) -> None:
         return
 
     www_dir = Path(__file__).parent / "www"
-    await hass.http.async_register_static_paths(
-        [
-            StaticPathConfig(
-                CARD_URL_PATH, str(www_dir / CARD_FILENAME), cache_headers=False
-            )
-        ]
-    )
-    add_extra_js_url(hass, f"{CARD_URL_PATH}?v={CARD_VERSION}")
+    card_path = www_dir / CARD_FILENAME
+    card_content = await hass.async_add_executor_job(card_path.read_text, "utf-8")
+    
+    async def _serve_card(request: web.Request) -> web.Response:
+        return web.Response(
+            text=card_content,
+            content_type="application/javascript",
+            charset="utf-8",
+            headers=_NO_CACHE_HEADERS,
+        )
+        
+        hass.http.app.router.add_get(CARD_URL_PATH, _serve_card)
+        add_extra_js_url(hass, f"{CARD_URL_PATH}?v={CARD_VERSION}")
     hass.data[_CARD_REGISTERED_KEY] = True
 
 @callback
