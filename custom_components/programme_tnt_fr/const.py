@@ -151,6 +151,13 @@ EXTRA_CHANNELS = {
     "Syfy.fr": "Syfy",
     "Euronews.fr": "Euronews",
     "France24.fr": "France 24",
+    # Ajouts : 6 chaines thematiques les plus regardees (Mediamat Semestriel Mediametrie, janv-juin 2026)
+    "RTL9.fr": "RTL9",
+    "TvBreizh.fr": "TV Breizh",
+    "PolarPlus.fr": "Polar+",
+    "Teva.fr": "Teva",
+    "serieclub.fr": "Serie Club",
+    "AB1.fr": "AB1",
 }
 
 # Union des deux listes pour le formulaire de selection des chaines.
