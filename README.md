@@ -225,7 +225,7 @@ content: |
       {% set rating = program.tmdb_rating | default(0) | float(0) %}
       {% set votes = program.tmdb_votes | default(0) | int(0) %}
       {% if category == 'Film' and media_type == 'movie' and rating > 0 %}
-        {% set ns.films = ns.films + [{'title': program.title, 'channel': state_attr(entity, 'channel_name'), 'start': program.start, 'rating': rating, 'votes': votes, 'tmdb_id': program.tmdb_id, 'poster': program.poster}] %}
+        {% set ns.films = ns.films + [{'title': program.title, 'channel': state_attr(entity, 'channel_name'), 'start': program.start, 'rating': rating, 'votes': votes, 'tmdb_id': program.tmdb_id, 'poster': program.poster, 'description': program.description}] %}
       {% endif %}
     {% endif %}
   {% endfor %}
@@ -233,19 +233,14 @@ content: |
   {% set displayed = top3[:3] %}
   {% set medals = ['🥇', '🥈', '🥉'] %}
   ## 🏆 Top {{ displayed | length }} film{{ 's' if displayed | length > 1 else '' }} suggér{{ 'és' if displayed | length > 1 else 'é' }} ce soir (1ère partie de soirée)
-  {% if displayed | length > 0 %}
-  {% for film in displayed %}
-  {{ medals[loop.index0] }}{% if film.poster %} <img src="{{ film.poster }}" width="40" style="vertical-align:middle;border-radius:4px;margin-right:4px;">{% endif %} **[{{ film.title }}](https://www.themoviedb.org/movie/{{ film.tmdb_id }})**
-
-  📺 {{ film.channel }} — 🕘 {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} — ⭐ {{ film.rating }}/10 ({{ film.votes }} votes)
-
-  {% endfor %}
-  {% else %}
+  {% if displayed | length > 0 -%}
+  <table width="100%"><tr>{% for film in displayed -%}<td width="{{ (100 / displayed|length)|int }}%" valign="top" align="center"><a href="https://www.themoviedb.org/movie/{{ film.tmdb_id }}">{% if film.poster %}<img src="{{ film.poster }}" width="120">{% endif %}</a><br><b>{{ medals[loop.index0] }} {{ film.title }}</b><br>{{ film.channel }} • {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} • {{ film.rating }}/10</td>{% endfor -%}</tr></table>
+  {%- else -%}
   Aucun film noté trouvé pour ce soir.
-  {% endif %}
+  {%- endif %}
 ```
 
-Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque titre est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. La jaquette TMDB du film s'affiche désormais devant chaque titre, quand une correspondance est trouvée.
+Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque jaquette est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. La jaquette TMDB du film s'affiche désormais devant chaque titre, quand une correspondance est trouvée.
 
 <img width="451" height="385" alt="image" src="https://github.com/user-attachments/assets/bc666b44-88ef-496e-bdc7-4ed6f4cabf75" />
 
