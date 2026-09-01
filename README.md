@@ -51,6 +51,13 @@ Un clic sur "Carrousel" dans l'entête revient a la vue de départ.
 Un bouton dans l'entête de la carte ouvre le classement des films les mieux notes (TMDB) en 1ere partie de soirée, navigable jour par jour sur environ une semaine — la même logique que la carte markdown ci-dessous, mais sans se limiter au soir même.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Rappels
+
+Depuis le détail d'un programme (clic sur une vignette), un bouton propose d'être notifié 5, 10 ou 15 minutes avant le début. Le rappel est conservé même si Home Assistant redémarre entre-temps, peut être annulé à tout moment depuis la même fiche, et ne s'affiche pas pour un programme déjà en cours de diffusion. Il peut être envoyé sous forme de notification (mobile, Alexa...) et/ou annoncé vocalement sur une enceinte ou une TV (`media_player`) via la synthèse vocale de Home Assistant.
+
+Des **profils de rappel** peuvent être créés depuis les options de l'intégration : chaque profil (ex. "Fred", "Ginie") regroupe le nom d'une personne et ses propres appareils à notifier, pour que chacun reçoive ses rappels sur son téléphone/enceinte plutôt que sur les cibles globales. Un menu déroulant dans la fiche du programme permet de choisir le profil (ou "Par défaut") avant de programmer le rappel.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Captures d'ecran
 
 Ecran de configuration des chaines suivies :
@@ -94,6 +101,26 @@ Vue Top films avec la navigation jour par jour:
 <img width="460" height="552" alt="image" src="https://github.com/user-attachments/assets/53121b73-6221-4704-b054-36fe7cdcc835" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Bouton de rappel dans le détail d'un programme :
+
+<img width="663" height="718" alt="Capture d&#39;écran 2026-09-01 214115" src="https://github.com/user-attachments/assets/e7b01917-d2ee-4cb2-900e-7879b3dfd5db" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Configuration des appareils de notification et de l'annonce vocale :
+
+<img width="737" height="742" alt="Capture d&#39;écran 2026-09-01 214327" src="https://github.com/user-attachments/assets/bac71e1c-d31d-4e70-9d86-f30bd9865300" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Gestion des profils de rappel (ajout/édition) :
+
+<img width="718" height="770" alt="Capture d&#39;écran 2026-09-01 214514" src="https://github.com/user-attachments/assets/dadd9f3f-9e4a-4cdb-a9fa-5197d94f2e55" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sélection d'un profil dans la fiche du programme avant de programmer un rappel :
+
+<img width="653" height="757" alt="Capture d&#39;écran 2026-09-01 214655" src="https://github.com/user-attachments/assets/1bd0b0f1-7826-464d-aa4e-3a65ca56a68d" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Installation
 
 1. Ajouter ce depot a HACS comme depot personnalise :
@@ -104,9 +131,9 @@ Vue Top films avec la navigation jour par jour:
    5. Cliquer sur **Ajouter** (*Add*), puis fermer la fenetre.
 2. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et télécharger des dépôts**) et l'installer.
 3. Redémarrer Home Assistant.
-4. Ajouter l'integration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
+4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
-La carte Lovelace est enregistrée automatiquement par l'intégration : aucune ressource a déclarer à la main.
+La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Configuration
@@ -114,6 +141,10 @@ La carte Lovelace est enregistrée automatiquement par l'intégration : aucune r
 A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller.
 
 Les chaines favorites se choisissent également depuis les options de l'intégration : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
+
+Les appareils utilisés pour les rappels se configurent via des **profils de rappel**, depuis les options de l'intégration (menu "Profils de rappel" puis "Ajouter un profil") : chaque profil a un nom (ex. "Fred", "Ginie"), un ou plusieurs appareils à notifier, une ou plusieurs enceintes/TV (`media_player`) pour une annonce vocale (avec le moteur de synthèse vocale TTS de votre choix), les deux pouvant être combinés. Un appareil Alexa déjà choisi comme notification (il parle déjà le message via son propre système) n'a pas besoin d'être ajouté une seconde fois côté `media_player` pour ce même profil - l'intégration bloque d'ailleurs cette combinaison pour éviter d'entendre le rappel deux fois.
+
+Pour que plusieurs personnes du foyer reçoivent leurs rappels chacune sur leurs propres appareils, un profil distinct peut être créé pour chacune, avec ses propres cibles indépendantes des autres profils. Le profil est ensuite sélectionnable dans la fiche du programme au moment de programmer le rappel ; sans profil configuré, aucun rappel ne peut être envoyé.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Utilisation dans un tableau de bord
@@ -253,6 +284,7 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 - Toutes les nouvelles options (`favorite_channels`, filtre Genre, vue Top films, `show_carousel`/`show_guide_tv`/`show_top_films`) sont facultatives : le comportement par défaut de la carte reste inchangé pour les configurations existantes.
 - La carte se protège désormais contre un double enregistrement du composant (garde `customElements.get()` avant `customElements.define()`), une cause possible de l'erreur "Custom element doesn't exist" rapportée occasionnellement par certains utilisateurs.
 - Le fichier JS de la carte est servi sans en-tete de cache HTTP explicite (`cache_headers=False`), pour reduire le risque que le navigateur garde en memoire une ancienne version de la carte apres une mise a jour. Si la carte ne se met pas a jour visuellement apres une mise a jour HACS (redemarrage effectue), un rechargement force de la page (ou de l'application Compagnon) resout generalement le probleme.
+- Un appareil Alexa (Alexa Media Player) choisi comme cible `media_player` pour l'annonce vocale d'un rappel est automatiquement détecté et route l'annonce via son propre service `notify.alexa_media_<appareil>` (donc avec la vraie voix Alexa), plutôt que via la synthèse vocale générique de Home Assistant qui nécessiterait une URL de fichier audio accessible publiquement.
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
 <div align="center">
 

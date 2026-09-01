@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 
 from .const import CONF_CHANNELS, DEFAULT_CHANNELS, DOMAIN
 from .coordinator import ProgrammeTntFrCoordinator
+from .reminders import async_setup_reminders
 from .ws_api import async_register_websocket_api
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,16 +20,22 @@ PLATFORMS = ["sensor"]
 
 CARD_FILENAME = "programme-tnt-fr-card.js"
 CARD_URL_PATH = f"/programme_tnt_fr/{CARD_FILENAME}"
-CARD_VERSION = "2.1.24"
+CARD_VERSION = "2.1.26"
 _CARD_REGISTERED_KEY = f"{DOMAIN}_card_registered"
 _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
-
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Programme TNT FR from a config entry."""
     await _async_register_card(hass)
     _async_register_ws_api(hass)
+    try:
+        await async_setup_reminders(hass)
+    except Exception:  # noqa: BLE001
+        _LOGGER.exception(
+            "Echec de l'initialisation des rappels programme_tnt_fr "
+            "(fonctionnalite desactivee, le reste de l'integration n'est pas affecte)"
+        )
 
     channels = entry.options.get(
         CONF_CHANNELS, entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS)
@@ -42,9 +49,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
+
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload the entry when its options change (e.g. channel selection)."""
     await hass.config_entries.async_reload(entry.entry_id)
+
 
 async def _async_register_card(hass: HomeAssistant) -> None:
     """Serve the Lovelace card from this integration and auto-register it.
@@ -66,6 +75,7 @@ async def _async_register_card(hass: HomeAssistant) -> None:
     add_extra_js_url(hass, f"{CARD_URL_PATH}?v={CARD_VERSION}")
     hass.data[_CARD_REGISTERED_KEY] = True
 
+
 @callback
 def _async_register_ws_api(hass: HomeAssistant) -> None:
     """Register the Guide TV card websocket API (once)."""
@@ -73,6 +83,7 @@ def _async_register_ws_api(hass: HomeAssistant) -> None:
         return
     async_register_websocket_api(hass)
     hass.data[_WS_API_REGISTERED_KEY] = True
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""

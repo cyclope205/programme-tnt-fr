@@ -39,6 +39,21 @@
     ".poster-channel-badge { position: absolute; bottom: 10px; left: 10px; width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.45); object-fit: contain; z-index: 1; }",
     ".poster-favorite-badge { position: absolute; top: 10px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
     ".poster-favorite-badge svg { width: 14px; height: 14px; }",
+    ".guide-item-favorite-badge { position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
+    ".guide-item-favorite-badge svg { width: 10px; height: 10px; }",
+    ".guide-col-logo-wrap { position: relative; display: inline-flex; }",
+    ".guide-col-favorite-badge { position: absolute; top: -4px; left: -4px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
+    ".guide-col-favorite-badge svg { width: 10px; height: 10px; }",
+    ".modal-notify-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }",
+    ".modal-notify-row[hidden] { display: none; }",
+    ".modal-notify-label { font-size: 0.85em; opacity: 0.8; }",
+      ".modal-notify-profile { font-size: 0.8em; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--divider-color, #555); background: var(--card-background-color, #1c1c1c); color: var(--primary-text-color); }",
+      ".modal-notify-profile[hidden] { display: none; }",
+    ".modal-notify-btn { border: none; background: var(--primary-color, #3f6fe0); color: #fff; font-size: 0.8em; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; }",
+    ".modal-notify-btn:active { transform: scale(0.95); }",
+    ".modal-notify-cancel-btn { border: 1px solid var(--divider-color, #555); background: transparent; color: var(--primary-text-color); font-size: 0.8em; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; }",
+    ".modal-notify-cancel-btn:active { transform: scale(0.95); }",
+    ".modal-notify-status { font-size: 0.8em; opacity: 0.85; margin-left: 2px; }",
     ".poster-live-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.66em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
     ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
     "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }",
@@ -385,6 +400,15 @@
         "<div class=\"modal-rating\" hidden></div>" +
         "<div class=\"modal-desc\"></div>" +
         "<a class=\"modal-tmdb-link\" hidden target=\"_blank\" rel=\"noopener noreferrer\">Voir la fiche TMDB</a>" +
+        "<div class=\"modal-notify-row\" hidden>" +
+        "<span class=\"modal-notify-label\">Me notifier avant :</span>" +
+        "<select class=\"modal-notify-profile\" hidden></select>" +
+        "<button type=\"button\" class=\"modal-notify-btn\" data-minutes=\"5\">5 min</button>" +
+        "<button type=\"button\" class=\"modal-notify-btn\" data-minutes=\"10\">10 min</button>" +
+        "<button type=\"button\" class=\"modal-notify-btn\" data-minutes=\"15\">15 min</button>" +
+        "<button type=\"button\" class=\"modal-notify-cancel-btn\" hidden>Annuler le rappel</button>" +
+        "<span class=\"modal-notify-status\"></span>" +
+        "</div>" +
         "</div>";
       this.appendChild(overlay);
 
@@ -409,9 +433,30 @@
         modalMeta: overlay.querySelector(".modal-meta"),
         modalRating: overlay.querySelector(".modal-rating"),
         modalDesc: overlay.querySelector(".modal-desc"),
-        modalTmdbLink: overlay.querySelector(".modal-tmdb-link")
+        modalTmdbLink: overlay.querySelector(".modal-tmdb-link"),
+        modalNotifyRow: overlay.querySelector(".modal-notify-row"),
+        modalNotifyBtns: overlay.querySelectorAll(".modal-notify-btn"),
+        modalNotifyCancelBtn: overlay.querySelector(".modal-notify-cancel-btn"),
+        modalNotifyStatus: overlay.querySelector(".modal-notify-status"),
+        modalNotifyProfile: overlay.querySelector(".modal-notify-profile")
       };
       this._built = true;
+      this._activeReminders = {};
+      this._els.modalNotifyRow.addEventListener("click", function (e) {
+        var scheduleBtn = e.target.closest(".modal-notify-btn");
+        if (scheduleBtn && self._modalProg) {
+          self._scheduleReminder(parseInt(scheduleBtn.dataset.minutes, 10));
+          return;
+        }
+        var cancelBtn = e.target.closest(".modal-notify-cancel-btn");
+        if (cancelBtn && self._modalProg) {
+          self._cancelReminder();
+        }
+      });
+      this._els.modalNotifyProfile.addEventListener("change", function () {
+        self._modalProfile = self._els.modalNotifyProfile.value || null;
+        self._refreshReminderStatus();
+      });
     }
 
     _updateHeaderButtons() {
@@ -807,6 +852,15 @@
       columns.id = "slider";
       root.appendChild(self._buildCarouselWrap(columns));
 
+      var favorites = self._config.favorite_channels;
+      var favSet = null;
+      if (favorites && favorites.length) {
+        favSet = {};
+        favorites.forEach(function (cid) {
+          favSet[cid] = true;
+        });
+      }
+
       var colRefs = {};
       entities.forEach(function (entityId) {
         var attrs = hass.states[entityId].attributes || {};
@@ -823,11 +877,20 @@
         colHeader.className = "guide-col-header";
 
         if (icon) {
+          var logoWrap = document.createElement("div");
+          logoWrap.className = "guide-col-logo-wrap";
           var logo = document.createElement("img");
           logo.className = "guide-col-logo";
           logo.src = icon;
           logo.alt = "";
-          colHeader.appendChild(logo);
+          logoWrap.appendChild(logo);
+          if (favSet && favSet[channelId]) {
+            var colFavBadge = document.createElement("div");
+            colFavBadge.className = "guide-col-favorite-badge";
+            colFavBadge.innerHTML = STAR_ICON;
+            logoWrap.appendChild(colFavBadge);
+          }
+          colHeader.appendChild(logoWrap);
         }
 
         var meta = document.createElement("div");
@@ -973,6 +1036,12 @@
       var self = this;
       var dayData = this._guideCache[dateStr] || {};
       var categories = {};
+      var favorites = this._config.favorite_channels;
+      var favSet = null;
+      if (favorites && favorites.length) {
+        favSet = {};
+        favorites.forEach(function (cid) { favSet[cid] = true; });
+      }
       Object.keys(this._guideColRefs).forEach(function (channelId) {
         var ref = self._guideColRefs[channelId];
         var progs = dayData[channelId] || [];
@@ -984,9 +1053,10 @@
           ref.list.appendChild(empty);
           return;
         }
+        var isFavorite = !!(favSet && favSet[channelId]);
         progs.forEach(function (prog) {
           if (prog.category) categories[prog.category] = true;
-          ref.list.appendChild(self._buildGuideItem(prog, ref.label, ref.icon));
+          ref.list.appendChild(self._buildGuideItem(prog, ref.label, ref.icon, isFavorite));
         });
       });
       this._updateGenreOptions(Object.keys(categories).sort(function (a, b) {
@@ -1017,7 +1087,7 @@
       }
     }
 
-    _buildGuideItem(prog, channelLabel, channelIcon) {
+    _buildGuideItem(prog, channelLabel, channelIcon, isFavorite) {
       var self = this;
       var item = document.createElement("button");
       item.type = "button";
@@ -1031,7 +1101,7 @@
       imageWrap.className = "guide-item-image-wrap";
       item.appendChild(imageWrap);
 
-      var artUrl = prog.poster || prog.icon || channelIcon || null;
+            var artUrl = prog.poster || prog.icon || channelIcon || null;
       if (artUrl) {
         var img = document.createElement("img");
         img.className = "guide-item-img";
@@ -1325,6 +1395,14 @@
       });
     }
 
+    _applyReminderState(activeMinutes) {
+      var els = this._els;
+      for (var bi = 0; bi < els.modalNotifyBtns.length; bi++) {
+        els.modalNotifyBtns[bi].hidden = !!activeMinutes;
+      }
+      els.modalNotifyCancelBtn.hidden = !activeMinutes;
+    }
+
     _openModal(channelLabel, prog) {
       var els = this._els;
       if (prog.icon) {
@@ -1368,11 +1446,143 @@
         els.modalTmdbLink.removeAttribute("href");
       }
 
+      
+      // Un programme deja commence (encore en cours ou totalement termine) ne
+      // peut plus recevoir de rappel : isProgLive() ne couvre que le cas "en
+      // cours" (0 < frac < 1) et laisse donc passer les programmes deja finis
+      // (frac = 1), d'ou l'utilisation d'une comparaison directe sur l'heure
+      // de debut pour n'autoriser le rappel que sur un programme a venir.
+      var notStarted = !!prog.start && Date.now() < new Date(prog.start).getTime();
+      if (notStarted) {
+        this._modalProg = { channelLabel: channelLabel, title: prog.title, start: prog.start };
+        if (this._reminderProfiles === undefined) {
+          this._reminderProfiles = [];
+          this._loadReminderProfiles();
+        }
+        this._modalProfile = (this._reminderProfiles.length > 1) ? this._reminderProfiles[0] : null;
+        this._renderReminderProfileSelect();
+        els.modalNotifyRow.hidden = false;
+        this._refreshReminderStatus();
+              } else {
+        this._modalProg = null;
+        els.modalNotifyRow.hidden = true;
+      }
+      els.modalNotifyStatus.textContent = "";
+
       els.overlay.hidden = false;
     }
 
     _closeModal() {
       this._els.overlay.hidden = true;
+    }
+
+    _reminderServiceData(ctx, minutes) {
+      var data = {
+        channel_name: ctx.channelLabel,
+        program_title: ctx.title,
+        start_time: ctx.start,
+        minutes_before: minutes
+      };
+      if (this._modalProfile) data.profile_name = this._modalProfile;
+      return data;
+    }
+
+    _reminderKey() {
+      var ctx = this._modalProg;
+      if (!ctx) return null;
+      return ctx.channelLabel + "|" + ctx.title + "|" + ctx.start + "|" + (this._modalProfile || "");
+    }
+
+    _loadReminderProfiles() {
+      var self = this;
+      if (!this._hass || !this._hass.connection) return;
+      this._hass.connection.sendMessagePromise({ type: "programme_tnt_fr/reminder_profiles" }).then(function (resp) {
+        self._reminderProfiles = (resp && resp.profiles) || [];
+        if (self._reminderProfiles.length > 1 && !self._modalProfile) { self._modalProfile = self._reminderProfiles[0]; }
+        self._renderReminderProfileSelect();
+      }).catch(function () {
+        self._reminderProfiles = [];
+      });
+    }
+
+    _renderReminderProfileSelect() {
+      var sel = this._els.modalNotifyProfile;
+      var profiles = this._reminderProfiles || [];
+      if (profiles.length < 2) {
+        sel.hidden = true;
+        sel.innerHTML = "";
+        return;
+      }
+      var self = this;
+      sel.innerHTML = "";
+      profiles.forEach(function (name) {
+        var opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+      sel.value = this._modalProfile || profiles[0];
+      sel.hidden = false;
+    }
+
+    _refreshReminderStatus() {
+      var self = this;
+      var ctx = this._modalProg;
+      if (!ctx || !this._hass) return;
+      var key = this._reminderKey();
+      this._applyReminderState(this._activeReminders[key]);
+      var data = { channel_name: ctx.channelLabel, program_title: ctx.title, start_time: ctx.start };
+      if (this._modalProfile) data.profile_name = this._modalProfile;
+      this._hass
+        .callService("programme_tnt_fr", "get_reminder_status", data, undefined, false, true)
+        .then(function (resp) {
+          if (self._reminderKey() !== key) return;
+          var scheduled = (resp && resp.response && resp.response.scheduled_minutes) || [];
+          var minutes = scheduled.length ? scheduled[0] : null;
+          self._activeReminders[key] = minutes;
+          self._applyReminderState(minutes);
+        })
+        .catch(function () {});
+    }
+
+    _scheduleReminder(minutes) {
+      var self = this;
+      var ctx = this._modalProg;
+      var els = this._els;
+      if (!ctx || !this._hass) return;
+      els.modalNotifyStatus.textContent = "Programmation...";
+      this._hass.callService("programme_tnt_fr", "schedule_reminder", this._reminderServiceData(ctx, minutes)).then(function () {
+        self._activeReminders[self._reminderKey()] = minutes;
+        for (var bi = 0; bi < els.modalNotifyBtns.length; bi++) {
+          els.modalNotifyBtns[bi].hidden = true;
+        }
+        els.modalNotifyCancelBtn.hidden = false;
+        els.modalNotifyStatus.textContent = "Rappel programme \u2713";
+      }).catch(function (err) {
+        var msg = (err && err.message) || "Impossible de programmer ce rappel.";
+        els.modalNotifyStatus.textContent = msg;
+      });
+    }
+
+    _cancelReminder() {
+      var self = this;
+      var ctx = this._modalProg;
+      var els = this._els;
+      if (!ctx || !this._hass) return;
+      var minutes = this._activeReminders[this._reminderKey()];
+      if (!minutes) return;
+      els.modalNotifyStatus.textContent = "Annulation...";
+      this._hass.callService("programme_tnt_fr", "cancel_reminder", this._reminderServiceData(ctx, minutes)).then(function () {
+        delete self._activeReminders[self._reminderKey()];
+        for (var bi = 0; bi < els.modalNotifyBtns.length; bi++) {
+          els.modalNotifyBtns[bi].hidden = false;
+        }
+        els.modalNotifyCancelBtn.hidden = true;
+        els.modalNotifyStatus.textContent = "";
+      }).catch(function (err) {
+        var msg = (err && err.message) || "Impossible d'annuler ce rappel.";
+        els.modalNotifyStatus.textContent = msg;
+      });
     }
 
     static getStubConfig() {
