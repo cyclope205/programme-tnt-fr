@@ -103,22 +103,22 @@ Vue Top films avec la navigation jour par jour:
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Bouton de rappel dans le détail d'un programme :
 
-*(capture à ajouter)*
+<img width="663" height="718" alt="Capture d&#39;écran 2026-09-01 214115" src="https://github.com/user-attachments/assets/e7b01917-d2ee-4cb2-900e-7879b3dfd5db" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Configuration des appareils de notification et de l'annonce vocale :
 
-*(capture à ajouter)*
+<img width="737" height="742" alt="Capture d&#39;écran 2026-09-01 214327" src="https://github.com/user-attachments/assets/bac71e1c-d31d-4e70-9d86-f30bd9865300" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Gestion des profils de rappel (ajout/édition) :
 
-*(capture à ajouter)*
+<img width="718" height="770" alt="Capture d&#39;écran 2026-09-01 214514" src="https://github.com/user-attachments/assets/dadd9f3f-9e4a-4cdb-a9fa-5197d94f2e55" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Sélection d'un profil dans la fiche du programme avant de programmer un rappel :
 
-*(capture à ajouter)*
+<img width="653" height="757" alt="Capture d&#39;écran 2026-09-01 214655" src="https://github.com/user-attachments/assets/1bd0b0f1-7826-464d-aa4e-3a65ca56a68d" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Installation
