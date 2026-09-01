@@ -33,6 +33,11 @@ Pour chaque chaîne suivie, la carte affiche jusqu'à 3 programmes : celui en co
 **Chaines favorites** : une chaine marquée comme favorite (option `favorite_channels`) est épinglée en tête du carrousel et affiche une étoile sur ses vignettes, pour la retrouver immédiatement sans faire défiler toutes les chaines suivies.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Favoris
+
+Si au moins une chaine favorite est configuree (`favorite_channels`), un bouton "Favoris" apparait dans l'entete de la carte, a cote de Carrousel/Guide TV/Top films. Il affiche la meme vue que le Carrousel (en ce moment / 1ere et 2eme partie de soiree), mais limitee aux chaines favorites, pour retrouver immediatement ses chaines habituelles sans faire defiler les autres.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Guide TV
 
 Le bouton "Guide TV" dans l'entête de la carte bascule vers un guide complet, inspire de l'application Free : deux colonnes de chaines visibles à la fois, défilement horizontal pour changer de chaine (flèches sur ordinateur, glissement au doigt sur mobile/tablette) et défilement vertical pour parcourir la grille chronologique d'une chaine.
@@ -169,16 +174,17 @@ show_second_part: true
 
 Ces options sont également disponibles directement dans l'éditeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les trois bascules sans avoir a écrire de YAML.
 
-Les trois vues de la carte (Carrousel, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
+Les quatre vues de la carte (Carrousel, Favoris, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
 
 ```yaml
 type: custom:programme-tnt-fr-card
 show_carousel: true
+show_favorites: true
 show_guide_tv: true
 show_top_films: true
 ```
 
-Ces trois bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
 
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
