@@ -6,6 +6,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
+from homeassistant.helpers import entity_registry as er
 
 from .const import (
     ALL_CHANNELS,
@@ -47,6 +48,36 @@ def _notify_options(hass: HomeAssistant) -> list[selector.SelectOptionDict]:
         for slug in sorted(services)
         if slug not in {"send_message", "notify", "persistent_notification"}
     ]
+
+
+def _notify_media_player_conflict(
+    hass: HomeAssistant,
+    notify_targets: list[str],
+    media_player_targets: list[str],
+) -> bool:
+    """True if a notify target and a media_player target hit the same device.
+
+    Alexa Media Player registers both a media_player entity and a
+    notify.alexa_media_<slug> service for the same physical Echo. Selecting
+    both for one profile double-announces every reminder on that device (see
+    _alexa_notify_slug / _async_notify in reminders.py) - block that here
+    instead of letting it fail silently at reminder-fire time.
+    """
+    if not notify_targets or not media_player_targets:
+        return False
+    notify_slugs = {
+        slug[len("notify.") :] if slug.startswith("notify.") else slug
+        for slug in notify_targets
+    }
+    registry = er.async_get(hass)
+    for entity_id in media_player_targets:
+        entry = registry.async_get(entity_id)
+        if entry is None or entry.platform != "alexa_media":
+            continue
+        slug = "alexa_media_" + entity_id.split(".", 1)[1]
+        if slug in notify_slugs:
+            return True
+    return False
 
 
 def _schema(
@@ -270,6 +301,12 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                 if editing_name is None or p["name"] != editing_name
             ):
                 errors["base"] = "duplicate_name"
+            elif _notify_media_player_conflict(
+                self.hass,
+                user_input.get(CONF_NOTIFY_TARGET) or [],
+                user_input.get(CONF_MEDIA_PLAYER_TARGETS) or [],
+            ):
+                errors["base"] = "device_conflict"
             else:
                 profile: dict = {"name": name}
                 if user_input.get(CONF_NOTIFY_TARGET):
