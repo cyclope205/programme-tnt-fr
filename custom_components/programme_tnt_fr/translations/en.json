@@ -19,15 +19,40 @@
   "options": {
     "step": {
       "init": {
+        "menu_options": {
+          "general": "General settings",
+          "profiles": "Reminder profiles"
+        }
+      },
+      "general": {
         "title": "Followed channels",
         "description": "Change the list of TNT channels to follow.",
         "data": {
           "channels": "Channels"
         }
+      },
+      "profiles": {
+        "title": "Reminder profiles",
+        "description": "Configured profiles: {profiles}. A profile groups a person's name with their own devices to notify, so everyone gets reminders on their own phone/speaker instead of the global targets.",
+        "data": {
+          "action": "Action"
+        }
+      },
+      "add_profile": {
+        "title": "New reminder profile",
+        "description": "Give the profile a name (e.g. Fred, Ginie) and pick its devices.",
+        "data": {
+          "name": "Profile name",
+          "notify_target": "Device to notify (optional)",
+          "media_player_targets": "Speakers/TV to announce on (optional)",
+          "tts_engine": "Text-to-speech engine to use (optional)"
+        }
       }
     },
     "error": {
-      "no_channels": "Select at least one channel."
+      "no_channels": "Select at least one channel.",
+      "no_name": "Enter a name for this profile.",
+      "duplicate_name": "A profile with this name already exists."
     }
   }
 }
