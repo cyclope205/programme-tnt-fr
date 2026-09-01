@@ -35,6 +35,13 @@ schedule_reminder:
           step: 5
           unit_of_measurement: min
           mode: box
+    profile_name:
+      name: Profile name
+      description: Nom du profil de rappel (personne/appareils) configure dans les options de l'integration. Laisser vide pour utiliser les cibles par defaut de l'integration.
+      required: false
+      example: "Fred"
+      selector:
+        text:
 
 cancel_reminder:
   name: Cancel reminder
@@ -73,6 +80,13 @@ cancel_reminder:
           step: 5
           unit_of_measurement: min
           mode: box
+    profile_name:
+      name: Profile name
+      description: Nom du profil de rappel (personne/appareils) concerne. Doit correspondre a celui utilise pour programmer le rappel.
+      required: false
+      example: "Fred"
+      selector:
+        text:
 
 get_reminder_status:
   name: Get reminder status
@@ -97,5 +111,12 @@ get_reminder_status:
       description: Heure de debut du programme (ISO 8601).
       required: true
       example: "2026-09-01T20:00:00+02:00"
+      selector:
+        text:
+    profile_name:
+      name: Profile name
+      description: Nom du profil de rappel (personne/appareils) concerne. Doit correspondre a celui utilise pour programmer le rappel.
+      required: false
+      example: "Fred"
       selector:
         text:
