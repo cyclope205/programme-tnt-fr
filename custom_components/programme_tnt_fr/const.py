@@ -11,6 +11,7 @@ CONF_CHANNELS = "channels"
 CONF_NOTIFY_TARGET = "notify_target"
 CONF_MEDIA_PLAYER_TARGETS = "media_player_targets"
 CONF_TTS_ENGINE = "tts_engine"
+CONF_REMINDER_PROFILES = "reminder_profiles"
 
 # Cle API TMDB (The Movie Database) optionnelle : si renseignee, l'integration
 # tente de recuperer une affiche officielle (films et series) pour chaque
