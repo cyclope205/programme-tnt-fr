@@ -6,13 +6,14 @@ import voluptuous as vol
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
 
-from .const import DOMAIN
+from .const import CONF_REMINDER_PROFILES, DOMAIN
 
 
 @callback
 def async_register_websocket_api(hass: HomeAssistant) -> None:
     """Register the programme_tnt_fr websocket commands."""
     websocket_api.async_register_command(hass, websocket_get_programmes)
+    websocket_api.async_register_command(hass, websocket_get_reminder_profiles)
 
 
 @websocket_api.websocket_command(
@@ -46,3 +47,24 @@ def websocket_get_programmes(
                 programmes[channel_id] = day_progs
 
     connection.send_result(msg["id"], {"programmes": programmes})
+
+
+@websocket_api.websocket_command({vol.Required("type"): "programme_tnt_fr/reminder_profiles"})
+@callback
+def websocket_get_reminder_profiles(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict
+) -> None:
+    """Retourne les noms des profils de rappel configures (options de
+    l'integration), pour que la carte propose un choix de profil au moment
+    de programmer un rappel quand plusieurs personnes/appareils sont
+    configures. Liste vide si aucun profil n'a ete cree : la carte se
+    rabat alors sur les cibles globales, sans afficher de selecteur.
+    """
+    names: list[str] = []
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        for profile in entry.options.get(CONF_REMINDER_PROFILES, []):
+            name = profile.get("name")
+            if name and name not in names:
+                names.append(name)
+
+    connection.send_result(msg["id"], {"profiles": names})
