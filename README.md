@@ -126,9 +126,10 @@ Sélection d'un profil dans la fiche du programme avant de programmer un rappel 
 1. Ajouter ce depot a HACS comme depot personnalise :
 
    [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
-  
-2. Redémarrer Home Assistant.
-3. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
+
+2. Télécharger la dernière Version.
+3. Redémarrer Home Assistant.
+4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
 La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
