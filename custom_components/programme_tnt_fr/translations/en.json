@@ -52,7 +52,8 @@
     "error": {
       "no_channels": "Select at least one channel.",
       "no_name": "Enter a name for this profile.",
-      "duplicate_name": "A profile with this name already exists."
+      "duplicate_name": "A profile with this name already exists.",
+      "device_conflict": "The same device cannot be picked for both notification and voice announcement (it would be announced twice)."
     }
   }
 }
