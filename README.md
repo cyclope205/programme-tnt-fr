@@ -126,6 +126,7 @@ Sélection d'un profil dans la fiche du programme avant de programmer un rappel 
 1. Ajouter ce depot a HACS comme depot personnalise :
 
    [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+   Le bouton ouvre HACS avec le formulaire pre-rempli. Sinon, manuellement :
    1. Ouvrir **HACS** dans le menu latéral de Home Assistant.
    2. Cliquer sur le menu **&#8942;** (trois points verticaux) en haut a droite de la page HACS, puis choisir **Dépôts personnalisés** (*Custom repositories*).
    3. Coller l'URL du depot dans le champ **Dépôt** (*Repository*) : `https://github.com/cyclope205/programme-tnt-fr`
