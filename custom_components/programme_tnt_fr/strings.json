@@ -1,39 +1,66 @@
 {
-"config": {
-"step": {
-"user": {
-"title": "Programme TNT FR",
-"description": "Choisissez les chaines de la TNT a suivre.",
-"data": {
-"channels": "Chaines",
-"notify_target": "Appareil a notifier avant un programme (optionnel)",
-"media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
-"tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
-}
-}
-},
-"error": {
-"no_channels": "Selectionnez au moins une chaine."
-},
-"abort": {
-"single_instance_allowed": "Une seule instance de Programme TNT FR est autorisee."
-}
-},
-"options": {
-"step": {
-"init": {
-"title": "Chaines suivies",
-"description": "Modifiez la liste des chaines de la TNT a suivre.",
-"data": {
-"channels": "Chaines",
-"notify_target": "Appareil a notifier avant un programme (optionnel)",
-"media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
-"tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
-}
-}
-},
-"error": {
-"no_channels": "Selectionnez au moins une chaine."
-}
-}
+  "config": {
+    "step": {
+      "user": {
+        "title": "Programme TNT FR",
+        "description": "Choisissez les chaines de la TNT a suivre.",
+        "data": {
+          "channels": "Chaines",
+          "tmdb_api_key": "Cle API TMDB personnelle (optionnel : une cle partagee est deja incluse pour les affiches, ne remplir que pour utiliser la votre)",
+          "notify_target": "Appareil a notifier avant un programme (optionnel)",
+          "media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
+          "tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Selectionnez au moins une chaine."
+    },
+    "abort": {
+      "single_instance_allowed": "Une seule instance de Programme TNT FR est autorisee."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "menu_options": {
+          "general": "Parametres generaux",
+          "profiles": "Profils de rappel"
+        }
+      },
+      "general": {
+        "title": "Chaines suivies",
+        "description": "Modifiez la liste des chaines de la TNT a suivre.",
+        "data": {
+          "channels": "Chaines",
+          "tmdb_api_key": "Cle API TMDB personnelle (optionnel : une cle partagee est deja incluse pour les affiches, ne remplir que pour utiliser la votre)",
+          "notify_target": "Appareil a notifier avant un programme (optionnel)",
+          "media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
+          "tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
+        }
+      },
+      "profiles": {
+        "title": "Profils de rappel",
+        "description": "Profils configures : {profiles}. Un profil regroupe le nom d'une personne et ses propres appareils a notifier, pour que chacun recoive ses rappels sur son telephone/enceinte plutot que sur les cibles globales.",
+        "data": {
+          "action": "Action"
+        }
+      },
+      "add_profile": {
+        "title": "Nouveau profil de rappel",
+        "description": "Donnez un nom au profil (ex: Fred, Ginie) et choisissez ses appareils.",
+        "data": {
+          "name": "Nom du profil",
+          "notify_target": "Appareil a notifier (optionnel)",
+          "media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
+          "tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
+        }
+      }
+    },
+    "error": {
+      "no_channels": "Selectionnez au moins une chaine.",
+      "no_name": "Indiquez un nom pour ce profil.",
+      "duplicate_name": "Un profil porte deja ce nom."
+    }
+  }
 }
