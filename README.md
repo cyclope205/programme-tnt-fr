@@ -3,7 +3,7 @@
 [![release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr?label=release&color=blue)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
 [![license](https://img.shields.io/github/license/cyclope205/programme-tnt-fr)](LICENSE)
-[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration) [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 <img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" alt="Programme TNT FR" width="120">
 
@@ -124,14 +124,16 @@ Sélection d'un profil dans la fiche du programme avant de programmer un rappel 
 ## Installation
 
 1. Ajouter ce depot a HACS comme depot personnalise :
+
+   [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
    1. Ouvrir **HACS** dans le menu latéral de Home Assistant.
    2. Cliquer sur le menu **&#8942;** (trois points verticaux) en haut a droite de la page HACS, puis choisir **Dépôts personnalisés** (*Custom repositories*).
    3. Coller l'URL du depot dans le champ **Dépôt** (*Repository*) : `https://github.com/cyclope205/programme-tnt-fr`
    4. Choisir **Integration** dans le menu deroulant **Type** (*Category*).
    5. Cliquer sur **Ajouter** (*Add*), puis fermer la fenetre.
-2. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et télécharger des dépôts**) et l'installer.
-3. Redémarrer Home Assistant.
-4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
+3. Rechercher **Programme TNT FR** dans HACS (bouton **+ Explorer et télécharger des dépôts**) et l'installer.
+4. Redémarrer Home Assistant.
+5. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
 La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
