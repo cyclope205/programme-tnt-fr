@@ -60,7 +60,8 @@
     "error": {
       "no_channels": "Selectionnez au moins une chaine.",
       "no_name": "Indiquez un nom pour ce profil.",
-      "duplicate_name": "Un profil porte deja ce nom."
+      "duplicate_name": "Un profil porte deja ce nom.",
+      "device_conflict": "Un meme appareil ne peut pas etre choisi a la fois comme notification et comme enceinte vocale (il serait annonce deux fois)."
     }
   }
 }
