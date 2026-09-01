@@ -1,13 +1,13 @@
 {
-  "domain": "programme_tnt_fr",
-  "name": "Programme TNT FR",
-  "codeowners": ["@cyclope205"],
-  "config_flow": true,
-  "dependencies": ["http", "frontend", "websocket_api"],
-  "documentation": "https://github.com/cyclope205/programme-tnt-fr",
-  "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/cyclope205/programme-tnt-fr/issues",
-  "requirements": [],
-  "single_config_entry": true,
-    "version": "2.1.25"
+"domain": "programme_tnt_fr",
+"name": "Programme TNT FR",
+"codeowners": ["@cyclope205"],
+"config_flow": true,
+"dependencies": ["http", "frontend", "websocket_api"],
+"documentation": "https://github.com/cyclope205/programme-tnt-fr",
+"iot_class": "cloud_polling",
+"issue_tracker": "https://github.com/cyclope205/programme-tnt-fr/issues",
+"requirements": [],
+"single_config_entry": true,
+"version": "2.1.26"
 }
