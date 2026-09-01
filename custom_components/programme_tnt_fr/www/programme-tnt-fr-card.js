@@ -144,6 +144,7 @@
   // quelle vue est affichee (voir _isViewEnabled/_enabledViews/_firstEnabledView).
   var VIEW_DEFS = [
     ["carousel", "Carrousel", "show_carousel"],
+    ["favorites", "Favoris", "show_favorites"],
     ["guide", "Guide TV", "show_guide_tv"],
     ["topfilms", "Top films", "show_top_films"]
   ];
@@ -266,7 +267,7 @@
       return 12;
     }
 
-    _resolveEntities() {
+    _resolveEntities(favoritesOnly) {
       var hass = this._hass;
       if (!hass) return [];
       var ids;
@@ -291,17 +292,26 @@
       if (favorites && favorites.length) {
         var favSet = {};
         favorites.forEach(function (cid) { favSet[cid] = true; });
-        var favIds = [];
-        var restIds = [];
-        ids.forEach(function (id) {
-          var cid = hass.states[id].attributes.channel_id;
-          if (cid && favSet[cid]) {
-            favIds.push(id);
-          } else {
-            restIds.push(id);
-          }
-        });
-        ids = favIds.concat(restIds);
+        if (favoritesOnly) {
+          ids = ids.filter(function (id) {
+            var cid = hass.states[id].attributes.channel_id;
+            return cid && favSet[cid];
+          });
+        } else {
+          var favIds = [];
+          var restIds = [];
+          ids.forEach(function (id) {
+            var cid = hass.states[id].attributes.channel_id;
+            if (cid && favSet[cid]) {
+              favIds.push(id);
+            } else {
+              restIds.push(id);
+            }
+          });
+          ids = favIds.concat(restIds);
+        }
+      } else if (favoritesOnly) {
+        ids = [];
       }
 
       return ids;
@@ -309,7 +319,14 @@
 
     // Une vue est affichee sauf si sa cle de config vaut explicitement false
     // (meme convention que show_current/show_prime_time/show_second_part).
+    // Cas particulier de "show_favorites" : cette vue n'a de sens que si au
+    // moins une chaine favorite est configuree, meme si elle n'est pas
+    // explicitement masquee.
     _isViewEnabled(configKey) {
+      if (configKey === "show_favorites") {
+        var favs = this._config.favorite_channels;
+        return this._config[configKey] !== false && !!(favs && favs.length);
+      }
       return this._config[configKey] !== false;
     }
 
@@ -342,10 +359,6 @@
 
       var header = document.createElement("div");
       header.className = "header";
-
-      var headerTitle = document.createElement("span");
-      headerTitle.className = "header-title";
-      header.appendChild(headerTitle);
 
       var actions = document.createElement("div");
       actions.className = "header-actions";
@@ -421,7 +434,6 @@
 
       this._els = {
         header: header,
-        headerTitle: headerTitle,
         viewLinks: viewLinks,
         body: body,
         guideRoot: guideRoot,
@@ -479,7 +491,6 @@
     _render() {
       this._ensureDom();
       var els = this._els;
-      els.headerTitle.textContent = this._config.title || "Qu'est-ce qu'on regarde ?";
 
       if (!this._hass) {
         els.body.innerHTML = "";
@@ -526,7 +537,7 @@
 
     _renderBody() {
       var els = this._els;
-      els.body.hidden = this._view !== "carousel";
+      els.body.hidden = this._view !== "carousel" && this._view !== "favorites";
       els.guideRoot.hidden = this._view !== "guide";
       els.filmsRoot.hidden = this._view !== "topfilms";
 
@@ -542,9 +553,10 @@
     _renderCarousel() {
       var hass = this._hass;
       var els = this._els;
+      var favoritesOnly = this._view === "favorites";
 
-      var carIds = this._resolveEntities();
-      var carSig = carIds.map(function (id) {
+      var carIds = this._resolveEntities(favoritesOnly);
+      var carSig = favoritesOnly + "|" + carIds.map(function (id) {
         var st = hass.states[id];
         return id + ":" + (st ? st.last_changed + ":" + JSON.stringify(st.attributes) : "");
       }).join("|");
@@ -560,7 +572,7 @@
 
       els.body.innerHTML = "";
 
-      var entities = this._resolveEntities();
+      var entities = this._resolveEntities(favoritesOnly);
       var self = this;
 
       var favorites = this._config.favorite_channels;
@@ -1586,7 +1598,7 @@
     }
 
     static getStubConfig() {
-      return { title: "Qu'est-ce qu'on regarde ?" };
+      return {};
     }
 
     static getConfigElement() {
@@ -1652,6 +1664,7 @@
       wrap.appendChild(viewsTitle);
 
       addToggle("show_carousel", "Afficher le carrousel");
+      addToggle("show_favorites", "Afficher la vue Favoris");
       addToggle("show_guide_tv", "Afficher le Guide TV");
       addToggle("show_top_films", "Afficher le Top films");
 
