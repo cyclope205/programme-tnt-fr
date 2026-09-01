@@ -51,6 +51,11 @@ Un clic sur "Carrousel" dans l'entête revient a la vue de départ.
 Un bouton dans l'entête de la carte ouvre le classement des films les mieux notes (TMDB) en 1ere partie de soirée, navigable jour par jour sur environ une semaine — la même logique que la carte markdown ci-dessous, mais sans se limiter au soir même.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Rappels
+
+Depuis le détail d'un programme (clic sur une vignette), un bouton propose d'être notifié 5, 10 ou 15 minutes avant le début. Le rappel est conservé même si Home Assistant redémarre entre-temps, peut être annulé à tout moment depuis la même fiche, et ne s'affiche pas pour un programme déjà en cours de diffusion. Il peut être envoyé sous forme de notification (mobile, Alexa...) et/ou annoncé vocalement sur une enceinte ou une TV (`media_player`) via la synthèse vocale de Home Assistant.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Captures d'ecran
 
 Ecran de configuration des chaines suivies :
@@ -94,6 +99,16 @@ Vue Top films avec la navigation jour par jour:
 <img width="460" height="552" alt="image" src="https://github.com/user-attachments/assets/53121b73-6221-4704-b054-36fe7cdcc835" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Bouton de rappel dans le détail d'un programme :
+
+*(capture à ajouter)*
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Configuration des appareils de notification et de l'annonce vocale :
+
+*(capture à ajouter)*
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Installation
 
 1. Ajouter ce depot a HACS comme depot personnalise :
@@ -114,6 +129,8 @@ La carte Lovelace est enregistrée automatiquement par l'intégration : aucune r
 A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller.
 
 Les chaines favorites se choisissent également depuis les options de l'intégration : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
+
+Un appareil (ou plusieurs) à notifier avant un programme, ainsi que des enceintes/TV (`media_player`) à utiliser pour une annonce vocale (avec le moteur de synthèse vocale TTS de votre choix), se configurent également depuis les options de l'intégration. Les deux types d'appareils peuvent être combinés ; un appareil Alexa déjà choisi comme notification (il parle déjà le message via son propre système) n'a pas besoin d'être ajouté une seconde fois côté `media_player`, sous peine d'entendre le rappel deux fois.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Utilisation dans un tableau de bord
