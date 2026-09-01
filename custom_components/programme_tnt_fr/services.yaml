@@ -25,15 +25,16 @@ schedule_reminder:
         text:
     minutes_before:
       name: Minutes before
-      description: Nombre de minutes avant le debut auquel envoyer le rappel.
+      description: Nombre de minutes avant le debut auquel envoyer le rappel (5, 10 ou 15).
       required: true
       example: 10
       selector:
-        select:
-          options:
-            - 5
-            - 10
-            - 15
+        number:
+          min: 5
+          max: 15
+          step: 5
+          unit_of_measurement: min
+          mode: box
 
 cancel_reminder:
   name: Cancel reminder
@@ -62,15 +63,16 @@ cancel_reminder:
         text:
     minutes_before:
       name: Minutes before
-      description: Delai (en minutes) du rappel a annuler.
+      description: Delai (en minutes) du rappel a annuler (5, 10 ou 15).
       required: true
       example: 10
       selector:
-        select:
-          options:
-            - 5
-            - 10
-            - 15
+        number:
+          min: 5
+          max: 15
+          step: 5
+          unit_of_measurement: min
+          mode: box
 
 get_reminder_status:
   name: Get reminder status
