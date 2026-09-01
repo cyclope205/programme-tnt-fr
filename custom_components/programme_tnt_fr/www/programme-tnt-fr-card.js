@@ -1447,8 +1447,13 @@
       }
 
       
-      var live = isProgLive(prog);
-      if (!live && prog.start) {
+      // Un programme deja commence (encore en cours ou totalement termine) ne
+      // peut plus recevoir de rappel : isProgLive() ne couvre que le cas "en
+      // cours" (0 < frac < 1) et laisse donc passer les programmes deja finis
+      // (frac = 1), d'ou l'utilisation d'une comparaison directe sur l'heure
+      // de debut pour n'autoriser le rappel que sur un programme a venir.
+      var notStarted = !!prog.start && Date.now() < new Date(prog.start).getTime();
+      if (notStarted) {
         this._modalProg = { channelLabel: channelLabel, title: prog.title, start: prog.start };
         if (this._reminderProfiles === undefined) {
           this._reminderProfiles = [];
