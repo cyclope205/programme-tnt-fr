@@ -1,33 +1,39 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Programme TNT FR",
-        "description": "Choisissez les chaines de la TNT a suivre.",
-        "data": {
-          "channels": "Chaines"
-        }
-      }
-    },
-    "error": {
-      "no_channels": "Selectionnez au moins une chaine."
-    },
-    "abort": {
-      "single_instance_allowed": "Une seule instance de Programme TNT FR est autorisee."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Chaines suivies",
-        "description": "Modifiez la liste des chaines de la TNT a suivre.",
-        "data": {
-          "channels": "Chaines"
-        }
-      }
-    },
-    "error": {
-      "no_channels": "Selectionnez au moins une chaine."
-    }
-  }
+"config": {
+"step": {
+"user": {
+"title": "Programme TNT FR",
+"description": "Choisissez les chaines de la TNT a suivre.",
+"data": {
+"channels": "Chaines",
+"notify_target": "Appareil a notifier avant un programme (optionnel)",
+"media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
+"tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
+}
+}
+},
+"error": {
+"no_channels": "Selectionnez au moins une chaine."
+},
+"abort": {
+"single_instance_allowed": "Une seule instance de Programme TNT FR est autorisee."
+}
+},
+"options": {
+"step": {
+"init": {
+"title": "Chaines suivies",
+"description": "Modifiez la liste des chaines de la TNT a suivre.",
+"data": {
+"channels": "Chaines",
+"notify_target": "Appareil a notifier avant un programme (optionnel)",
+"media_player_targets": "Enceintes/TV a annoncer vocalement (optionnel)",
+"tts_engine": "Moteur de synthese vocale a utiliser (optionnel)"
+}
+}
+},
+"error": {
+"no_channels": "Selectionnez au moins une chaine."
+}
+}
 }
