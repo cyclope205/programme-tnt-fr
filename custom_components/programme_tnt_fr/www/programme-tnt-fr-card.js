@@ -1665,6 +1665,14 @@
 
       addToggle("show_carousel", "Afficher le carrousel");
       addToggle("show_favorites", "Afficher la vue Favoris");
+      if (self._config.show_favorites !== false && !((self._config.favorite_channels || []).length)) {
+        var favHint = document.createElement("div");
+        favHint.textContent = "Cette vue ne s'affiche sur la carte que si au moins une chaine favorite est cochee ci-dessous.";
+        favHint.style.fontSize = "12px";
+        favHint.style.opacity = "0.7";
+        favHint.style.margin = "-4px 0 10px 52px";
+        wrap.appendChild(favHint);
+      }
       addToggle("show_guide_tv", "Afficher le Guide TV");
       addToggle("show_top_films", "Afficher le Top films");
 
