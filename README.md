@@ -143,6 +143,8 @@ Sélection d'un profil dans la fiche du programme avant de programmer un rappel 
 
 La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
+**⚠️ La carte affiche « Erreur de configuration : Custom element doesn't exist: programme-tnt-fr-card » juste apres l'installation ?** C'est normal, le temps que le navigateur recharge le cache : faites **Ctrl+F5** sur navigateur (rechargement force), ou **fermez completement puis relancez l'application Home Assistant Companion** sur mobile. La carte s'affiche ensuite normalement.
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Configuration
 
