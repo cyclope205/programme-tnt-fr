@@ -20,7 +20,7 @@ PLATFORMS = ["sensor"]
 
 CARD_FILENAME = "programme-tnt-fr-card.js"
 CARD_URL_PATH = f"/programme_tnt_fr/{CARD_FILENAME}"
-CARD_VERSION = "2.2.3"
+CARD_VERSION = "2.2.4"
 _CARD_REGISTERED_KEY = f"{DOMAIN}_card_registered"
 _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
 
