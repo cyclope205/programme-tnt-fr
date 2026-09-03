@@ -1,4 +1,6 @@
 """Constants for the Programme TNT FR integration."""
+
+import base64
 from datetime import time
 
 DOMAIN = "programme_tnt_fr"
@@ -28,7 +30,8 @@ TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 # commercial (voir la section Credits du README pour attribution requise
 # par TMDB). Les utilisateurs qui le souhaitent peuvent renseigner leur
 # propre cle dans les options de integration : celle-ci a alors priorite.
-DEFAULT_TMDB_API_KEY = None
+_DEFAULT_TMDB_API_KEY_B64 = "MzE4MGVkZTFmMGVhNGM3NzNiOWQ1NGY0NTAyMDE0M2M="
+DEFAULT_TMDB_API_KEY = base64.b64decode(_DEFAULT_TMDB_API_KEY_B64).decode("ascii")
 
 # La liste complete est re-telechargee au plus une fois par heure.
 # Le calcul "en ce moment / soiree" est, lui, rafraichi toutes les 5 minutes
