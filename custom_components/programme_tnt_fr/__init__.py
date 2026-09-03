@@ -9,7 +9,7 @@ from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 
-from .const import CONF_CHANNELS, DEFAULT_CHANNELS, DOMAIN
+from .const import CONF_CHANNELS, CONF_TMDB_API_KEY, DEFAULT_CHANNELS, DOMAIN
 from .coordinator import ProgrammeTntFrCoordinator
 from .reminders import async_setup_reminders
 from .ws_api import async_register_websocket_api
@@ -40,7 +40,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     channels = entry.options.get(
         CONF_CHANNELS, entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS)
     )
-    coordinator = ProgrammeTntFrCoordinator(hass, channels)
+    tmdb_api_key = entry.options.get(
+        CONF_TMDB_API_KEY, entry.data.get(CONF_TMDB_API_KEY)
+    )
+    coordinator = ProgrammeTntFrCoordinator(hass, channels, tmdb_api_key)
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
