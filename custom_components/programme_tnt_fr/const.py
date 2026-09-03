@@ -28,7 +28,7 @@ TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 # commercial (voir la section Credits du README pour attribution requise
 # par TMDB). Les utilisateurs qui le souhaitent peuvent renseigner leur
 # propre cle dans les options de integration : celle-ci a alors priorite.
-DEFAULT_TMDB_API_KEY = "3180ede1f0ea4c773b9d54f45020143c"
+DEFAULT_TMDB_API_KEY = None
 
 # La liste complete est re-telechargee au plus une fois par heure.
 # Le calcul "en ce moment / soiree" est, lui, rafraichi toutes les 5 minutes
