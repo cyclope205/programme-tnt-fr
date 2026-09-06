@@ -138,6 +138,9 @@ def test_resolve_targets_falls_back_to_global_when_profile_not_found():
 
 def test_alexa_notify_slug_returns_slug_for_alexa_media_device():
     hass = _make_hass([])
+    # _alexa_notify_slug also gates on a real notify.<slug> service existing
+    # (it must not route to a service that isn't actually registered).
+    hass.services.has_service = MagicMock(return_value=True)
     manager = _ReminderManager(hass, _FakeStore())
     with patch("custom_components.programme_tnt_fr.reminders.er.async_get") as async_get:
         registry = MagicMock()
