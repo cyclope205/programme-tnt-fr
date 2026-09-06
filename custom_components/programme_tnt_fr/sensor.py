@@ -8,7 +8,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, TNT_CHANNELS
+from .const import DOMAIN, ALL_CHANNELS
 from .coordinator import ProgrammeTntFrCoordinator
 
 
@@ -37,7 +37,7 @@ class ProgrammeTntFrSensor(CoordinatorEntity[ProgrammeTntFrCoordinator], SensorE
         super().__init__(coordinator)
         self._channel_id = channel_id
         self._attr_unique_id = f"{entry.entry_id}_{channel_id}"
-        self._attr_name = TNT_CHANNELS.get(channel_id, channel_id)
+        self._attr_name = ALL_CHANNELS.get(channel_id, channel_id)
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, "programme_tnt_fr")},
             name="Programme TNT FR",
