@@ -4,6 +4,8 @@
  * Utilisation minimale dans un tableau de bord :
  * type: custom:programme-tnt-fr-card
  */
+
+const CARD_VERSION = "2.2.4";
 (function () {
   "use strict";
 
@@ -1322,7 +1324,7 @@
         var category = pick.category || "";
         var mediaType = pick.tmdb_media_type || "";
         var rating = Number(pick.tmdb_rating || 0);
-        if (category === "Film" && mediaType === "movie" && rating > 0) {
+        if (["film","long m\u00e9trage","long metrage","cin\u00e9ma","cinema"].some((k) => (category || "").toLowerCase().includes(k)) && mediaType === "movie" && rating > 0) {
           films.push({
             title: pick.title,
             channel: attrs.channel_name || cid,
@@ -1622,6 +1624,56 @@
 
     connectedCallback() {
       this._render();
+      this._checkVersion();
+    }
+
+    async _checkVersion() {
+      if (this._versionCheckDone || !this._hass || !this._hass.connection) {
+        return;
+      }
+      this._versionCheckDone = true;
+      try {
+        const result = await this._hass.connection.sendMessagePromise({
+          type: "programme_tnt_fr/version",
+        });
+        if (result && result.version && result.version !== CARD_VERSION) {
+          this._showVersionMismatch(result.version);
+        }
+      } catch (err) {
+        // Best-effort only: an older backend without this command, or a
+        // transient websocket error, should never break the card itself.
+      }
+    }
+
+    _showVersionMismatch(backendVersion) {
+      const message = "Programme TNT FR : nouvelle version disponible (carte " + CARD_VERSION + ", integration " + backendVersion + "). Rechargez la page pour l'appliquer.";
+      this.dispatchEvent(
+        new CustomEvent("hass-notification", {
+          detail: {
+            message: message,
+            duration: -1,
+            dismissable: true,
+            action: {
+              text: "Recharger",
+              action: () => this._handleReload(),
+            },
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+
+    _handleReload() {
+      if ("caches" in window) {
+        caches.keys().then((names) => {
+          Promise.all(names.map((name) => caches.delete(name))).then(() => {
+            window.location.reload();
+          });
+        });
+      } else {
+        window.location.reload();
+      }
     }
 
     _render() {
