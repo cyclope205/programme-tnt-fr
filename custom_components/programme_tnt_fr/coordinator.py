@@ -234,6 +234,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
         # (toutes les 5 min) pour un programme deja resolu.
         self._tmdb_poster_cache: dict[str, TmdbMatch | None] = {}
+        # Titles currently being resolved by a background TMDB lookup -
+        # guards against a slow resolution still being in flight when the
+        # next refresh cycle (5 min later) runs, which would otherwise
+        # fire a duplicate concurrent TMDB request for the same title.
+        self._tmdb_pending_titles: set[str] = set()
         # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
         # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
         self._tmdb_auth_warned = False
@@ -273,9 +278,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                         and programme.stop > now
                         and programme.title not in self._tmdb_poster_cache
                         and programme.title not in title_categories
+                        and programme.title not in self._tmdb_pending_titles
                     ):
                         title_categories[programme.title] = programme.category
             if title_categories:
+                self._tmdb_pending_titles.update(title_categories)
                 self.hass.async_create_task(
                     self._background_resolve_tmdb_posters(title_categories)
                 )
@@ -314,7 +321,10 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         new titles (e.g. a whole day's guide on first setup) can never delay
         or cancel config entry setup again.
         """
-        await self._resolve_tmdb_posters(title_categories)
+        try:
+            await self._resolve_tmdb_posters(title_categories)
+        finally:
+            self._tmdb_pending_titles.difference_update(title_categories)
         await self.async_request_refresh()
 
     async def _resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
