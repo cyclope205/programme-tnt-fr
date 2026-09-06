@@ -4,10 +4,19 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
+import voluptuous as vol
+
+from homeassistant.components import websocket_api
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import (
+    CoreState,
+    EVENT_HOMEASSISTANT_STARTED,
+    HomeAssistant,
+    callback,
+)
+from homeassistant.helpers.event import async_call_later
 
 from .const import CONF_CHANNELS, CONF_TMDB_API_KEY, DEFAULT_CHANNELS, DOMAIN
 from .coordinator import ProgrammeTntFrCoordinator
@@ -27,8 +36,15 @@ _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Programme TNT FR from a config entry."""
-    await _async_register_card(hass)
     _async_register_ws_api(hass)
+
+    async def _setup_frontend(_event=None) -> None:
+        await _async_register_card(hass)
+
+    if hass.state == CoreState.running:
+        await _setup_frontend()
+    else:
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _setup_frontend)
     try:
         await async_setup_reminders(hass)
     except Exception:  # noqa: BLE001
@@ -80,7 +96,7 @@ async def _async_register_card(hass: HomeAssistant) -> None:
     await _async_sync_lovelace_resource(hass)
 
 
-async def _async_sync_lovelace_resource(hass: HomeAssistant) -> None:
+async def _async_sync_lovelace_resource(hass: HomeAssistant, _now=None) -> None:
     """Additionally register the card as a real Lovelace resource.
 
     add_extra_js_url only injects a <script type="module"> tag into the
@@ -104,6 +120,8 @@ async def _async_sync_lovelace_resource(hass: HomeAssistant) -> None:
     lovelace_data = hass.data.get("lovelace")
     resources = getattr(lovelace_data, "resources", None)
     if resources is None or not hasattr(resources, "async_create_item"):
+        _LOGGER.debug("Lovelace not ready yet, retrying resource sync in 5s")
+        async_call_later(hass, 5, _async_sync_lovelace_resource)
         return
 
     target_url = f"{CARD_URL_PATH}?v={CARD_VERSION}"
@@ -133,12 +151,25 @@ async def _async_sync_lovelace_resource(hass: HomeAssistant) -> None:
         )
 
 
+@websocket_api.websocket_command({vol.Required("type"): "programme_tnt_fr/version"})
+@callback
+def _websocket_get_version(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict
+) -> None:
+    """Retourne la version courante de l'integration, pour que la carte
+    puisse detecter un decalage avec sa propre version embarquee et
+    proposer un rechargement (cache navigateur perime apres mise a jour).
+    """
+    connection.send_result(msg["id"], {"version": CARD_VERSION})
+
+
 @callback
 def _async_register_ws_api(hass: HomeAssistant) -> None:
     """Register the Guide TV card websocket API (once)."""
     if hass.data.get(_WS_API_REGISTERED_KEY):
         return
     async_register_websocket_api(hass)
+    websocket_api.async_register_command(hass, _websocket_get_version)
     hass.data[_WS_API_REGISTERED_KEY] = True
 
 
