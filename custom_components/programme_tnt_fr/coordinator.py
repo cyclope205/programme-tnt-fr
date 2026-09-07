@@ -270,6 +270,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
         if self._tmdb_api_key:
             title_categories: dict[str, str | None] = {}
+            title_categories_far: dict[str, str | None] = {}
+            near_cutoff = now + timedelta(days=2)
             for channel_id in self._channels:
                 for programme in self._programmes_by_channel.get(channel_id, []):
                     if (
@@ -278,13 +280,20 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                         and programme.stop > now
                         and programme.title not in self._tmdb_poster_cache
                         and programme.title not in title_categories
+                        and programme.title not in title_categories_far
                         and programme.title not in self._tmdb_pending_titles
                     ):
-                        title_categories[programme.title] = programme.category
-            if title_categories:
-                self._tmdb_pending_titles.update(title_categories)
+                        if programme.start <= near_cutoff:
+                            title_categories[programme.title] = programme.category
+                        else:
+                            title_categories_far[programme.title] = programme.category
+            all_new_titles = {**title_categories, **title_categories_far}
+            if all_new_titles:
+                self._tmdb_pending_titles.update(all_new_titles)
                 self.hass.async_create_task(
-                    self._background_resolve_tmdb_posters(title_categories)
+                    self._background_resolve_tmdb_posters_staged(
+                        title_categories, title_categories_far
+                    )
                 )
 
         result: dict[str, dict] = {}
@@ -313,6 +322,27 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             tmdb_rating=match.rating,
             tmdb_votes=match.votes,
         )
+
+    async def _background_resolve_tmdb_posters_staged(
+        self,
+        near_titles: dict[str, str | None],
+        far_titles: dict[str, str | None],
+    ) -> None:
+        """Resolve near-term (today/tomorrow) TMDB posters first, then the rest.
+
+        Splits what used to be a single large batch into two waves so a
+        first setup with many channels does not fire hundreds of TMDB
+        lookups at once: the near-term wave resolves (and triggers a
+        refresh) first, so posters for what is actually about to be shown
+        appear quickly, then the remaining days resolve afterward at the
+        same bounded concurrency as before. Every title still eventually
+        gets resolved - this only changes the order/timing, not the total
+        number of lookups.
+        """
+        if near_titles:
+            await self._background_resolve_tmdb_posters(near_titles)
+        if far_titles:
+            await self._background_resolve_tmdb_posters(far_titles)
 
     async def _background_resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
         """Resolve TMDB posters in the background, then push a refresh once done.
