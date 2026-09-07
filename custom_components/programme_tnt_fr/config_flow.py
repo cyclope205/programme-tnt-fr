@@ -91,7 +91,7 @@ def _schema(
     ]
     fields: dict = {}
 
-    tmdb_selector = selector.selector({"text": {}})
+    tmdb_selector = selector.selector({"text": {"type": "password"}})
     if tmdb_api_key_default:
         fields[vol.Optional(CONF_TMDB_API_KEY, default=tmdb_api_key_default)] = tmdb_selector
     else:
@@ -228,8 +228,7 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                     CONF_CHANNELS: channels,
                     CONF_REMINDER_PROFILES: self._profiles,
                 }
-                if user_input.get(CONF_TMDB_API_KEY):
-                    data[CONF_TMDB_API_KEY] = user_input[CONF_TMDB_API_KEY]
+                data[CONF_TMDB_API_KEY] = user_input.get(CONF_TMDB_API_KEY) or ""
                 return self.async_create_entry(title="", data=data)
 
         return self.async_show_form(
