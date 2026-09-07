@@ -18,7 +18,13 @@ from homeassistant.core import (
 )
 from homeassistant.helpers.event import async_call_later
 
-from .const import CONF_CHANNELS, CONF_TMDB_API_KEY, DEFAULT_CHANNELS, DOMAIN
+from .const import (
+    CARD_VERSION,
+    CONF_CHANNELS,
+    CONF_TMDB_API_KEY,
+    DEFAULT_CHANNELS,
+    DOMAIN,
+)
 from .coordinator import ProgrammeTntFrCoordinator
 from .reminders import async_setup_reminders
 from .ws_api import async_register_websocket_api
@@ -29,7 +35,6 @@ PLATFORMS = ["sensor"]
 
 CARD_FILENAME = "programme-tnt-fr-card.js"
 CARD_URL_PATH = f"/programme_tnt_fr/{CARD_FILENAME}"
-CARD_VERSION = "2.3.0"
 _CARD_REGISTERED_KEY = f"{DOMAIN}_card_registered"
 _WS_API_REGISTERED_KEY = f"{DOMAIN}_ws_api_registered"
 
