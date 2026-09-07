@@ -149,7 +149,7 @@ La carte Lovelace est enregistree automatiquement par l'intégration : aucune re
 
 A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller.
 
-Les chaines favorites se choisissent également depuis les options de l'intégration : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
+Les chaines favorites se choisissent depuis la configuration de la carte (option `favorite_channels`, en YAML ou via l'éditeur visuel) : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
 
 Les appareils utilisés pour les rappels se configurent via des **profils de rappel**, depuis les options de l'intégration (menu "Profils de rappel" puis "Ajouter un profil") : chaque profil a un nom (ex. "Fred", "Ginie"), un ou plusieurs appareils à notifier, une ou plusieurs enceintes/TV (`media_player`) pour une annonce vocale (avec le moteur de synthèse vocale TTS de votre choix), les deux pouvant être combinés. Un appareil Alexa déjà choisi comme notification (il parle déjà le message via son propre système) n'a pas besoin d'être ajouté une seconde fois côté `media_player` pour ce même profil - l'intégration bloque d'ailleurs cette combinaison pour éviter d'entendre le rappel deux fois.
 
