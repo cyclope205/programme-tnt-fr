@@ -61,9 +61,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     channels = entry.options.get(
         CONF_CHANNELS, entry.data.get(CONF_CHANNELS, DEFAULT_CHANNELS)
     )
-    tmdb_api_key = entry.options.get(
-        CONF_TMDB_API_KEY, entry.data.get(CONF_TMDB_API_KEY)
-    )
+    if CONF_TMDB_API_KEY in entry.options:
+        tmdb_api_key = entry.options[CONF_TMDB_API_KEY] or None
+    else:
+        tmdb_api_key = entry.data.get(CONF_TMDB_API_KEY)
     coordinator = ProgrammeTntFrCoordinator(hass, channels, tmdb_api_key)
     await coordinator.async_config_entry_first_refresh()
 
@@ -124,9 +125,15 @@ async def _async_sync_lovelace_resource(hass: HomeAssistant, _now=None) -> None:
     """
     lovelace_data = hass.data.get("lovelace")
     resources = getattr(lovelace_data, "resources", None)
-    if resources is None or not hasattr(resources, "async_create_item"):
+    if resources is None:
         _LOGGER.debug("Lovelace not ready yet, retrying resource sync in 5s")
         async_call_later(hass, 5, _async_sync_lovelace_resource)
+        return
+    if not hasattr(resources, "async_create_item"):
+        _LOGGER.debug(
+            "Lovelace resources are in YAML mode; skipping automatic "
+            "resource registration for the card"
+        )
         return
 
     target_url = f"{CARD_URL_PATH}?v={CARD_VERSION}"
