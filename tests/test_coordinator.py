@@ -450,8 +450,15 @@ def test_parse_xmltv_parses_channel_and_full_programme():
     assert prog.category == "Information"
     assert prog.icon == "https://example.com/journal.png"
     assert prog.rating == "10"
-    assert (prog.start.hour, prog.start.minute) == (20, 0)
-    assert (prog.stop.hour, prog.stop.minute) == (22, 0)
+    # Compared as absolute instants (datetime equality is timezone-
+    # independent), not via .hour: _parse_xmltv runs dt_util.as_local(),
+    # which converts to whatever local timezone Home Assistant is
+    # configured with - in CI (no hass.config set) that is UTC, so the
+    # local wall-clock hour here would depend on the runner's timezone.
+    expected_start = datetime(2026, 8, 21, 20, 0, tzinfo=timezone(timedelta(hours=2)))
+    expected_stop = datetime(2026, 8, 21, 22, 0, tzinfo=timezone(timedelta(hours=2)))
+    assert prog.start == expected_start
+    assert prog.stop == expected_stop
 
 
 _XML_UNWANTED_CHANNEL = """<?xml version="1.0" encoding="UTF-8"?>
