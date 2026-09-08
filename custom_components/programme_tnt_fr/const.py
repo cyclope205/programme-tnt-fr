@@ -174,3 +174,25 @@ EXTRA_CHANNELS = {
 
 # Union des deux listes pour le formulaire de selection des chaines.
 ALL_CHANNELS = {**TNT_CHANNELS, **EXTRA_CHANNELS}
+
+# Curated display order for the 30 standard TNT channels, matching the
+# physical remote numbering with related channels grouped nearby (e.g.
+# Canal+ variants right after Canal+, Planete+ right after France 5) -
+# intentionally different from TNT_CHANNELS' own dict order above, which
+# just mirrors this file's listing. This is the single source of truth:
+# exposed to the card via the programme_tnt_fr/version websocket command
+# (see __init__.py's _websocket_get_version), so the card no longer keeps
+# its own hardcoded copy that could silently drift when a channel is
+# added here and forgotten there. Channels not listed here (EXTRA_CHANNELS)
+# have no defined rank and sort after all of these on the card.
+CHANNEL_ORDER = {
+    "TF1.fr": 1, "France2.fr": 2, "France3.fr": 3,
+    "CanalPlus.fr": 3.1, "CanalPlusCinema.fr": 3.2, "CanalPlusSport.fr": 3.3,
+    "France4.fr": 4, "France5.fr": 5, "PlanetePlus.fr": 5.1,
+    "M6.fr": 6, "Arte.fr": 7, "LaChaineParlementaire.fr": 8,
+    "W9.fr": 9, "TMC.fr": 10, "NT1.fr": 11, "Gulli.fr": 12,
+    "BFMTV.fr": 13, "CNews.fr": 14, "LCI.fr": 15, "FranceInfo.fr": 16,
+    "CStar.fr": 17, "T18.fr": 18, "NOVO19.fr": 19, "TF1SeriesFilms.fr": 20,
+    "LEquipe21.fr": 21, "6ter.fr": 22, "Numero23.fr": 23,
+    "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26,
+}
