@@ -155,6 +155,15 @@ const CARD_VERSION = "2.3.0";
   var CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
   var STAR_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.771l-7.416 3.642 1.48-8.279L0 9.306l8.332-1.151z"/></svg>';
 
+  // Curated display order for TNT channels, matching the physical remote
+  // numbering with related channels grouped nearby (e.g. Canal+ variants,
+  // Planete+ next to France 5). This is only the INITIAL/fallback copy so
+  // the very first render (before the backend round-trip in _checkVersion
+  // below resolves) is already correctly ordered - the authoritative copy
+  // now lives in const.py's CHANNEL_ORDER and overrides this one via the
+  // programme_tnt_fr/version websocket response, so a channel added only
+  // on the backend gets ordered correctly here too instead of silently
+  // falling back to rank 999 forever.
   var CHANNEL_ORDER = {
     "TF1.fr": 1, "France2.fr": 2, "France3.fr": 3,
     "CanalPlus.fr": 3.1, "CanalPlusCinema.fr": 3.2, "CanalPlusSport.fr": 3.3,
@@ -1638,6 +1647,14 @@ const CARD_VERSION = "2.3.0";
         });
         if (result && result.version && result.version !== CARD_VERSION) {
           this._showVersionMismatch(result.version);
+        }
+        if (result && result.channel_order && typeof result.channel_order === "object") {
+          // Backend is the single source of truth for channel order -
+          // override the local fallback copy and re-render so a channel
+          // added only on the backend side sorts correctly here too,
+          // instead of silently staying at rank 999.
+          CHANNEL_ORDER = result.channel_order;
+          this._render();
         }
       } catch (err) {
         // Best-effort only: an older backend without this command, or a
