@@ -8,7 +8,7 @@ DOMAIN = "programme_tnt_fr"
 # Served-card cache-busting version, also returned via the
 # programme_tnt_fr/version websocket command so the card can detect a
 # stale cached copy of itself against the actually-installed backend.
-CARD_VERSION = "2.3.0"
+CARD_VERSION = "2.3.4"
 
 # XML TV Fr - flux dedie aux chaines de la TNT francaise.
 # Source et credits : https://github.com/racacax/XML-TV-Fr
