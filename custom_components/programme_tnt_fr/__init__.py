@@ -20,6 +20,7 @@ from homeassistant.helpers.event import async_call_later
 
 from .const import (
     CARD_VERSION,
+    CHANNEL_ORDER,
     CONF_CHANNELS,
     CONF_TMDB_API_KEY,
     DEFAULT_CHANNELS,
@@ -172,7 +173,9 @@ def _websocket_get_version(
     puisse detecter un decalage avec sa propre version embarquee et
     proposer un rechargement (cache navigateur perime apres mise a jour).
     """
-    connection.send_result(msg["id"], {"version": CARD_VERSION})
+    connection.send_result(
+        msg["id"], {"version": CARD_VERSION, "channel_order": CHANNEL_ORDER}
+    )
 
 
 @callback
