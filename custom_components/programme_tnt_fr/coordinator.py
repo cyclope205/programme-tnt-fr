@@ -1,12 +1,9 @@
 """Data update coordinator for the Programme TNT FR integration."""
 from __future__ import annotations
 
-import asyncio
+import io
 import logging
-import re
-import unicodedata
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
@@ -16,126 +13,14 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     DAY_RESET,
-    DEFAULT_TMDB_API_KEY,
     FETCH_MIN_INTERVAL_MINUTES,
     LATE_NIGHT_START,
     PRIME_TIME_START,
-    TMDB_IMAGE_BASE_URL,
-    TMDB_SEARCH_MOVIE_URL,
-    TMDB_SEARCH_TV_URL,
     UPDATE_INTERVAL_MINUTES,
     XMLTV_URL,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-# Bruit frequent dans les titres du flux XMLTV pour les series : sous-titre
-# d'episode entre parentheses, numero de saison, position dans la saison
-# (ex: "Candice Renoir (Faute avouee a demi-pardonnee) S5 (1/10)"), et
-# marqueur d'annee pour distinguer un reboot (ex: "Magnum *2018" du Magnum
-# original des annees 1980). Verifie sur le flux xmltvfr.fr reel : environ
-# un quart des titres suivent ce format. On les retire avant d'interroger
-# TMDB, car la requete brute (bruitee de mots sans rapport avec le vrai
-# titre) degrade nettement la pertinence du moteur de recherche TMDB et
-# peut faire disparaitre le bon resultat de la premiere page de reponses.
-_EPISODE_SUFFIX_RE = re.compile(
-    r"\s*\([^()]*\)\s*S\d{1,2}\s*(?:\(\d+/\d+\)|\(n°\d+\))\s*$", re.IGNORECASE
-)
-_SEASON_SUFFIX_RE = re.compile(
-    r"\s*S\d{1,2}\s*(?:\(\d+/\d+\)|\(n°\d+\))\s*$", re.IGNORECASE
-)
-# Autre format d'episode rencontre sur le flux (ex: "Zig & Sharko - S04E61",
-# "Mr Bean - S04E14") : code saison+episode colle, precede d'un tiret, sans
-# parentheses ni fraction.
-_DASH_EPISODE_CODE_RE = re.compile(r"\s*-\s*S\d{1,2}E\d{1,3}\s*$", re.IGNORECASE)
-# Autre variante rencontree (ex: "Planete chefs - Saison 1") : "Saison"
-# ecrit en toutes lettres plutot que "S<n>", sans numero d'episode.
-_DASH_SAISON_WORD_RE = re.compile(r"\s*-\s*Saison\s+\d{1,2}\s*$", re.IGNORECASE)
-# Repli le plus large, tente en dernier seulement : simple marqueur de
-# saison en fin de titre, sans parentheses ni tiret (ex: "90' Enquetes S17",
-# "Reporters S1", "Appels d'urgence S22" - tous verifies avec une vraie
-# fiche TMDB). Comme il est peu specifique, il n'est essaye que si aucun
-# des motifs plus precis ci-dessus n'a matche.
-_BARE_SEASON_SUFFIX_RE = re.compile(r"\s+S\d{1,2}\s*$")
-# Feuilletons quotidiens de tres longue duree, sans notion de saison :
-# double numero d'episode cumulatif en fin de titre (ex: "Amour, gloire et
-# beaute (9709) (n°9709)", verifie sur TMDB).
-_CUMULATIVE_EPISODE_RE = re.compile(r"\s*\(\d+\)\s*\(n°\d+\)\s*$")
-# Sous-titre d'episode descriptif suivi du marqueur "(n°N)", sans marqueur
-# de saison entre les deux (ex: "Cuisines des terroirs (La Macedoine du
-# Nord) (n°311)" -> "Cuisines des terroirs", "Tom et Jerry Show
-# (Chat-acombes) (n°224)" -> "Tom et Jerry Show" - tous verifies avec de
-# vraies fiches TMDB). Chevauche partiellement _CUMULATIVE_EPISODE_RE
-# (sans-objet ici puisque ce dernier est tente en premier) mais couvre en
-# plus les sous-titres non numeriques que celui-ci ne capture pas.
-_SUBTITLE_NUMBER_MARKER_RE = re.compile(r"\s*\([^()]*\)\s*\(n°\d+\)\s*$")
-# Qualificatif de version en fin de titre, absent de la fiche TMDB (ex:
-# "Le bateau (version realisateur)" -> "Le Bateau", "Rencontres du
-# troisieme type (Director's Cut)" -> "Rencontres du troisieme type" -
-# tous verifies avec une vraie fiche TMDB).
-_VERSION_QUALIFIER_RE = re.compile(
-    r"\s*\((?:version (?:réalisateur|restaurée|longue|intégrale|non censurée)"
-    r"|director'?s cut|extended(?: cut)?|uncut)\)\s*$",
-    re.IGNORECASE,
-)
-_YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
-
-# De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
-# systematiquement (ex: XMLTV "Meilleur Patissier" vs TMDB "Le Meilleur
-# Patissier" ; "Voix" vs "La Voix" ; "Grande Librairie" vs "La Grande
-# Librairie" - verifie sur des recherches TMDB reelles). On retire cet
-# article des DEUX cotes avant comparaison (symetrique, comme pour la
-# ponctuation) : la comparaison stricte par prefixe qui suit reste le
-# garde-fou contre les faux positifs, ce n'est pas un relachement du
-# critere d'acceptation. Meme logique pour l'anglais "the" (ex: XMLTV
-# "Big Bang Theory" vs TMDB "The Big Bang Theory" - verifie en direct).
-_LEADING_ARTICLE_RE = re.compile(r"^(?:le|la|les|the)\s+|^l'")
-
-# TMDB prefixe certaines emissions "en direct/en continu" (ex: talk-shows
-# d'actualite) d'un marqueur "LIVE:" absent du titre XMLTV correspondant
-# (verifie sur TMDB : "C dans l'air" -> "LIVE: C dans l'air", avec une
-# vraie affiche). Retire uniquement ce marqueur precis en tete, pas le mot
-# "live" en general, pour eviter de perturber un titre qui commencerait
-# reellement par ce mot.
-_LIVE_PREFIX_RE = re.compile(r"^live\s*:\s*", re.IGNORECASE)
-
-
-class _TmdbTransientError(Exception):
-    """Raised for TMDB failures that should be retried, not cached as no-poster.
-
-    Covers auth failures (revoked/invalid API key), rate limiting, and
-    server errors - none of these mean "this title has no TMDB match", so
-    they must not be cached as such in _tmdb_poster_cache.
-    """
-
-
-# "un"/"une" sont volontairement absents : ce sont des articles francais
-# omnipresents (ex: "Un diner presque parfait"), pas seulement des nombres -
-# les convertir en "1" corromprait la comparaison de la plupart des titres.
-_FR_NUMBER_WORDS = {
-    "zero": "0",
-    "deux": "2",
-    "trois": "3",
-    "quatre": "4",
-    "cinq": "5",
-    "six": "6",
-    "sept": "7",
-    "huit": "8",
-    "neuf": "9",
-    "dix": "10",
-    "onze": "11",
-    "douze": "12",
-    "treize": "13",
-    "quatorze": "14",
-    "quinze": "15",
-    "seize": "16",
-    "vingt": "20",
-    "trente": "30",
-    "quarante": "40",
-    "cinquante": "50",
-    "soixante": "60",
-}
 
 
 def _parse_xmltv_datetime(value: str | None):
@@ -146,22 +31,6 @@ def _parse_xmltv_datetime(value: str | None):
         return datetime.strptime(value.strip(), "%Y%m%d%H%M%S %z")
     except ValueError:
         return None
-
-
-@dataclass(frozen=True)
-class TmdbMatch:
-    """Une correspondance TMDB unique : affiche + donnees de notation.
-
-    Regroupees dans un seul objet (plutot que de faire grossir le cache en
-    plusieurs dicts paralleles) pour que _tmdb_poster_cache reste une simple
-    map titre -> resultat, comme avant l'ajout de la notation.
-    """
-
-    poster: str
-    tmdb_id: int | None
-    media_type: str | None
-    rating: float
-    votes: int
 
 
 class Programme:
@@ -187,37 +56,88 @@ class Programme:
         self.icon = icon
         self.rating = rating
 
-    def as_dict(
-        self,
-        poster: str | None = None,
-        tmdb_id: int | None = None,
-        tmdb_media_type: str | None = None,
-        tmdb_rating: float = 0,
-        tmdb_votes: int = 0,
-    ) -> dict:
+    def as_dict(self) -> dict:
         return {
             "title": self.title,
             "subtitle": self.subtitle,
             "description": self.desc,
             "category": self.category,
             "icon": self.icon,
-            "poster": poster,
-            "tmdb_id": tmdb_id,
-            "tmdb_media_type": tmdb_media_type,
-            "tmdb_rating": tmdb_rating,
-            "tmdb_votes": tmdb_votes,
             "rating": self.rating,
             "start": self.start.isoformat() if self.start else None,
             "stop": self.stop.isoformat() if self.stop else None,
         }
 
 
+def _parse_xmltv_bytes(
+    raw: bytes, wanted: set[str]
+) -> tuple[dict[str, dict], dict[str, list[Programme]]]:
+    """Stream-parse the XMLTV feed, keeping only the wanted channels.
+
+    Runs in a worker thread (see _fetch_and_parse): this walks the whole
+    document with ET.iterparse and discards each <channel>/<programme>
+    element right after reading it (elem.clear() + detach from the root),
+    instead of ET.fromstring() which would first build the *entire* tree
+    in memory (every channel, every one of the ~113k programmes in the
+    full feed) before any filtering happens. Peak memory here scales with
+    the number of channels actually followed, not with the size of the
+    whole feed.
+    """
+    channels_meta: dict[str, dict] = {}
+    programmes: dict[str, list[Programme]] = {}
+
+    context = ET.iterparse(io.BytesIO(raw), events=("start", "end"))
+    _, root = next(context)  # first start event: the <tv> root element
+
+    for event, elem in context:
+        if event != "end":
+            continue
+
+        if elem.tag == "channel":
+            cid = elem.get("id")
+            if cid and cid in wanted:
+                name_el = elem.find("display-name")
+                icon_el = elem.find("icon")
+                channels_meta[cid] = {
+                    "name": name_el.text if name_el is not None else cid,
+                    "icon": icon_el.get("src") if icon_el is not None else None,
+                }
+            elem.clear()
+            root.remove(elem)
+
+        elif elem.tag == "programme":
+            channel_id = elem.get("channel")
+            if channel_id in wanted:
+                start = _parse_xmltv_datetime(elem.get("start"))
+                stop = _parse_xmltv_datetime(elem.get("stop"))
+                if start is not None and stop is not None:
+                    title_el = elem.find("title")
+                    subtitle_el = elem.find("sub-title")
+                    desc_el = elem.find("desc")
+                    category_el = elem.find("category")
+                    icon_el = elem.find("icon")
+                    rating_el = elem.find("rating/value")
+                    item = Programme(
+                        start=dt_util.as_local(start),
+                        stop=dt_util.as_local(stop),
+                        title=title_el.text if title_el is not None else "",
+                        subtitle=subtitle_el.text if subtitle_el is not None else None,
+                        desc=desc_el.text if desc_el is not None else None,
+                        category=category_el.text if category_el is not None else None,
+                        icon=icon_el.get("src") if icon_el is not None else None,
+                        rating=rating_el.text if rating_el is not None else None,
+                    )
+                    programmes.setdefault(channel_id, []).append(item)
+            elem.clear()
+            root.remove(elem)
+
+    return channels_meta, programmes
+
+
 class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     """Fetches the XMLTV feed and derives now / prime-time / late-night slots."""
 
-    def __init__(
-        self, hass: HomeAssistant, channels: list[str], tmdb_api_key: str | None = None
-    ) -> None:
+    def __init__(self, hass: HomeAssistant, channels: list[str]) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -225,23 +145,12 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
         )
         self._channels = channels
-        self._tmdb_api_key = tmdb_api_key or DEFAULT_TMDB_API_KEY
         self._session = async_get_clientsession(hass)
         self._programmes_by_channel: dict[str, list[Programme]] = {}
         self._channels_meta: dict[str, dict] = {}
         self._last_fetch = None
-        # Cache titre -> URL d'affiche TMDB (ou None si aucune correspondance
-        # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
-        # (toutes les 5 min) pour un programme deja resolu.
-        self._tmdb_poster_cache: dict[str, TmdbMatch | None] = {}
-        # Titles currently being resolved by a background TMDB lookup -
-        # guards against a slow resolution still being in flight when the
-        # next refresh cycle (5 min later) runs, which would otherwise
-        # fire a duplicate concurrent TMDB request for the same title.
-        self._tmdb_pending_titles: set[str] = set()
-        # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
-        # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
-        self._tmdb_auth_warned = False
+        self._etag: str | None = None
+        self._last_modified: str | None = None
 
     async def _async_update_data(self) -> dict:
         now = dt_util.now()
@@ -263,430 +172,50 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     err,
                 )
 
-        picks = {
-            channel_id: self._pick_slots(channel_id, now)
+        return {
+            channel_id: self._compute_slots(channel_id, now)
             for channel_id in self._channels
         }
 
-        if self._tmdb_api_key:
-            title_categories: dict[str, str | None] = {}
-            title_categories_far: dict[str, str | None] = {}
-            near_cutoff = now + timedelta(days=2)
-            for channel_id in self._channels:
-                for programme in self._programmes_by_channel.get(channel_id, []):
-                    if (
-                        programme is not None
-                        and programme.title
-                        and programme.stop > now
-                        and programme.title not in self._tmdb_poster_cache
-                        and programme.title not in title_categories
-                        and programme.title not in title_categories_far
-                        and programme.title not in self._tmdb_pending_titles
-                    ):
-                        if programme.start <= near_cutoff:
-                            title_categories[programme.title] = programme.category
-                        else:
-                            title_categories_far[programme.title] = programme.category
-            all_new_titles = {**title_categories, **title_categories_far}
-            if all_new_titles:
-                self._tmdb_pending_titles.update(all_new_titles)
-                self.hass.async_create_task(
-                    self._background_resolve_tmdb_posters_staged(
-                        title_categories, title_categories_far
-                    )
-                )
-
-        result: dict[str, dict] = {}
-        for channel_id, (current, prime_time, second_part) in picks.items():
-            meta = self._channels_meta.get(channel_id, {})
-            result[channel_id] = {
-                "channel_id": channel_id,
-                "channel_name": meta.get("name", channel_id),
-                "channel_icon": meta.get("icon"),
-                "current": self._programme_dict(current),
-                "prime_time": self._programme_dict(prime_time),
-                "second_part": self._programme_dict(second_part),
-            }
-        return result
-
-    def _programme_dict(self, programme: Programme | None) -> dict | None:
-        if programme is None:
-            return None
-        match = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
-        if match is None:
-            return programme.as_dict()
-        return programme.as_dict(
-            poster=match.poster,
-            tmdb_id=match.tmdb_id,
-            tmdb_media_type=match.media_type,
-            tmdb_rating=match.rating,
-            tmdb_votes=match.votes,
-        )
-
-    async def _background_resolve_tmdb_posters_staged(
-        self,
-        near_titles: dict[str, str | None],
-        far_titles: dict[str, str | None],
-    ) -> None:
-        """Resolve near-term (today/tomorrow) TMDB posters first, then the rest.
-
-        Splits what used to be a single large batch into two waves so a
-        first setup with many channels does not fire hundreds of TMDB
-        lookups at once: the near-term wave resolves (and triggers a
-        refresh) first, so posters for what is actually about to be shown
-        appear quickly, then the remaining days resolve afterward at the
-        same bounded concurrency as before. Every title still eventually
-        gets resolved - this only changes the order/timing, not the total
-        number of lookups.
-        """
-        if near_titles:
-            await self._background_resolve_tmdb_posters(near_titles)
-        if far_titles:
-            await self._background_resolve_tmdb_posters(far_titles)
-
-    async def _background_resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
-        """Resolve TMDB posters in the background, then push a refresh once done.
-
-        Runs outside of _async_update_data's await chain so a large batch of
-        new titles (e.g. a whole day's guide on first setup) can never delay
-        or cancel config entry setup again.
-        """
-        try:
-            await self._resolve_tmdb_posters(title_categories)
-        finally:
-            self._tmdb_pending_titles.difference_update(title_categories)
-        await self.async_request_refresh()
-
-    async def _resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
-        """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre.
-
-        Runs lookups concurrently (bounded) instead of one at a time, since
-        this can now cover a full day's programmes instead of just 3 picks.
-        """
-        semaphore = asyncio.Semaphore(5)
-
-        async def _resolve_one(title: str, category: str | None) -> None:
-            async with semaphore:
-                try:
-                    match = await self._lookup_tmdb_poster(title, category)
-                except Exception as err:  # noqa: BLE001
-                    # Erreur temporaire (reseau, cle invalide, rate limit...) :
-                    # on ne met PAS en cache pour que ce titre soit retente au
-                    # prochain cycle, plutot que fige a tort sur "aucune affiche".
-                    _LOGGER.debug("Recherche TMDB reportee pour %s (erreur temporaire): %s", title, err)
-                    return
-                self._tmdb_poster_cache[title] = match
-
-        await asyncio.gather(
-            *(_resolve_one(title, category) for title, category in title_categories.items())
-        )
-
-    async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> TmdbMatch | None:
-        clean_title, year = self._clean_search_query(title)
-        if self._is_movie_category(category):
-            search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
-        else:
-            search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
-        for url in search_order:
-            match = await self._tmdb_search(url, clean_title)
-            if match:
-                return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
-        # Repli avec filtre par annee, uniquement si un marqueur "*AAAA" a ete
-        # trouve et que rien n'a matche sans lui (ex: distinguer le Magnum de
-        # 2018 de l'original) - tente en plus, ne remplace jamais les essais
-        # ci-dessus, donc ne peut pas faire regresser un match qui marchait deja.
-        if year:
-            for url in search_order:
-                match = await self._tmdb_search(url, clean_title, year)
-                if match:
-                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
-        # Dernier repli : une description libre apres une virgule/deux-points
-        # (ex: "Nomade des mers, les escales de l'innovation", pas un format
-        # d'episode structure donc non couvert par _clean_search_query) peut a
-        # elle seule faire retourner zero resultat TMDB. On retente avec
-        # uniquement la partie avant, seulement en dernier recours.
-        truncated = self._truncate_at_first_separator(clean_title)
-        if truncated and truncated != clean_title:
-            for url in search_order:
-                match = await self._tmdb_search(url, truncated)
-                if match:
-                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
-        return None
-
-    @staticmethod
-    def _is_movie_category(category: str | None) -> bool:
-        """Return True if the XMLTV category explicitly indicates a movie.
-
-        Le flux XMLTV tague systematiquement les films avec "Film" (ou
-        variantes), alors que les series n'ont pas toujours de categorie
-        "Serie" explicite (parfois seulement un genre comme "Action"). On ne
-        bascule donc en recherche film que si la categorie le confirme
-        explicitement ; sinon on cherche d'abord cote serie, avec repli
-        automatique sur film si la recherche serie ne trouve rien.
-        """
-        if not category:
-            return False
-        normalized = category.strip().lower()
-        movie_keywords = (
-            "film",
-            "long m\u00e9trage",
-            "long metrage",
-            "cin\u00e9ma",
-            "cinema",
-        )
-        return any(keyword in normalized for keyword in movie_keywords)
-
-    async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> TmdbMatch | None:
-        params = {
-            "api_key": self._tmdb_api_key,
-            "query": title,
-            "language": "fr-FR",
-            "include_adult": "false",
-        }
-        if year:
-            if url == TMDB_SEARCH_TV_URL:
-                params["first_air_date_year"] = year
-            elif url == TMDB_SEARCH_MOVIE_URL:
-                params["primary_release_year"] = year
-        resp = await self._session.get(url, params=params, timeout=10)
-        if resp.status in (401, 403):
-            if not self._tmdb_auth_warned:
-                self._tmdb_auth_warned = True
-                _LOGGER.warning(
-                    "TMDB a rejete la requete (cle API invalide ou revoquee, code %s) : "
-                    "les affiches TMDB resteront indisponibles tant que ce n'est pas "
-                    "corrige. Vous pouvez renseigner votre propre cle TMDB dans les "
-                    "options de l'integration.",
-                    resp.status,
-                )
-            raise _TmdbTransientError(f"TMDB auth error {resp.status}")
-        if resp.status == 429:
-            raise _TmdbTransientError("TMDB rate limited (429)")
-        if resp.status >= 500:
-            raise _TmdbTransientError(f"TMDB server error {resp.status}")
-        if resp.status != 200:
-            return None
-        data = await resp.json()
-        results = data.get("results") or []
-        if not results:
-            return None
-        query_norm = self._normalize_title(title)
-        media_type = "movie" if url == TMDB_SEARCH_MOVIE_URL else "tv"
-        # TMDB peut lister plusieurs fiches homonymes exactes (ex: un film
-        # rejoue plusieurs annees de suite genere 3 fiches "Fini de rire",
-        # dont deux sans affiche uploadee cote TMDB) : s'arreter a la
-        # premiere correspondance de titre, meme sans affiche, faisait
-        # perdre une affiche bel et bien disponible sur une fiche suivante.
-        # On continue donc de chercher une affiche parmi TOUTES les fiches
-        # dont le titre correspond avant d'abandonner.
-        for result in results:
-            candidate = result.get("title") or result.get("name") or ""
-            candidate_norm = self._normalize_title(candidate)
-            if candidate_norm and self._titles_match(query_norm, candidate_norm):
-                if result.get("poster_path"):
-                    return self._build_tmdb_match(result, media_type)
-                continue
-            # Repli sur le titre original (non localise) : le titre fr-FR peut
-            # diverger du nom XMLTV alors que le titre original correspond.
-            original = result.get("original_title") or result.get("original_name") or ""
-            original_norm = self._normalize_title(original)
-            if (
-                original_norm
-                and original_norm != candidate_norm
-                and self._titles_match(query_norm, original_norm)
-                and result.get("poster_path")
-            ):
-                return self._build_tmdb_match(result, media_type)
-        return None
-
-    @staticmethod
-    def _build_tmdb_match(result: dict, media_type: str) -> TmdbMatch:
-        """Construit un TmdbMatch a partir d'un resultat brut de l'API TMDB.
-
-        Isole la conversion (valeurs par defaut, casts) du reste de
-        _tmdb_search pour rester testable sans appel reseau, comme les
-        autres methodes statiques de matching de ce module.
-        """
-        return TmdbMatch(
-            poster=result.get("poster_path") or "",
-            tmdb_id=result.get("id"),
-            media_type=media_type,
-            rating=float(result.get("vote_average") or 0),
-            votes=int(result.get("vote_count") or 0),
-        )
-
-    @staticmethod
-    def _truncate_at_first_separator(title: str) -> str | None:
-        """Retourne la partie avant la premiere virgule/deux-points d'un
-        titre, seulement s'il y a au moins deux mots avant ce separateur
-        (evite de tronquer des titres courts comme "Amour, gloire et
-        beaute" ou la virgule fait partie du vrai nom). None si aucun
-        separateur pertinent n'est trouve.
-        """
-        match = re.match(r"^(\S+\s+\S.*?)\s*[,:]\s", title or "")
-        return match.group(1) if match else None
-
-    @staticmethod
-    def _clean_search_query(title: str) -> tuple[str, str | None]:
-        """Retire le bruit episode/saison d'un titre XMLTV avant de le
-        soumettre a TMDB (voir les regex ci-dessus pour des exemples reels).
-        Retourne (titre_nettoye, annee) : annee (extraite d'un marqueur
-        "*AAAA") aide a distinguer un reboot de l'original du meme nom.
-        Si aucun motif ne correspond, retourne le titre original inchange -
-        aucun effet de bord pour les titres deja propres (films, etc.).
-        """
-        working = title or ""
-        year = None
-        year_match = _YEAR_MARKER_RE.search(working)
-        if year_match:
-            year = year_match.group(1)
-            working = _YEAR_MARKER_RE.sub("", working)
-        before = working
-        working = _EPISODE_SUFFIX_RE.sub("", working)
-        if working == before:
-            working = _SEASON_SUFFIX_RE.sub("", working)
-        if working == before:
-            working = _DASH_EPISODE_CODE_RE.sub("", working)
-        if working == before:
-            working = _DASH_SAISON_WORD_RE.sub("", working)
-        if working == before:
-            working = _BARE_SEASON_SUFFIX_RE.sub("", working)
-        if working == before:
-            working = _CUMULATIVE_EPISODE_RE.sub("", working)
-        if working == before:
-            working = _SUBTITLE_NUMBER_MARKER_RE.sub("", working)
-        if working == before:
-            working = _VERSION_QUALIFIER_RE.sub("", working)
-        working = working.strip()
-        return (working or title or "", year)
-
-    @staticmethod
-    def _titles_match(query_norm: str, candidate_norm: str) -> bool:
-        """Return True if a normalized TMDB candidate matches a normalized query.
-
-        A prefix match in either direction: handles XMLTV titles with episode
-        suffixes (ex: "Koh-Lanta - S29E01" matching TMDB's "Koh-Lanta") while
-        rejecting loose full-text matches where neither is a prefix of the
-        other (ex: "Meteo" vs "Miss Meteo").
-        """
-        return query_norm.startswith(candidate_norm) or candidate_norm.startswith(query_norm)
-
-    @staticmethod
-    def _normalize_title(value: str) -> str:
-        """Normalise un titre pour comparaison (minuscules, sans accents).
-
-        Utilise pour verifier qu'un resultat TMDB correspond vraiment au
-        titre recherche avant d'accepter son affiche, plutot que de
-        prendre le premier resultat les yeux fermes : une recherche
-        plein texte comme "Meteo" matchait a tort la serie "Miss Meteo"
-        alors que le bulletin meteo generique n'a pas de fiche TMDB.
-        """
-        value = _LIVE_PREFIX_RE.sub("", value or "")
-        # "&" et "et" sont utilises indifferemment d'une source a l'autre
-        # pour le meme titre, dans les deux sens (ex: XMLTV "Superman et
-        # Loïs" vs TMDB "Superman & Loïs" ; XMLTV "Tom & Jerry et le
-        # haricot geant" vs TMDB "Tom et Jerry et le haricot geant" -
-        # verifies avec de vraies fiches TMDB). On unifie vers "et" des
-        # les deux cotes (meme normalisation, donc pas de faux positif).
-        value = (value or "").replace("&", " et ")
-        # TMDB utilise parfois l'apostrophe courbe typographique (’)
-        # la ou XMLTV utilise l'apostrophe droite ASCII (ex: TMDB "Le
-        # combat d’Alice" vs XMLTV "Le combat d'Alice" - verifie sur une
-        # vraie fiche TMDB). On unifie vers l'apostrophe droite des les
-        # deux cotes.
-        for curly in ("’", "‘", "‛"):
-            value = value.replace(curly, "'")
-        normalized = unicodedata.normalize("NFD", value or "")
-        normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
-        normalized = normalized.lower().strip()
-        normalized = (
-            normalized.replace("dix-sept", "17")
-            .replace("dix-huit", "18")
-            .replace("dix-neuf", "19")
-        )
-        # XMLTV et TMDB ne separent pas titre/sous-titre avec la meme
-        # ponctuation pour le meme programme (ex: XMLTV "Sisteron : citadelle
-        # de tous les defis" vs TMDB "Sisteron, la citadelle de tous les
-        # defis" ; "Irish Celtic : le chemin des legendes" vs TMDB "Irish
-        # Celtic - Le Chemin des Legendes") : on normalise tous ces
-        # separateurs en simple espace pour que la comparaison ne depende pas
-        # du signe de ponctuation utilise par chaque source.
-        for separator in ("-", ":", ",", ";", "!", "?", ".", "/"):
-            normalized = normalized.replace(separator, " ")
-        words = [_FR_NUMBER_WORDS.get(word, word) for word in normalized.split()]
-        result = " ".join(words)
-        return _LEADING_ARTICLE_RE.sub("", result, count=1)
-
     async def _fetch_and_parse(self) -> None:
-        resp = await self._session.get(XMLTV_URL, timeout=30)
+        # Conditional request: if the feed hasn't changed since our last
+        # successful fetch, the server answers 304 with an empty body
+        # instead of resending the full ~80 Mo file - the feed itself only
+        # changes every few days, this check still runs hourly but the
+        # actual download (and the parsing work below) only happens when
+        # there is really something new.
+        headers = {}
+        if self._etag:
+            headers["If-None-Match"] = self._etag
+        elif self._last_modified:
+            headers["If-Modified-Since"] = self._last_modified
+
+        resp = await self._session.get(XMLTV_URL, timeout=60, headers=headers)
+        if resp.status == 304:
+            _LOGGER.debug("Flux XMLTV inchange depuis le dernier telechargement")
+            return
         resp.raise_for_status()
-        text = await resp.text()
+        self._etag = resp.headers.get("ETag")
+        self._last_modified = resp.headers.get("Last-Modified")
+        raw = await resp.read()
 
-        # Le flux complet (xmltv_fr.xml) pese plusieurs dizaines de Mo : on
-        # deporte le parsing XML (CPU-bound) dans un thread pour ne pas
-        # bloquer la boucle evenementielle de Home Assistant.
+        wanted = set(self._channels)
+        # The XML parsing itself is CPU-bound and, for the full feed, can
+        # take a noticeable amount of time - run it in the executor so it
+        # never blocks Home Assistant's event loop.
         channels_meta, programmes = await self.hass.async_add_executor_job(
-            self._parse_xmltv, text, set(self._channels)
+            _parse_xmltv_bytes, raw, wanted
         )
-
-        self._programmes_by_channel = programmes
-        self._channels_meta = channels_meta
-
-    @staticmethod
-    def _parse_xmltv(
-        text: str, wanted: set[str]
-    ) -> tuple[dict[str, dict], dict[str, list[Programme]]]:
-        """Parse le flux XMLTV (CPU-bound, execute dans un executor thread)."""
-        root = ET.fromstring(text)
-
-        channels_meta: dict[str, dict] = {}
-        for chan in root.findall("channel"):
-            cid = chan.get("id")
-            if not cid:
-                continue
-            name_el = chan.find("display-name")
-            icon_el = chan.find("icon")
-            channels_meta[cid] = {
-                "name": name_el.text if name_el is not None else cid,
-                "icon": icon_el.get("src") if icon_el is not None else None,
-            }
-
-        programmes: dict[str, list[Programme]] = {}
-        for prog in root.findall("programme"):
-            channel_id = prog.get("channel")
-            if channel_id not in wanted:
-                continue
-            start = _parse_xmltv_datetime(prog.get("start"))
-            stop = _parse_xmltv_datetime(prog.get("stop"))
-            if start is None or stop is None:
-                continue
-            title_el = prog.find("title")
-            subtitle_el = prog.find("sub-title")
-            desc_el = prog.find("desc")
-            category_el = prog.find("category")
-            icon_el = prog.find("icon")
-            rating_el = prog.find("rating/value")
-            item = Programme(
-                start=dt_util.as_local(start),
-                stop=dt_util.as_local(stop),
-                title=title_el.text if title_el is not None else "",
-                subtitle=subtitle_el.text if subtitle_el is not None else None,
-                desc=desc_el.text if desc_el is not None else None,
-                category=category_el.text if category_el is not None else None,
-                icon=icon_el.get("src") if icon_el is not None else None,
-                rating=rating_el.text if rating_el is not None else None,
-            )
-            programmes.setdefault(channel_id, []).append(item)
 
         for progs in programmes.values():
             progs.sort(key=lambda p: p.start)
 
-        return channels_meta, programmes
+        self._programmes_by_channel = programmes
+        self._channels_meta = channels_meta
 
-    def _pick_slots(
-        self, channel_id: str, now
-    ) -> tuple[Programme | None, Programme | None, Programme | None]:
+    def _compute_slots(self, channel_id: str, now) -> dict:
         progs = self._programmes_by_channel.get(channel_id, [])
+        meta = self._channels_meta.get(channel_id, {})
 
         current = None
         for programme in progs:
@@ -719,40 +248,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     second_part = programme
                     break
 
-        return current, prime_time, second_part
-
-    def get_programmes_for_day(
-        self, channel_id: str, date_str: str | None = None
-    ) -> list[dict] | None:
-        """Retourne tous les programmes en cache pour channel_id sur une
-        journee de diffusion (de DAY_RESET a DAY_RESET le lendemain), pour
-        alimenter la carte "Guide TV". Utilise la meme frontiere que le
-        calcul des creneaux pour que les programmes de nuit avant 05h00
-        restent rattaches a la soiree precedente. date_str est une date ISO
-        (AAAA-MM-JJ) ; si absente, utilise la journee de diffusion en cours.
-        """
-        if channel_id not in self._programmes_by_channel:
-            return None
-
-        tzinfo = dt_util.now().tzinfo
-        if date_str:
-            try:
-                broadcast_day = datetime.strptime(date_str, "%Y-%m-%d").date()
-            except ValueError:
-                return None
-        else:
-            now = dt_util.now()
-            broadcast_day = (
-                (now - timedelta(days=1)).date()
-                if now.time() < DAY_RESET
-                else now.date()
-            )
-
-        day_start = datetime.combine(broadcast_day, DAY_RESET, tzinfo=tzinfo)
-        day_end = day_start + timedelta(days=1)
-
-        return [
-            self._programme_dict(p)
-            for p in self._programmes_by_channel[channel_id]
-            if p.start < day_end and p.stop > day_start
-        ]
+        return {
+            "channel_id": channel_id,
+            "channel_name": meta.get("name", channel_id),
+            "channel_icon": meta.get("icon"),
+            "current": current.as_dict() if current else None,
+            "prime_time": prime_time.as_dict() if prime_time else None,
+            "second_part": second_part.as_dict() if second_part else None,
+        }
