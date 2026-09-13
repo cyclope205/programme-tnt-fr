@@ -1,6 +1,7 @@
 """Scheduled 'notify me before it starts' reminders for Programme TNT FR."""
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 from datetime import timedelta
@@ -16,6 +17,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_ANNOUNCE_VOLUME,
     CONF_MEDIA_PLAYER_TARGETS,
     CONF_NOTIFY_TARGET,
     CONF_REMINDER_PROFILES,
@@ -155,6 +157,16 @@ class _ReminderManager:
                 return engine
         return None
 
+    def _resolve_announce_volume(self) -> float | None:
+        """Volume (0.0-1.0) a regler avant une annonce, si configure."""
+        for entry in self._hass.config_entries.async_entries(DOMAIN):
+            vol_value = entry.options.get(
+                CONF_ANNOUNCE_VOLUME, entry.data.get(CONF_ANNOUNCE_VOLUME)
+            )
+            if vol_value is not None:
+                return float(vol_value)
+        return None
+
     def _find_profile(self, profile_name: str | None) -> dict | None:
         """Named reminder profile matching profile_name, if configured and found."""
         if not profile_name:
@@ -166,7 +178,9 @@ class _ReminderManager:
                     return profile
         return None
 
-    def _resolve_targets(self, profile_name: str | None) -> tuple[list[str], list[str], str | None]:
+    def _resolve_targets(
+        self, profile_name: str | None
+    ) -> tuple[list[str], list[str], str | None, float | None]:
         """(notify targets, media_player targets, tts engine) for this reminder.
 
         Uses the named profile's own devices when profile_name matches a
@@ -183,11 +197,17 @@ class _ReminderManager:
             ]
             media_targets = profile.get(CONF_MEDIA_PLAYER_TARGETS) or []
             media_targets = media_targets if isinstance(media_targets, list) else [media_targets]
-            return targets, media_targets, profile.get(CONF_TTS_ENGINE)
+            return (
+                targets,
+                media_targets,
+                profile.get(CONF_TTS_ENGINE),
+                profile.get(CONF_ANNOUNCE_VOLUME),
+            )
         return (
             self._resolve_notify_targets(),
             self._resolve_media_player_targets(),
             self._resolve_tts_engine(),
+            self._resolve_announce_volume(),
         )
 
     async def async_handle_schedule(self, call: ServiceCall) -> None:
@@ -197,7 +217,9 @@ class _ReminderManager:
         minutes_before = call.data["minutes_before"]
         profile_name = call.data.get("profile_name")
 
-        targets, media_player_targets, tts_engine = self._resolve_targets(profile_name)
+        targets, media_player_targets, tts_engine, announce_volume = (
+            self._resolve_targets(profile_name)
+        )
         if not media_player_targets or not tts_engine:
             media_player_targets = []
         if not targets and not media_player_targets:
@@ -230,6 +252,7 @@ class _ReminderManager:
             "targets": targets,
             "media_player_targets": media_player_targets,
             "tts_engine": tts_engine,
+            "announce_volume": announce_volume,
         }
         await self._async_save(reminder)
         self._schedule(reminder)
@@ -350,7 +373,25 @@ class _ReminderManager:
 
         media_player_targets = reminder.get("media_player_targets") or []
         tts_engine = reminder.get("tts_engine") or self._resolve_tts_engine()
+        announce_volume = reminder.get("announce_volume")
         for player in media_player_targets:
+            previous_volume = None
+            if announce_volume is not None:
+                state = self._hass.states.get(player)
+                if state is not None:
+                    previous_volume = state.attributes.get("volume_level")
+                try:
+                    await self._hass.services.async_call(
+                        "media_player",
+                        "volume_set",
+                        {"volume_level": announce_volume},
+                        target={"entity_id": player},
+                    )
+                except Exception:  # noqa: BLE001
+                    _LOGGER.exception(
+                        "Echec du reglage du volume d'annonce pour %s",
+                        player,
+                    )
             alexa_slug = self._alexa_notify_slug(player)
             if alexa_slug:
                 try:
@@ -369,6 +410,7 @@ class _ReminderManager:
                         reminder["program_title"],
                         player,
                     )
+                await self._restore_announce_volume(player, previous_volume, message)
                 continue
             if not tts_engine:
                 _LOGGER.warning(
@@ -376,6 +418,7 @@ class _ReminderManager:
                     reminder["program_title"],
                     player,
                 )
+                await self._restore_announce_volume(player, previous_volume, message)
                 continue
             try:
                 await self._hass.services.async_call(
@@ -390,6 +433,29 @@ class _ReminderManager:
                     reminder["program_title"],
                     player,
                 )
+            await self._restore_announce_volume(player, previous_volume, message)
+
+    async def _restore_announce_volume(
+        self, player: str, previous_volume: float | None, message: str
+    ) -> None:
+        """Attend approximativement la fin de l'annonce puis restaure le volume."""
+        if previous_volume is None:
+            return
+        words = max(1, len(message.split()))
+        delay = min(30.0, max(2.5, words / 2.5 + 1.5))
+        await asyncio.sleep(delay)
+        try:
+            await self._hass.services.async_call(
+                "media_player",
+                "volume_set",
+                {"volume_level": previous_volume},
+                target={"entity_id": player},
+            )
+        except Exception:  # noqa: BLE001
+            _LOGGER.exception(
+                "Echec de la restauration du volume pour %s",
+                player,
+            )
 
     async def _async_save(self, reminder: dict) -> None:
         data = await self._store.async_load() or {"reminders": []}
