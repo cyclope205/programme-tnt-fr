@@ -153,6 +153,8 @@ Les chaines favorites se choisissent depuis la configuration de la carte (option
 
 Les appareils utilisés pour les rappels se configurent via des **profils de rappel**, depuis les options de l'intégration (menu "Profils de rappel" puis "Ajouter un profil") : chaque profil a un nom (ex. "Fred", "Ginie"), un ou plusieurs appareils à notifier, une ou plusieurs enceintes/TV (`media_player`) pour une annonce vocale (avec le moteur de synthèse vocale TTS de votre choix), les deux pouvant être combinés. Un appareil Alexa déjà choisi comme notification (il parle déjà le message via son propre système) n'a pas besoin d'être ajouté une seconde fois côté `media_player` pour ce même profil - l'intégration bloque d'ailleurs cette combinaison pour éviter d'entendre le rappel deux fois.
 
+Chaque profil peut également définir un volume d'annonce (0 à 100 %) : le volume de l'enceinte/TV ciblée est temporairement réglé sur cette valeur juste avant l'annonce vocale, puis restauré à son niveau d'origine juste après (délai estimé selon la longueur du message). Ce réglage est facultatif : s'il n'est pas défini, aucun changement de volume n'est appliqué.
+
 Pour que plusieurs personnes du foyer reçoivent leurs rappels chacune sur leurs propres appareils, un profil distinct peut être créé pour chacune, avec ses propres cibles indépendantes des autres profils. Le profil est ensuite sélectionnable dans la fiche du programme au moment de programmer le rappel ; sans profil configuré, aucun rappel ne peut être envoyé.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -191,6 +193,15 @@ show_top_films: true
 ```
 
 La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+
+Le nombre de vignettes affichées par ligne dans le carrousel se règle avec l'option `columns` (2 par défaut, entre 1 et 4) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+columns: 3
+```
+
+Comme les autres options ci-dessus, `columns` est également réglable directement depuis l'éditeur visuel de la carte (section "Carrousel", champ "Nombre de jaquettes visibles"), sans avoir à écrire de YAML.
 
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
