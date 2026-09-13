@@ -10,6 +10,7 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import (
     ALL_CHANNELS,
+    CONF_ANNOUNCE_VOLUME,
     CONF_CHANNELS,
     CONF_MEDIA_PLAYER_TARGETS,
     CONF_NOTIFY_TARGET,
@@ -115,6 +116,7 @@ def _profile_schema(
     notify_default: list[str] | None = None,
     media_player_default: list[str] | None = None,
     tts_default: str | None = None,
+    announce_volume_default: float | None = None,
 ) -> vol.Schema:
     """Form to create or edit one named reminder profile (a person -> their devices).
 
@@ -138,6 +140,9 @@ def _profile_schema(
         {"entity": {"domain": "media_player", "multiple": True}}
     )
     tts_selector = selector.selector({"entity": {"domain": "tts", "multiple": False}})
+    volume_selector = selector.selector(
+        {"number": {"min": 0, "max": 1, "step": 0.05, "mode": "slider"}}
+    )
     fields: dict = {}
     if name_default is not None:
         fields[vol.Required("name", default=name_default)] = selector.selector({"text": {}})
@@ -157,6 +162,10 @@ def _profile_schema(
         fields[vol.Optional(CONF_TTS_ENGINE, default=tts_default)] = tts_selector
     else:
         fields[vol.Optional(CONF_TTS_ENGINE)] = tts_selector
+    if announce_volume_default is not None:
+        fields[vol.Optional(CONF_ANNOUNCE_VOLUME, default=announce_volume_default)] = volume_selector
+    else:
+        fields[vol.Optional(CONF_ANNOUNCE_VOLUME)] = volume_selector
     return vol.Schema(fields)
 
 
@@ -314,6 +323,8 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                     profile[CONF_MEDIA_PLAYER_TARGETS] = user_input[CONF_MEDIA_PLAYER_TARGETS]
                 if user_input.get(CONF_TTS_ENGINE):
                     profile[CONF_TTS_ENGINE] = user_input[CONF_TTS_ENGINE]
+                if user_input.get(CONF_ANNOUNCE_VOLUME) is not None:
+                    profile[CONF_ANNOUNCE_VOLUME] = user_input[CONF_ANNOUNCE_VOLUME]
                 if editing_name is not None:
                     self._profiles = [
                         profile if p["name"] == editing_name else p
@@ -342,6 +353,9 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                 existing.get(CONF_MEDIA_PLAYER_TARGETS) if existing else None
             )
             tts_default = existing.get(CONF_TTS_ENGINE) if existing else None
+            announce_volume_default = (
+                existing.get(CONF_ANNOUNCE_VOLUME) if existing else None
+            )
 
         return self.async_show_form(
             step_id="add_profile",
@@ -351,6 +365,7 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
                 notify_default=notify_default,
                 media_player_default=media_player_default,
                 tts_default=tts_default,
+                announce_volume_default=announce_volume_default,
             ),
             errors=errors,
         )
