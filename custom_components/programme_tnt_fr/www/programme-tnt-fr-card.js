@@ -1,6 +1,6 @@
-/* Carte Lovelace "Programme TNT FR" - carrousel + Guide TV intÃ©grÃ©s.
- * Servie automatiquement par l'intÃ©gration Home Assistant du mÃªme nom :
- * aucune configuration de ressource Lovelace manuelle n'est nÃ©cessaire.
+/* Carte Lovelace "Programme TNT FR" - carrousel + Guide TV intÃÂ©grÃÂ©s.
+ * Servie automatiquement par l'intÃÂ©gration Home Assistant du mÃÂªme nom :
+ * aucune configuration de ressource Lovelace manuelle n'est nÃÂ©cessaire.
  * Utilisation minimale dans un tableau de bord :
  * type: custom:programme-tnt-fr-card
  */
@@ -29,7 +29,7 @@ const CARD_VERSION = "2.3.4";
     ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
-    ".poster-card { position: relative; flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: none; transition: transform 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
+    ".poster-card { position: relative; flex: 0 0 calc((100% - (var(--tntfr-columns, 2) - 1) * 12px) / var(--tntfr-columns, 2)); width: calc((100% - (var(--tntfr-columns, 2) - 1) * 12px) / var(--tntfr-columns, 2)); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: none; transition: transform 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
     ".poster-card:active { transform: scale(0.97); }",
     ".poster-card:disabled { cursor: default; opacity: 0.55; }",
     ".poster-image-wrap { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; flex-shrink: 0; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.35); }",
@@ -137,9 +137,9 @@ const CARD_VERSION = "2.3.4";
   ].join("\n");
 
   var SLOT_DEFS = [
-    ["current", "En ce moment Ã  la tÃ©lÃ©", "live"],
-    ["prime_time", "Programmes tÃ©lÃ© en 1Ã¨re partie de soirÃ©e", "prime"],
-    ["second_part", "Programmes tÃ©lÃ© en 2Ã¨me partie de soirÃ©e", "second"]
+    ["current", "En ce moment ÃÂ  la tÃÂ©lÃÂ©", "live"],
+    ["prime_time", "Programmes tÃÂ©lÃÂ© en 1ÃÂ¨re partie de soirÃÂ©e", "prime"],
+    ["second_part", "Programmes tÃÂ©lÃÂ© en 2ÃÂ¨me partie de soirÃÂ©e", "second"]
   ];
 
   // Vue : cle interne, libelle du bouton, cle de config pour l'afficher/masquer.
@@ -256,6 +256,8 @@ const CARD_VERSION = "2.3.4";
   class ProgrammeTntFrCard extends HTMLElement {
     setConfig(config) {
       this._config = config || {};
+      var tntfrCols = Math.max(1, Number(this._config.columns) || 2);
+      this.style.setProperty("--tntfr-columns", tntfrCols);
       this._entities = this._config.entities || null;
       this._built = false;
       this._view = this._firstEnabledView();
@@ -734,7 +736,7 @@ const CARD_VERSION = "2.3.4";
       if (prog.category) metaParts.push(prog.category);
       metaParts.push(channelLabel);
       metaParts.push((startFmt || "?") + " - " + (stopFmt || "?"));
-      timeEl.textContent = metaParts.join(" â¢ ");
+      timeEl.textContent = metaParts.join(" Ã¢ÂÂ¢ ");
       content.appendChild(timeEl);
       btn.appendChild(content);
 
@@ -766,7 +768,7 @@ const CARD_VERSION = "2.3.4";
       var prevBtn = document.createElement("button");
       prevBtn.type = "button";
       prevBtn.className = "carousel-nav prev";
-      prevBtn.setAttribute("aria-label", "PrÃ©cÃ©dent");
+      prevBtn.setAttribute("aria-label", "PrÃÂ©cÃÂ©dent");
       prevBtn.innerHTML = CHEVRON_LEFT;
 
       var nextBtn = document.createElement("button");
@@ -810,7 +812,7 @@ const CARD_VERSION = "2.3.4";
       var search = document.createElement("input");
       search.type = "text";
       search.className = "guide-search";
-      search.placeholder = "Rechercher une chaÃ®ne";
+      search.placeholder = "Rechercher une chaÃÂ®ne";
       root.appendChild(search);
 
       var daybar = document.createElement("div");
@@ -820,7 +822,7 @@ const CARD_VERSION = "2.3.4";
       prevBtn.type = "button";
       prevBtn.className = "guide-day-btn";
       prevBtn.innerHTML = CHEVRON_LEFT;
-      prevBtn.setAttribute("aria-label", "Jour prÃ©cÃ©dent");
+      prevBtn.setAttribute("aria-label", "Jour prÃÂ©cÃÂ©dent");
 
       var dayLabel = document.createElement("button");
       dayLabel.type = "button";
@@ -1180,7 +1182,7 @@ const CARD_VERSION = "2.3.4";
       if (prog.category) metaParts.push(prog.category);
       metaParts.push(channelLabel);
       metaParts.push((formatTime(prog.start) || "?") + " - " + (formatTime(prog.stop) || "?"));
-      metaEl.textContent = metaParts.join(" â¢ ");
+      metaEl.textContent = metaParts.join(" Ã¢ÂÂ¢ ");
       body.appendChild(metaEl);
 
       item.appendChild(body);
@@ -1203,7 +1205,7 @@ const CARD_VERSION = "2.3.4";
       prevBtn.type = "button";
       prevBtn.className = "guide-day-btn";
       prevBtn.innerHTML = CHEVRON_LEFT;
-      prevBtn.setAttribute("aria-label", "Jour prÃ©cÃ©dent");
+      prevBtn.setAttribute("aria-label", "Jour prÃÂ©cÃÂ©dent");
 
       var dayLabel = document.createElement("button");
       dayLabel.type = "button";
@@ -1361,12 +1363,12 @@ const CARD_VERSION = "2.3.4";
       if (!films.length) {
         var empty = document.createElement("div");
         empty.className = "guide-empty";
-        empty.textContent = "Aucun film notÃ© trouvÃ© pour cette soirÃ©e.";
+        empty.textContent = "Aucun film notÃÂ© trouvÃÂ© pour cette soirÃÂ©e.";
         els.list.appendChild(empty);
         return;
       }
 
-      var medals = ["ð¥", "ð¥", "ð¥"];
+      var medals = ["Ã°ÂÂ¥Â", "Ã°ÂÂ¥Â", "Ã°ÂÂ¥Â"];
       films.forEach(function (film, index) {
         var row = document.createElement("div");
         row.className = "film-row";
@@ -1411,7 +1413,7 @@ const CARD_VERSION = "2.3.4";
         var metaRow = document.createElement("div");
         metaRow.className = "film-meta";
         var timeFmt = formatTime(film.start);
-        metaRow.textContent = film.channel + " â¢ " + (timeFmt || "?") + " â¢ " + film.rating.toFixed(1) + "/10";
+        metaRow.textContent = film.channel + " Ã¢ÂÂ¢ " + (timeFmt || "?") + " Ã¢ÂÂ¢ " + film.rating.toFixed(1) + "/10";
         info.appendChild(metaRow);
 
         row.appendChild(info);
@@ -1449,11 +1451,11 @@ const CARD_VERSION = "2.3.4";
       if (startFmt && stopFmt) metaParts.push(startFmt + " - " + stopFmt);
       if (prog.category) metaParts.push(prog.category);
       if (prog.rating) metaParts.push("CSA : " + prog.rating);
-      els.modalMeta.textContent = metaParts.join(" â¢ ");
+      els.modalMeta.textContent = metaParts.join(" Ã¢ÂÂ¢ ");
 
       if (prog.tmdb_rating) {
         var votesTxt = prog.tmdb_votes ? " (" + prog.tmdb_votes + " votes)" : "";
-        els.modalRating.textContent = "â­ " + Number(prog.tmdb_rating).toFixed(1) + "/10" + votesTxt + " â TMDB";
+        els.modalRating.textContent = "Ã¢Â­Â " + Number(prog.tmdb_rating).toFixed(1) + "/10" + votesTxt + " Ã¢ÂÂ TMDB";
         els.modalRating.hidden = false;
       } else {
         els.modalRating.hidden = true;
@@ -1767,7 +1769,7 @@ const CARD_VERSION = "2.3.4";
 
         if (ids.length) {
           var favTitle = document.createElement("div");
-          favTitle.textContent = "ChaÃ®nes favorites (Ã©pinglÃ©es en premier)";
+          favTitle.textContent = "ChaÃÂ®nes favorites (ÃÂ©pinglÃÂ©es en premier)";
           favTitle.style.fontWeight = "600";
           favTitle.style.margin = "14px 0 4px";
           wrap.appendChild(favTitle);
@@ -1832,6 +1834,6 @@ const CARD_VERSION = "2.3.4";
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaÃ®nes franÃ§aises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirÃ©e), avec chaÃ®nes favorites Ã©pinglables, un bouton Guide TV (recherche, jour, horaire, genre) et un bouton Top films pour voir le classement des films les mieux notÃ©s sur plusieurs jours."
+    description: "Programme TV des chaÃÂ®nes franÃÂ§aises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirÃÂ©e), avec chaÃÂ®nes favorites ÃÂ©pinglables, un bouton Guide TV (recherche, jour, horaire, genre) et un bouton Top films pour voir le classement des films les mieux notÃÂ©s sur plusieurs jours."
   });
 })();
