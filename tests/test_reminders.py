@@ -117,10 +117,11 @@ def test_resolve_targets_uses_profile_when_found():
         })
     ])
     manager = _ReminderManager(hass, _FakeStore())
-    targets, media_targets, tts = manager._resolve_targets("Fred")
+    targets, media_targets, tts, volume = manager._resolve_targets("Fred")
     assert targets == ["mobile_app_iphone_fred"]
     assert media_targets == ["media_player.echo_salon"]
     assert tts == "tts.piper"
+    assert volume is None
 
 
 def test_resolve_targets_falls_back_to_global_when_profile_not_found():
@@ -128,10 +129,11 @@ def test_resolve_targets_falls_back_to_global_when_profile_not_found():
         _FakeConfigEntry(options={"notify_target": ["notify.mobile_app_iphone_fred"]})
     ])
     manager = _ReminderManager(hass, _FakeStore())
-    targets, media_targets, tts = manager._resolve_targets("Unknown")
+    targets, media_targets, tts, volume = manager._resolve_targets("Unknown")
     assert targets == ["mobile_app_iphone_fred"]
     assert media_targets == []
     assert tts is None
+    assert volume is None
 
 
 # --- _alexa_notify_slug -------------------------------------------------
