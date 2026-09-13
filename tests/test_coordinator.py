@@ -213,7 +213,7 @@ def test_normalize_title_does_not_strip_live_without_colon():
 
 def test_clean_search_query_strips_n_degree_episode_marker():
     cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
-        "Lucas l'araignee (Derriere la porte) S1 (n°72)"
+        "Lucas l'araignee (Derriere la porte) S1 (nÂ°72)"
     )
     assert cleaned == "Lucas l'araignee"
     assert year is None
@@ -268,7 +268,7 @@ def test_clean_search_query_bare_season_is_last_resort_only():
 
 def test_clean_search_query_strips_cumulative_episode_numbering():
     cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
-        "Amour, gloire et beaute (9709) (n°9709)"
+        "Amour, gloire et beaute (9709) (nÂ°9709)"
     )
     assert cleaned == "Amour, gloire et beaute"
     assert year is None
@@ -368,10 +368,10 @@ def test_clean_search_query_strips_subtitle_marker_does_not_break_cumulative():
 
 def test_normalize_title_unifies_curly_and_straight_apostrophe():
     # XMLTV "Le combat d'Alice" (apostrophe droite) vs TMDB
-    # "Le combat d’Alice" (apostrophe courbe typographique) - verifie
+    # "Le combat dâAlice" (apostrophe courbe typographique) - verifie
     # sur une vraie fiche TMDB.
     xmltv = ProgrammeTntFrCoordinator._normalize_title("Le combat d'Alice")
-    tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat d’Alice")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat dâAlice")
     assert xmltv == tmdb
 
 
@@ -437,8 +437,8 @@ _XML_VALID_PROGRAMME = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_parses_channel_and_full_programme():
-    channels_meta, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_VALID_PROGRAMME, {"TF1.fr"}
+    channels_meta, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_VALID_PROGRAMME.encode("utf-8"), {"TF1.fr"}
     )
     assert channels_meta["TF1.fr"]["name"] == "TF1"
     assert channels_meta["TF1.fr"]["icon"] == "https://example.com/tf1.png"
@@ -472,8 +472,8 @@ _XML_UNWANTED_CHANNEL = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_skips_programme_for_channel_not_in_wanted():
-    channels_meta, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_UNWANTED_CHANNEL, {"France2.fr"}
+    channels_meta, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_UNWANTED_CHANNEL.encode("utf-8"), {"France2.fr"}
     )
     assert programmes == {}
     # Channel metadata is collected for every <channel> element regardless
@@ -498,8 +498,8 @@ _XML_MISSING_OR_INVALID_TIMES = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_skips_programmes_with_missing_or_invalid_start_stop():
-    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_MISSING_OR_INVALID_TIMES, {"TF1.fr"}
+    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_MISSING_OR_INVALID_TIMES.encode("utf-8"), {"TF1.fr"}
     )
     assert programmes.get("TF1.fr", []) == []
 
@@ -514,8 +514,8 @@ _XML_MINIMAL_PROGRAMME = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_missing_optional_fields_default_gracefully():
-    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_MINIMAL_PROGRAMME, {"TF1.fr"}
+    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_MINIMAL_PROGRAMME.encode("utf-8"), {"TF1.fr"}
     )
     prog = programmes["TF1.fr"][0]
     assert prog.title == ""
@@ -535,8 +535,8 @@ _XML_CHANNEL_WITHOUT_ID = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_skips_channel_element_without_id():
-    channels_meta, _ = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_CHANNEL_WITHOUT_ID, {"TF1.fr"}
+    channels_meta, _ = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_CHANNEL_WITHOUT_ID.encode("utf-8"), {"TF1.fr"}
     )
     assert list(channels_meta.keys()) == ["TF1.fr"]
 
@@ -549,8 +549,8 @@ _XML_CHANNEL_WITHOUT_NAME = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_channel_meta_defaults_name_to_id_and_icon_to_none():
-    channels_meta, _ = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_CHANNEL_WITHOUT_NAME, {"M6.fr"}
+    channels_meta, _ = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_CHANNEL_WITHOUT_NAME.encode("utf-8"), {"M6.fr"}
     )
     assert channels_meta["M6.fr"] == {"name": "M6.fr", "icon": None}
 
@@ -572,8 +572,8 @@ def test_parse_xmltv_sorts_programmes_by_start_time():
     # Le flux XMLTV reel ne garantit pas l'ordre chronologique par chaine -
     # _pick_slots s'appuie sur ce tri pour ses boucles "premier programme
     # qui demarre apres X".
-    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_UNSORTED_PROGRAMMES, {"TF1.fr"}
+    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_UNSORTED_PROGRAMMES.encode("utf-8"), {"TF1.fr"}
     )
     titles = [p.title for p in programmes["TF1.fr"]]
     assert titles == ["Premier", "Second"]
@@ -597,8 +597,8 @@ _XML_MULTI_CHANNEL = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_parse_xmltv_filters_to_wanted_channels_only():
-    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv(
-        _XML_MULTI_CHANNEL, {"TF1.fr", "M6.fr"}
+    _, programmes = ProgrammeTntFrCoordinator._parse_xmltv_bytes(
+        _XML_MULTI_CHANNEL.encode("utf-8"), {"TF1.fr", "M6.fr"}
     )
     assert set(programmes.keys()) == {"TF1.fr", "M6.fr"}
 
