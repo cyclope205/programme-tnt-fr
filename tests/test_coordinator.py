@@ -213,7 +213,7 @@ def test_normalize_title_does_not_strip_live_without_colon():
 
 def test_clean_search_query_strips_n_degree_episode_marker():
     cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
-        "Lucas l'araignee (Derriere la porte) S1 (nÂ°72)"
+        "Lucas l'araignee (Derriere la porte) S1 (n°72)"
     )
     assert cleaned == "Lucas l'araignee"
     assert year is None
@@ -268,7 +268,7 @@ def test_clean_search_query_bare_season_is_last_resort_only():
 
 def test_clean_search_query_strips_cumulative_episode_numbering():
     cleaned, year = ProgrammeTntFrCoordinator._clean_search_query(
-        "Amour, gloire et beaute (9709) (nÂ°9709)"
+        "Amour, gloire et beaute (9709) (n°9709)"
     )
     assert cleaned == "Amour, gloire et beaute"
     assert year is None
@@ -368,10 +368,10 @@ def test_clean_search_query_strips_subtitle_marker_does_not_break_cumulative():
 
 def test_normalize_title_unifies_curly_and_straight_apostrophe():
     # XMLTV "Le combat d'Alice" (apostrophe droite) vs TMDB
-    # "Le combat dâAlice" (apostrophe courbe typographique) - verifie
+    # "Le combat d’Alice" (apostrophe courbe typographique) - verifie
     # sur une vraie fiche TMDB.
     xmltv = ProgrammeTntFrCoordinator._normalize_title("Le combat d'Alice")
-    tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat dâAlice")
+    tmdb = ProgrammeTntFrCoordinator._normalize_title("Le combat d’Alice")
     assert xmltv == tmdb
 
 
@@ -476,9 +476,9 @@ def test_parse_xmltv_skips_programme_for_channel_not_in_wanted():
         _XML_UNWANTED_CHANNEL.encode("utf-8"), {"France2.fr"}
     )
     assert programmes == {}
-    # Channel metadata is collected for every <channel> element regardless
-    # of `wanted` - only <programme> entries are filtered by it.
-    assert "TF1.fr" in channels_meta
+    # Le parsing en streaming ne conserve que les chaines suivies (wanted),
+    # aussi bien pour les metadonnees de chaine que pour les programmes.
+    assert "TF1.fr" not in channels_meta
 
 
 _XML_MISSING_OR_INVALID_TIMES = """<?xml version="1.0" encoding="UTF-8"?>
