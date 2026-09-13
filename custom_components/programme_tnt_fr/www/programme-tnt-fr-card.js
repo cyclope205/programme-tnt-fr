@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.3.5";
+const CARD_VERSION = "2.3.6";
 (function () {
   "use strict";
 
@@ -1729,6 +1729,53 @@ const CARD_VERSION = "2.3.5";
       addToggle("show_prime_time", "Afficher la 1re partie de soiree");
       addToggle("show_second_part", "Afficher la 2e partie de soiree");
 
+      var carouselTitle = document.createElement("div");
+      carouselTitle.textContent = "Carrousel";
+      carouselTitle.style.fontWeight = "600";
+      carouselTitle.style.margin = "14px 0 4px";
+      wrap.appendChild(carouselTitle);
+      
+      var colsRow = document.createElement("div");
+      colsRow.style.display = "flex";
+      colsRow.style.alignItems = "center";
+      colsRow.style.gap = "10px";
+      colsRow.style.padding = "6px 0";
+      var colsLabel = document.createElement("div");
+      colsLabel.textContent = "Nombre de jaquettes visibles";
+      colsLabel.style.flex = "1";
+      var colsInput = document.createElement("ha-textfield");
+      colsInput.type = "number";
+      colsInput.style.width = "72px";
+      colsInput.min = "1";
+      colsInput.max = "4";
+      colsInput.value = String(self._config.columns || 2);
+      colsInput.addEventListener("change", function (ev) {
+        var v = Math.max(1, Math.min(4, Math.round(Number(ev.target.value)) || 2));
+        colsInput.value = String(v);
+        var newConfig = Object.assign({}, self._config);
+        if (v === 2) {
+          delete newConfig.columns;
+        } else {
+          newConfig.columns = v;
+        }
+        self._config = newConfig;
+        self.dispatchEvent(new CustomEvent("config-changed", {
+          detail: { config: newConfig },
+          bubbles: true,
+          composed: true
+        }));
+      });
+      colsRow.appendChild(colsLabel);
+      colsRow.appendChild(colsInput);
+      wrap.appendChild(colsRow);
+      
+      var colsHint = document.createElement("div");
+      colsHint.textContent = "Entre 1 et 4 jaquettes affichees simultanement (par defaut : 2).";
+      colsHint.style.fontSize = "12px";
+      colsHint.style.opacity = "0.7";
+      colsHint.style.margin = "-4px 0 10px";
+      wrap.appendChild(colsHint);
+      
       var viewsTitle = document.createElement("div");
       viewsTitle.textContent = "Vues disponibles";
       viewsTitle.style.fontWeight = "600";
