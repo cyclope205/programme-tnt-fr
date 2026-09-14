@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.3.9";
+const CARD_VERSION = "2.3.10";
 (function () {
   "use strict";
 
@@ -1743,9 +1743,16 @@ const CARD_VERSION = "2.3.9";
       var colsLabel = document.createElement("div");
       colsLabel.textContent = "Nombre de jaquettes visibles";
       colsLabel.style.flex = "1";
-      var colsInput = document.createElement("ha-textfield");
+      var colsInput = document.createElement("input");
       colsInput.type = "number";
       colsInput.style.width = "72px";
+      colsInput.style.padding = "6px 8px";
+      colsInput.style.borderRadius = "4px";
+      colsInput.style.border = "1px solid var(--divider-color, #767676)";
+      colsInput.style.background = "var(--card-background-color, #fff)";
+      colsInput.style.color = "var(--primary-text-color)";
+      colsInput.style.fontFamily = "inherit";
+      colsInput.style.fontSize = "14px";
       colsInput.min = "1";
       colsInput.max = "4";
       colsInput.value = String(self._config.columns || 2);
