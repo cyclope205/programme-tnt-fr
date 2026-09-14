@@ -203,6 +203,10 @@ columns: 3
 
 Comme les autres options ci-dessus, `columns` est également réglable directement depuis l'éditeur visuel de la carte (section "Carrousel", champ "Nombre de jaquettes visibles"), sans avoir à écrire de YAML.
 
+Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes affichées dans le carrousel :
+
+<img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
+
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
 ```yaml
