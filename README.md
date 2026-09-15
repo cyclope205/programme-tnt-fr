@@ -177,6 +177,8 @@ Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines c
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Options d'affichage
 
+#### Sections affichees (En ce moment / 1ere / 2eme partie de soiree)
+
 Par défaut, les trois sections (En ce moment / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
 
 ```yaml
@@ -187,6 +189,16 @@ show_second_part: true
 ```
 
 Ces options sont également disponibles directement dans l'éditeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les trois bascules sans avoir a écrire de YAML.
+
+Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_current: false
+```
+<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
+
+#### Vues affichees (Carrousel / Favoris / Guide TV / Top films)
 
 Les quatre vues de la carte (Carrousel, Favoris, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
 
@@ -199,6 +211,8 @@ show_top_films: true
 ```
 
 La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+
+#### Nombre de jaquettes par ligne (columns)
 
 Le nombre de vignettes affichées par ligne dans le carrousel se règle avec l'option `columns` (2 par défaut, entre 1 et 4) :
 
@@ -213,13 +227,7 @@ Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes
 
 <img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
 
-Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-show_current: false
-```
-<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
+#### Chaines favorites (favorite_channels)
 
 Les chaines favorites, épinglées en tête du carrousel avec une étoile, se configurent avec `favorite_channels` :
 
@@ -231,6 +239,8 @@ favorite_channels:
 ```
 
 Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML.
+
+#### Zap TNT (zap_channel_scripts)
 
 Le clic sur le logo de chaîne (zap) se configure avec `zap_channel_scripts` : un dictionnaire qui associe l'identifiant de chaîne (`channel_id`, visible dans les [attributs disponibles](#attributs-disponibles)) au script Home Assistant à appeler pour zapper sur cette chaîne. **Chaque script doit déjà exister et avoir été testé de ton côté** : la carte se contente d'appeler `script.turn_on` sur l'entité indiquée, elle ne sait rien de ta box ou de ta TV et n'en crée aucun.
 
