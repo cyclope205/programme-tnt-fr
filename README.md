@@ -258,6 +258,10 @@ zap_channel_scripts:
   France2.fr: script.zap_france_2
 ```
 
+Résultat : logos cliquables sur le carrousel (config ci-dessus) :
+
+<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
+
 Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
