@@ -139,39 +139,10 @@ const CARD_VERSION = "2.3.10";
     ".film-meta { font-size: 0.75em; opacity: 0.75; margin-top: 3px; }"
   ].join("\n");
 
-    // Correspondance chaine (channel_id) -> script HA de zap dedie, deja
-  // construits et testes cote utilisateur (voir script.zap_tnt_freebox
-  // pour le mecanisme generique). Fonctionnalite non documentee/avancee :
-  // scopee a une installation precise, pas une garantie universelle.
-  var ZAP_SCRIPT_MAP = {
-    "TF1.fr": "script.tf1",
-    "France2.fr": "script.france_2",
-    "France3.fr": "script.france_3",
-    "France4.fr": "script.france_4",
-    "France5.fr": "script.france_5",
-    "M6.fr": "script.m6",
-    "Arte.fr": "script.arte",
-    "LaChaineParlementaire.fr": "script.public_senat",
-    "W9.fr": "script.w_9",
-    "TMC.fr": "script.t_m_c",
-    "NT1.fr": "script.t_f_x",
-    "Gulli.fr": "script.gulli",
-    "BFMTV.fr": "script.bfm_tv",
-    "CNews.fr": "script.c_news",
-    "LCI.fr": "script.l_c_i",
-    "FranceInfo.fr": "script.france_info",
-    "CStar.fr": "script.c_star",
-    "T18.fr": "script.t_18",
-    "NOVO19.fr": "script.novo_19",
-    "TF1SeriesFilms.fr": "script.tf1_series_films",
-    "LEquipe21.fr": "script.lequipe_tv",
-    "6ter.fr": "script.six_ter",
-    "Numero23.fr": "script.rmc_story",
-    "RMCDecouverte.fr": "script.rmc_decouverte",
-    "Cherie25.fr": "script.rmc_life",
-    "RTL9.fr": "script.rtl_9",
-    "NRJHits.fr": "script.nrj_hits"
-  };
+    // Voir option de carte "zap_channel_scripts" (documentee dans le README) :
+  // dictionnaire channel_id -> entity_id de script HA fourni par l'utilisateur.
+
+
 
 var SLOT_DEFS = [
     ["current", "En ce moment à la télé", "live"],
@@ -692,7 +663,8 @@ var SLOT_DEFS = [
         badge.className = "poster-channel-badge";
         badge.src = channelIcon;
         badge.alt = "";
-        var zapScript = channelId ? ZAP_SCRIPT_MAP[channelId] : null;
+        var zapScripts = (self._config && self._config.zap_channel_scripts) || {};
+        var zapScript = channelId ? zapScripts[channelId] : null;
         if (zapScript) {
           badge.classList.add("poster-channel-badge-zap");
           badge.title = "Zapper sur " + channelLabel;
