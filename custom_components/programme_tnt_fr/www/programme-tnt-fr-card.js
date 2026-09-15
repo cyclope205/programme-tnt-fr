@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.3.10";
+const CARD_VERSION = "2.4.0";
 (function () {
   "use strict";
 
