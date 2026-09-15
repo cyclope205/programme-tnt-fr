@@ -18,6 +18,7 @@ Intégration Home Assistant qui récupère le programme TV des chaines français
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Utilisation dans un tableau de bord](#utilisation-dans-un-tableau-de-bord)
+  - [Options d'affichage](#options-daffichage)
 - [Attributs disponibles](#attributs-disponibles)
 - [A savoir](#a-savoir)
 
