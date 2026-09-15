@@ -203,6 +203,8 @@ show_current: false
 ```
 <img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 #### Vues affichees (Carrousel / Favoris / Guide TV / Top films)
 
 Les quatre vues de la carte (Carrousel, Favoris, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
@@ -216,6 +218,8 @@ show_top_films: true
 ```
 
 La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #### Nombre de jaquettes par ligne (columns)
 
@@ -232,6 +236,8 @@ Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes
 
 <img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 #### Chaines favorites (favorite_channels)
 
 Les chaines favorites, épinglées en tête du carrousel avec une étoile, se configurent avec `favorite_channels` :
@@ -244,6 +250,8 @@ favorite_channels:
 ```
 
 Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #### Zap TNT (zap_channel_scripts)
 
