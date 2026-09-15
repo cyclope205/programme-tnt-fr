@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.4.1";
+const CARD_VERSION = "2.4.2";
 (function () {
   "use strict";
 
@@ -42,6 +42,9 @@ const CARD_VERSION = "2.4.1";
     ".poster-channel-badge-zap { cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.45), 0 0 0 2px rgba(255,255,255,0.9); }",
     ".poster-channel-badge-zap:hover { transform: scale(1.08); }",
     ".poster-channel-badge-zap:active { transform: scale(0.95); }",
+    ".guide-col-logo-zap { cursor: pointer; box-shadow: 0 0 0 2px rgba(255,255,255,0.9); }",
+    ".guide-col-logo-zap:hover { transform: scale(1.08); }",
+    ".guide-col-logo-zap:active { transform: scale(0.95); }",
     ".poster-favorite-badge { position: absolute; top: 10px; left: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
     ".poster-favorite-badge svg { width: 14px; height: 14px; }",
     ".guide-item-favorite-badge { position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,179,0,0.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 2; color: #fff; }",
@@ -928,8 +931,20 @@ var SLOT_DEFS = [
           logoWrap.className = "guide-col-logo-wrap";
           var logo = document.createElement("img");
           logo.className = "guide-col-logo";
-          logo.src = icon;
-          logo.alt = "";
+                    logo.src = icon;
+                    logo.alt = "";
+          var guideZapScripts = (self._config && self._config.zap_channel_scripts) || {};
+          var guideZapScript = channelId ? guideZapScripts[channelId] : null;
+          if (guideZapScript) {
+            logo.classList.add("guide-col-logo-zap");
+            logo.title = "Zapper sur " + label;
+            logo.addEventListener("click", function (ev) {
+              ev.stopPropagation();
+              if (self._hass) {
+                self._hass.callService("script", "turn_on", { entity_id: guideZapScript });
+              }
+            });
+          }
           logoWrap.appendChild(logo);
           if (favSet && favSet[channelId]) {
             var colFavBadge = document.createElement("div");
