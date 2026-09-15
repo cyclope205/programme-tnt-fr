@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.4.0";
+const CARD_VERSION = "2.4.1";
 (function () {
   "use strict";
 
@@ -268,6 +268,7 @@ var SLOT_DEFS = [
       this.style.setProperty("--tntfr-columns", tntfrCols);
       this._entities = this._config.entities || null;
       this._built = false;
+      this._carouselSig = null;
       this._view = this._firstEnabledView();
       this._guideBuilt = false;
       this._guideCache = {};
