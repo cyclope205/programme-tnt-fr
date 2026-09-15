@@ -137,6 +137,10 @@ Sélection d'un profil dans la fiche du programme avant de programmer un rappel 
 <img width="653" height="757" alt="Capture d&#39;écran 2026-09-01 214655" src="https://github.com/user-attachments/assets/1bd0b0f1-7826-464d-aa4e-3a65ca56a68d" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
+
+<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
+
 ## Installation
 
 1. Ajouter ce depot a HACS comme depot personnalise :
@@ -244,6 +248,8 @@ Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis
 #### Zap TNT (zap_channel_scripts)
 
 Le clic sur le logo de chaîne (zap) se configure avec `zap_channel_scripts` : un dictionnaire qui associe l'identifiant de chaîne (`channel_id`, visible dans les [attributs disponibles](#attributs-disponibles)) au script Home Assistant à appeler pour zapper sur cette chaîne. **Chaque script doit déjà exister et avoir été testé de ton côté** : la carte se contente d'appeler `script.turn_on` sur l'entité indiquée, elle ne sait rien de ta box ou de ta TV et n'en crée aucun.
+
+Exemple (remplace ces noms de script par les tiens) :
 
 ```yaml
 type: custom:programme-tnt-fr-card
