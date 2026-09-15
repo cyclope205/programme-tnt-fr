@@ -61,6 +61,12 @@ Depuis le détail d'un programme (clic sur une vignette), un bouton propose d'ê
 
 Des **profils de rappel** peuvent être créés depuis les options de l'intégration : chaque profil (ex. "Fred", "Ginie") regroupe le nom d'une personne et ses propres appareils à notifier, pour que chacun reçoive ses rappels sur son téléphone/enceinte plutôt que sur les cibles globales. Un menu déroulant dans la fiche du programme permet de choisir le profil (ou "Par défaut") avant de programmer le rappel.
 
+### Zap TNT
+
+Sur chaque vignette du carrousel, le logo de la chaîne peut devenir un bouton de zap : un clic appelle un script Home Assistant dédié à cette chaîne (via `script.turn_on`), par exemple pour changer la chaîne sur ta télé ou ta box. La carte ne contient aucune logique propre à une marque de box ou de TV : c'est toi qui associes, dans la config de la carte (`zap_channel_scripts`), quelle chaîne correspond à quel script — et c'est ce script, que tu dois avoir créé et testé toi-même au préalable, qui sait comment zapper sur ton propre matériel.
+
+Le logo n'est cliquable que pour les chaînes présentes dans cette configuration : les autres restent de simples logos, sans effet au clic. Voir [Options d'affichage](#options-daffichage) pour la configuration complète.
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Captures d'ecran
 
@@ -225,6 +231,17 @@ favorite_channels:
 ```
 
 Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML.
+
+Le clic sur le logo de chaîne (zap) se configure avec `zap_channel_scripts` : un dictionnaire qui associe l'identifiant de chaîne (`channel_id`, visible dans les [attributs disponibles](#attributs-disponibles)) au script Home Assistant à appeler pour zapper sur cette chaîne. **Chaque script doit déjà exister et avoir été testé de ton côté** : la carte se contente d'appeler `script.turn_on` sur l'entité indiquée, elle ne sait rien de ta box ou de ta TV et n'en crée aucun.
+
+```yaml
+type: custom:programme-tnt-fr-card
+zap_channel_scripts:
+  TF1.fr: script.zap_tf1
+  France2.fr: script.zap_france_2
+```
+
+Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
