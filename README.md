@@ -65,7 +65,7 @@ Des **profils de rappel** peuvent être créés depuis les options de l'intégra
 
 Sur chaque vignette du carrousel, le logo de la chaîne peut devenir un bouton de zap : un clic appelle un script Home Assistant dédié à cette chaîne (via `script.turn_on`), par exemple pour changer la chaîne sur ta télé ou ta box. La carte ne contient aucune logique propre à une marque de box ou de TV : c'est toi qui associes, dans la config de la carte (`zap_channel_scripts`), quelle chaîne correspond à quel script — et c'est ce script, que tu dois avoir créé et testé toi-même au préalable, qui sait comment zapper sur ton propre matériel.
 
-Le logo n'est cliquable que pour les chaînes présentes dans cette configuration : les autres restent de simples logos, sans effet au clic. Voir [Options d'affichage](#options-daffichage) pour la configuration complète.
+Le zap fonctionne sur le Carrousel/Favoris (logo sur la jaquette) et sur le Guide TV (logo en haut de chaque colonne de chaîne). Le logo n'est cliquable que pour les chaînes présentes dans cette configuration : les autres restent de simples logos, sans effet au clic. Voir [Options d'affichage](#options-daffichage) pour la configuration complète.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Captures d'ecran
@@ -251,7 +251,7 @@ zap_channel_scripts:
   France2.fr: script.zap_france_2
 ```
 
-Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
+Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
