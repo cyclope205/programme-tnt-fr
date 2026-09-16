@@ -300,13 +300,14 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 )
 
         result: dict[str, dict] = {}
-        for channel_id, (current, prime_time, second_part) in picks.items():
+        for channel_id, (current, next_programme, prime_time, second_part) in picks.items():
             meta = self._channels_meta.get(channel_id, {})
             result[channel_id] = {
                 "channel_id": channel_id,
                 "channel_name": meta.get("name", channel_id),
                 "channel_icon": meta.get("icon"),
                 "current": self._programme_dict(current),
+                "next": self._programme_dict(next_programme),
                 "prime_time": self._programme_dict(prime_time),
                 "second_part": self._programme_dict(second_part),
             }
