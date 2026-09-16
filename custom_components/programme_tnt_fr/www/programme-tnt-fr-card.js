@@ -185,7 +185,8 @@ var SLOT_DEFS = [
     "BFMTV.fr": 13, "CNews.fr": 14, "LCI.fr": 15, "FranceInfo.fr": 16,
     "CStar.fr": 17, "T18.fr": 18, "NOVO19.fr": 19, "TF1SeriesFilms.fr": 20,
     "LEquipe21.fr": 21, "6ter.fr": 22, "Numero23.fr": 23,
-    "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26
+    "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26,
+    "LaUne.be": 27, "LaDeux.be": 28, "LaTrois.be": 29
   };
 
   function channelName(hass, entityId) {
