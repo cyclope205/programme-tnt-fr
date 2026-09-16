@@ -94,6 +94,13 @@ TNT_CHANNELS = {
 # Par defaut, l'integration suit TOUTES les chaines de la liste ci-dessus.
 DEFAULT_CHANNELS = list(TNT_CHANNELS.keys())
 
+# Chaines belges de la RTBF, issues du guide complet xmltvfr.fr.
+RTBF_CHANNELS = {
+    "LaUne.be": "La Une",
+    "LaDeux.be": "Tipik",
+    "LaTrois.be": "La Trois",
+}
+
 # Chaines supplementaires (hors TNT) proposees en option, issues du guide
 # complet xmltvfr.fr (https://xmltvfr.fr/channels.php?guide=france). Tri
 # manuel : chaines francaises nationales grand public uniquement (pas de
@@ -196,4 +203,5 @@ CHANNEL_ORDER = {
     "CStar.fr": 17, "T18.fr": 18, "NOVO19.fr": 19, "TF1SeriesFilms.fr": 20,
     "LEquipe21.fr": 21, "6ter.fr": 22, "Numero23.fr": 23,
     "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26,
+    "LaUne.be": 27, "LaDeux.be": 28, "LaTrois.be": 29,
 }
