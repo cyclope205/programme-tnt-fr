@@ -274,6 +274,121 @@ Résultat : logos cliquables sur le carrousel (config ci-dessus) :
 
 Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
 
+<details>
+<summary>Voir la liste complète des <code>channel_id</code> disponibles (pour zap_channel_scripts)</summary>
+
+#### Chaînes TNT
+
+| channel_id | Chaîne |
+|---|---|
+| `TF1.fr` | TF1 |
+| `France2.fr` | France 2 |
+| `France3.fr` | France 3 |
+| `CanalPlus.fr` | Canal+ |
+| `France5.fr` | France 5 |
+| `M6.fr` | M6 |
+| `Arte.fr` | Arte |
+| `W9.fr` | W9 |
+| `TMC.fr` | TMC |
+| `NT1.fr` | TFX |
+| `LaChaineParlementaire.fr` | LCP |
+| `France4.fr` | France 4 |
+| `BFMTV.fr` | BFM TV |
+| `CNews.fr` | CNews |
+| `CStar.fr` | CStar |
+| `Gulli.fr` | Gulli |
+| `T18.fr` | T18 |
+| `NOVO19.fr` | NOVO19 |
+| `TF1SeriesFilms.fr` | TF1 Series Films |
+| `LEquipe21.fr` | L'Equipe |
+| `6ter.fr` | 6ter |
+| `Numero23.fr` | RMC Story |
+| `RMCDecouverte.fr` | RMC Decouverte |
+| `Cherie25.fr` | RMC Life |
+| `LCI.fr` | LCI |
+| `FranceInfo.fr` | franceinfo |
+| `ParisPremiere.fr` | Paris Premiere |
+| `CanalPlusSport.fr` | Canal+ Sport |
+| `CanalPlusCinema.fr` | Canal+ Cinema |
+| `PlanetePlus.fr` | Planete+ |
+
+#### Chaînes optionnelles (hors TNT)
+
+| channel_id | Chaîne |
+|---|---|
+| `CanalPlusSeries.fr` | Canal+ Series |
+| `CanalPlusDocs.fr` | Canal+ Docs |
+| `CanalPlusKIDS.fr` | Canal+ Kids |
+| `CanalPlusGrandEcran.fr` | Canal+ Grand Ecran |
+| `CanalPlusBoxOffice.fr` | Canal+ Box Office |
+| `CanalPlusFoot.fr` | Canal+ Foot |
+| `CanalPlusSport360.fr` | Canal+ Sport 360 |
+| `CanalPlusLigue1.fr` | Canal+ Ligue 1 |
+| `CanalPlusPremierLeague.fr` | Canal+ Premier League |
+| `CinePlusPremier.fr` | OCS |
+| `CinePlusClassic.fr` | Cine+ Classic |
+| `CinePlusClub.fr` | Cine+ Festival |
+| `CinePlusEmotion.fr` | Cine+ Emotion |
+| `CinePlusFamiz.fr` | Cine+ Family |
+| `CinePlusFrisson.fr` | Cine+ Frisson |
+| `Eurosport1.fr` | Eurosport 1 |
+| `Eurosport2.fr` | Eurosport 2 |
+| `beINSPORTS1.fr` | beIN Sports 1 |
+| `beINSPORTS2.fr` | beIN Sports 2 |
+| `beINSPORTS3.fr` | beIN Sports 3 |
+| `RMCSport1.fr` | RMC Sport 1 |
+| `RMCSport2.fr` | RMC Sport 2 |
+| `RMCSport3.fr` | RMC Sport 3 |
+| `DAZN.fr` | DAZN 1 |
+| `InfosportPlus.fr` | Infosport+ |
+| `GolfPlus.fr` | Golf+ |
+| `ChasseEtPeche.fr` | Chasse et Peche |
+| `Equidia.fr` | Equidia |
+| `ChevalTV.fr` | Cheval TV |
+| `DiscoveryChannel.fr` | Discovery Channel |
+| `DiscoveryInvestigation.fr` | Discovery Investigation |
+| `DiscoveryScience.fr` | TLC |
+| `NatGeoWild.fr` | NatGeoWild |
+| `NationalGeographic.fr` | National Geographic |
+| `Histoire.fr` | Histoire |
+| `TouteHistoire.fr` | Toute l'Histoire |
+| `UshuaiaTV.fr` | Ushuaia TV |
+| `Animaux.fr` | Animaux |
+| `Seasons.fr` | Seasons |
+| `DisneyChannel.fr` | Disney Channel |
+| `DisneyJunior.fr` | Disney Junior |
+| `DisneyXD.fr` | Disney XD |
+| `Nickelodeon.fr` | Nickelodeon |
+| `NickelodeonJunior.fr` | Nickelodeon Junior |
+| `Nickelodeon4Teen.fr` | Nickelodeon Teen |
+| `CartoonNetwork.fr` | Cartoon Network |
+| `Boomerang.fr` | Boomerang |
+| `CanalJ.fr` | Canal J |
+| `PIWI.fr` | Piwi+ |
+| `TIJI.fr` | TiJi |
+| `Mangas.fr` | Mangas |
+| `TeleToonPlus.fr` | TeleToon+ |
+| `MTV.fr` | MTV |
+| `MCM.fr` | MCM |
+| `M6Music.fr` | M6 Music |
+| `NRJHits.fr` | NRJ Hits |
+| `Mezzo.fr` | Mezzo |
+| `ComediePlus.fr` | Comedie+ |
+| `ComedyCentral.fr` | Comedy Central |
+| `CrimeDistrict.fr` | Crime District |
+| `WarnerTV.fr` | WarnerTV |
+| `Syfy.fr` | Syfy |
+| `Euronews.fr` | Euronews |
+| `France24.fr` | France 24 |
+| `RTL9.fr` | RTL9 |
+| `TvBreizh.fr` | TV Breizh |
+| `PolarPlus.fr` | Polar+ |
+| `Teva.fr` | Teva |
+| `serieclub.fr` | Serie Club |
+| `AB1.fr` | AB1 |
+
+</details>
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
 
