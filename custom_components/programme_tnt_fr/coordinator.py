@@ -300,14 +300,14 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 )
 
         result: dict[str, dict] = {}
-        for channel_id, (current, next_programme, prime_time, second_part) in picks.items():
+        for channel_id, (current, next, prime_time, second_part) in picks.items():
             meta = self._channels_meta.get(channel_id, {})
             result[channel_id] = {
                 "channel_id": channel_id,
                 "channel_name": meta.get("name", channel_id),
                 "channel_icon": meta.get("icon"),
                 "current": self._programme_dict(current),
-                "next": self._programme_dict(next_programme),
+                "next": self._programme_dict(next),
                 "prime_time": self._programme_dict(prime_time),
                 "second_part": self._programme_dict(second_part),
             }
@@ -721,11 +721,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 break
 
         # Programme suivant
-        next_programme = None
+        next = None
         if current_index is not None:
             for programme in progs[current_index + 1 :]:
                 if programme.start >= current.stop:
-                    next_programme = programme
+                    next = programme
                     break
 
         if now.time() < DAY_RESET:
@@ -753,7 +753,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     second_part = programme
                     break
 
-        return current, next_programme, prime_time, second_part
+        return current, next, prime_time, second_part
 
     def get_programmes_for_day(
         self, channel_id: str, date_str: str | None = None
