@@ -708,14 +708,24 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
     def _pick_slots(
         self, channel_id: str, now
-    ) -> tuple[Programme | None, Programme | None, Programme | None]:
+    ) -> tuple[Programme | None, Programme | None, Programme | None, Programme | None]:
         progs = self._programmes_by_channel.get(channel_id, [])
 
         current = None
-        for programme in progs:
+        current_index = None
+        for index, programme in enumerate(progs):
             if programme.start <= now < programme.stop:
                 current = programme
+                current_index = index
                 break
+
+        # Programme suivant
+        next_programme = None
+        if current_index is not None:
+            for programme in progs[current_index + 1 :]:
+                if programme.start >= current.stop:
+                    next_programme = programme
+                    break
 
         if now.time() < DAY_RESET:
             broadcast_day = (now - timedelta(days=1)).date()
@@ -742,7 +752,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     second_part = programme
                     break
 
-        return current, prime_time, second_part
+        return current, next_programme, prime_time, second_part
 
     def get_programmes_for_day(
         self, channel_id: str, date_str: str | None = None
