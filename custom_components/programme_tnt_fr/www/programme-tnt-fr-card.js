@@ -185,8 +185,7 @@ var SLOT_DEFS = [
     "BFMTV.fr": 13, "CNews.fr": 14, "LCI.fr": 15, "FranceInfo.fr": 16,
     "CStar.fr": 17, "T18.fr": 18, "NOVO19.fr": 19, "TF1SeriesFilms.fr": 20,
     "LEquipe21.fr": 21, "6ter.fr": 22, "Numero23.fr": 23,
-    "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26,
-    "LaUne.be": 27, "LaDeux.be": 28, "LaTrois.be": 29
+    "RMCDecouverte.fr": 24, "Cherie25.fr": 25, "ParisPremiere.fr": 26
   };
 
   function channelName(hass, entityId) {
@@ -265,6 +264,69 @@ var SLOT_DEFS = [
     return null;
   }
 
+    async function checkCardBackendVersion(context) {
+      if (
+        context._versionCheckDone ||
+        !context._hass ||
+        !context._hass.connection
+      ) {
+        return;
+      }
+    
+      context._versionCheckDone = true;
+    
+      try {
+        const result = await context._hass.connection.sendMessagePromise({
+          type: "programme_tnt_fr/version",
+        });
+    
+        if (result && result.version && result.version !== CARD_VERSION) {
+          context._showVersionMismatch(result.version);
+        }
+    
+        if (
+          result &&
+          result.channel_order &&
+          typeof result.channel_order === "object"
+        ) {
+          CHANNEL_ORDER = result.channel_order;
+          context._render();
+        }
+      } catch (err) {
+        // Best-effort only: an older backend or a transient websocket
+        // error must never break the card.
+      }
+    }
+
+    async function loadBackendChannelOrder(context) {
+      if (
+        context._channelOrderLoaded ||
+        !context._hass ||
+        !context._hass.connection
+      ) {
+        return;
+      }
+    
+      context._channelOrderLoaded = true;
+    
+      try {
+        const result = await context._hass.connection.sendMessagePromise({
+          type: "programme_tnt_fr/version",
+        });
+    
+        if (
+          result &&
+          result.channel_order &&
+          typeof result.channel_order === "object"
+        ) {
+          CHANNEL_ORDER = result.channel_order;
+          context._render();
+        }
+      } catch (err) {
+        // Keep the local fallback order if the backend does not provide it.
+      }
+    }
+
   class ProgrammeTntFrCard extends HTMLElement {
     setConfig(config) {
       this._config = config || {};
@@ -286,8 +348,14 @@ var SLOT_DEFS = [
     }
 
     set hass(hass) {
+      const firstHass = !this._hass;
+    
       this._hass = hass;
       this._render();
+    
+      if (firstHass) {
+        loadBackendChannelOrder(this);
+      }
     }
 
     getCardSize() {
@@ -1648,6 +1716,43 @@ var SLOT_DEFS = [
       });
     }
 
+    _showVersionMismatch(backendVersion) {
+      const message =
+        "Programme TNT FR : nouvelle version disponible (carte " +
+        CARD_VERSION +
+        ", integration " +
+        backendVersion +
+        "). Rechargez la page pour l'appliquer.";
+    
+      this.dispatchEvent(
+        new CustomEvent("hass-notification", {
+          detail: {
+            message: message,
+            duration: -1,
+            dismissable: true,
+            action: {
+              text: "Recharger",
+              action: () => this._handleReload(),
+            },
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+    
+    _handleReload() {
+      if ("caches" in window) {
+        caches.keys().then((names) => {
+          Promise.all(names.map((name) => caches.delete(name))).then(() => {
+            window.location.reload();
+          });
+        });
+      } else {
+        window.location.reload();
+      }
+    }
+
     static getStubConfig() {
       return {};
     }
@@ -1677,29 +1782,7 @@ var SLOT_DEFS = [
     }
 
     async _checkVersion() {
-      if (this._versionCheckDone || !this._hass || !this._hass.connection) {
-        return;
-      }
-      this._versionCheckDone = true;
-      try {
-        const result = await this._hass.connection.sendMessagePromise({
-          type: "programme_tnt_fr/version",
-        });
-        if (result && result.version && result.version !== CARD_VERSION) {
-          this._showVersionMismatch(result.version);
-        }
-        if (result && result.channel_order && typeof result.channel_order === "object") {
-          // Backend is the single source of truth for channel order -
-          // override the local fallback copy and re-render so a channel
-          // added only on the backend side sorts correctly here too,
-          // instead of silently staying at rank 999.
-          CHANNEL_ORDER = result.channel_order;
-          this._render();
-        }
-      } catch (err) {
-        // Best-effort only: an older backend without this command, or a
-        // transient websocket error, should never break the card itself.
-      }
+      return checkCardBackendVersion(this);
     }
 
     _showVersionMismatch(backendVersion) {
