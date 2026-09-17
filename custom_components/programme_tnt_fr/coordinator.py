@@ -178,6 +178,7 @@ class Programme:
         category,
         icon,
         rating,
+        date,
     ) -> None:
         self.start = start
         self.stop = stop
@@ -187,6 +188,7 @@ class Programme:
         self.category = category
         self.icon = icon
         self.rating = rating
+        self.date = date
 
     def as_dict(
         self,
@@ -210,6 +212,7 @@ class Programme:
             "rating": self.rating,
             "start": self.start.isoformat() if self.start else None,
             "stop": self.stop.isoformat() if self.stop else None,
+            "date": self.date,
         }
 
 
@@ -300,13 +303,14 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 )
 
         result: dict[str, dict] = {}
-        for channel_id, (current, prime_time, second_part) in picks.items():
+        for channel_id, (current, next, prime_time, second_part) in picks.items():
             meta = self._channels_meta.get(channel_id, {})
             result[channel_id] = {
                 "channel_id": channel_id,
                 "channel_name": meta.get("name", channel_id),
                 "channel_icon": meta.get("icon"),
                 "current": self._programme_dict(current),
+                "next": self._programme_dict(next),
                 "prime_time": self._programme_dict(prime_time),
                 "second_part": self._programme_dict(second_part),
             }
@@ -687,6 +691,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                         category_el = elem.find("category")
                         icon_el = elem.find("icon")
                         rating_el = elem.find("rating/value")
+                        date_el = elem.find("date")
                         item = Programme(
                             start=dt_util.as_local(start),
                             stop=dt_util.as_local(stop),
@@ -696,6 +701,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                             category=category_el.text if category_el is not None else None,
                             icon=icon_el.get("src") if icon_el is not None else None,
                             rating=rating_el.text if rating_el is not None else None,
+                            date=date_el.text.strip() if date_el is not None and date_el.text else None,
                         )
                         programmes.setdefault(channel_id, []).append(item)
                 elem.clear()
@@ -708,14 +714,24 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
     def _pick_slots(
         self, channel_id: str, now
-    ) -> tuple[Programme | None, Programme | None, Programme | None]:
+    ) -> tuple[Programme | None, Programme | None, Programme | None, Programme | None]:
         progs = self._programmes_by_channel.get(channel_id, [])
 
         current = None
-        for programme in progs:
+        current_index = None
+        for index, programme in enumerate(progs):
             if programme.start <= now < programme.stop:
                 current = programme
+                current_index = index
                 break
+
+        # Programme suivant
+        next = None
+        if current_index is not None:
+            for programme in progs[current_index + 1 :]:
+                if programme.start >= current.stop:
+                    next = programme
+                    break
 
         if now.time() < DAY_RESET:
             broadcast_day = (now - timedelta(days=1)).date()
@@ -742,7 +758,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     second_part = programme
                     break
 
-        return current, prime_time, second_part
+        return current, next, prime_time, second_part
 
     def get_programmes_for_day(
         self, channel_id: str, date_str: str | None = None
