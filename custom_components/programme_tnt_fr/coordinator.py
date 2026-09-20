@@ -275,8 +275,13 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         }
 
         if self._tmdb_api_key:
-            title_categories: dict[str, str | None] = {}
-            title_categories_far: dict[str, str | None] = {}
+            # La valeur associe la categorie XMLTV (pour choisir film vs
+            # serie) et le champ <date> XMLTV (annee de production, quand
+            # fournie par la source) : ce dernier aide TMDB a distinguer un
+            # remake/reboot homonyme sans dependre du marqueur manuel
+            # "*AAAA" dans le titre, absent la plupart du temps.
+            title_categories: dict[str, tuple[str | None, str | None]] = {}
+            title_categories_far: dict[str, tuple[str | None, str | None]] = {}
             near_cutoff = now + timedelta(days=2)
             for channel_id in self._channels:
                 for programme in self._programmes_by_channel.get(channel_id, []):
@@ -290,9 +295,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                         and programme.title not in self._tmdb_pending_titles
                     ):
                         if programme.start <= near_cutoff:
-                            title_categories[programme.title] = programme.category
+                            title_categories[programme.title] = (programme.category, programme.date)
                         else:
-                            title_categories_far[programme.title] = programme.category
+                            title_categories_far[programme.title] = (programme.category, programme.date)
             all_new_titles = {**title_categories, **title_categories_far}
             if all_new_titles:
                 self._tmdb_pending_titles.update(all_new_titles)
@@ -332,8 +337,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
     async def _background_resolve_tmdb_posters_staged(
         self,
-        near_titles: dict[str, str | None],
-        far_titles: dict[str, str | None],
+        near_titles: dict[str, tuple[str | None, str | None]],
+        far_titles: dict[str, tuple[str | None, str | None]],
     ) -> None:
         """Resolve near-term (today/tomorrow) TMDB posters first, then the rest.
 
@@ -351,7 +356,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         if far_titles:
             await self._background_resolve_tmdb_posters(far_titles)
 
-    async def _background_resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
+    async def _background_resolve_tmdb_posters(
+        self, title_categories: dict[str, tuple[str | None, str | None]]
+    ) -> None:
         """Resolve TMDB posters in the background, then push a refresh once done.
 
         Runs outside of _async_update_data's await chain so a large batch of
@@ -364,7 +371,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             self._tmdb_pending_titles.difference_update(title_categories)
         await self.async_request_refresh()
 
-    async def _resolve_tmdb_posters(self, title_categories: dict[str, str | None]) -> None:
+    async def _resolve_tmdb_posters(
+        self, title_categories: dict[str, tuple[str | None, str | None]]
+    ) -> None:
         """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre.
 
         Runs lookups concurrently (bounded) instead of one at a time, since
@@ -372,10 +381,10 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         """
         semaphore = asyncio.Semaphore(5)
 
-        async def _resolve_one(title: str, category: str | None) -> None:
+        async def _resolve_one(title: str, category: str | None, date: str | None) -> None:
             async with semaphore:
                 try:
-                    match = await self._lookup_tmdb_poster(title, category)
+                    match = await self._lookup_tmdb_poster(title, category, date)
                 except Exception as err:  # noqa: BLE001
                     # Erreur temporaire (reseau, cle invalide, rate limit...) :
                     # on ne met PAS en cache pour que ce titre soit retente au
@@ -385,11 +394,22 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 self._tmdb_poster_cache[title] = match
 
         await asyncio.gather(
-            *(_resolve_one(title, category) for title, category in title_categories.items())
+            *(
+                _resolve_one(title, category, date)
+                for title, (category, date) in title_categories.items()
+            )
         )
 
-    async def _lookup_tmdb_poster(self, title: str, category: str | None = None) -> TmdbMatch | None:
+    async def _lookup_tmdb_poster(
+        self, title: str, category: str | None = None, date: str | None = None
+    ) -> TmdbMatch | None:
         clean_title, year = self._clean_search_query(title)
+        if not year:
+            # Repli sur l'annee fournie par le champ <date> du flux XMLTV
+            # (quand disponible) : un signal plus fiable et bien plus
+            # frequent que le marqueur manuel "*AAAA" dans le titre, pour
+            # le meme usage (distinguer un remake/reboot homonyme).
+            year = self._extract_year_from_xmltv_date(date)
         if self._is_movie_category(category):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
         else:
@@ -521,6 +541,20 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             rating=float(result.get("vote_average") or 0),
             votes=int(result.get("vote_count") or 0),
         )
+
+    @staticmethod
+    def _extract_year_from_xmltv_date(date: str | None) -> str | None:
+        """Extrait l'annee (AAAA) d'un champ <date> XMLTV.
+
+        Le standard XMLTV autorise plusieurs granularites pour cet element
+        (AAAA, AAAAMM ou AAAAMMJJ) : les 4 premiers chiffres correspondent
+        toujours a l'annee quelle que soit la granularite fournie par la
+        source.
+        """
+        if not date:
+            return None
+        match = re.match(r"(\d{4})", date.strip())
+        return match.group(1) if match else None
 
     @staticmethod
     def _truncate_at_first_separator(title: str) -> str | None:
