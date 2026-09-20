@@ -66,6 +66,7 @@ class ProgrammeTntFrSensor(CoordinatorEntity[ProgrammeTntFrCoordinator], SensorE
             "channel_name": data.get("channel_name"),
             "channel_icon": data.get("channel_icon"),
             "current": data.get("current"),
+            "next": data.get("next"),
             "prime_time": data.get("prime_time"),
             "second_part": data.get("second_part"),
         }
