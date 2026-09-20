@@ -27,10 +27,13 @@ Intégration Home Assistant qui récupère le programme TV des chaines français
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Carrousel
 
-Pour chaque chaîne suivie, la carte affiche jusqu'à 3 programmes : celui en cours, la premiere partie de soirée et la deuxième partie de soirée. Chaque vignette montre l'affiche du programme récupérée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme (synopsis, et note TMDB avec lien vers la fiche quand une correspondance est trouvée).
+Pour chaque chaîne suivie, la carte affiche jusqu'à 4 programmes : celui en cours, celui à suivre juste après, la premiere partie de soirée et la deuxième partie de soirée. Chaque vignette montre l'affiche du programme récupérée sur TMDB quand une correspondance fiable est trouvée, sinon l'icone fournie par le flux TV), le titre, la catégorie, la chaine et l'horaire. Un programme en cours de diffusion affiche un badge "Direct" et une barre de progression. Cliquer sur une vignette ouvre le détail du programme (synopsis, et note TMDB avec lien vers la fiche quand une correspondance est trouvée).
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Chaines favorites** : une chaine marquée comme favorite (option `favorite_channels`) est épinglée en tête du carrousel et affiche une étoile sur ses vignettes, pour la retrouver immédiatement sans faire défiler toutes les chaines suivies.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**Rangée « à suivre »** : sous « En ce moment », une deuxième rangée affiche le programme qui suit immediatement sur chaque chaine. Elle fonctionne exactement comme les autres rangées (zap sur le logo, clic pour ouvrir le détail) et défile de façon synchronisée avec « En ce moment » : faire glisser l'une des deux rangées fait glisser l'autre en même temps. Elle peut être masquée avec l'option `show_next` (voir [Options d'affichage](#options-daffichage)).
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Favoris
@@ -186,16 +189,17 @@ Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines c
 
 #### Sections affichees (En ce moment / 1ere / 2eme partie de soiree)
 
-Par défaut, les trois sections (En ce moment / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
+Par défaut, les quatre sections (En ce moment / À suivre / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
 
 ```yaml
 type: custom:programme-tnt-fr-card
 show_current: true
+show_next: true
 show_prime_time: true
 show_second_part: true
 ```
 
-Ces options sont également disponibles directement dans l'éditeur visuel de la carte (trois interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les trois bascules sans avoir a écrire de YAML.
+Ces options sont également disponibles directement dans l'éditeur visuel de la carte (quatre interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les quatre bascules sans avoir a écrire de YAML.
 
 Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
 
@@ -251,7 +255,7 @@ favorite_channels:
   - France 2
 ```
 
-Comme pour les trois bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML.
+Comme pour les bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML : la liste des chaines y est regroupée par pays (« Chaînes françaises » / « Chaînes belges ») pour s'y retrouver plus facilement.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -387,6 +391,14 @@ Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du G
 | `serieclub.fr` | Serie Club |
 | `AB1.fr` | AB1 |
 
+#### Chaînes belges (RTBF)
+
+| channel_id | Chaîne |
+|---|---|
+| `LaUne.be` | La Une |
+| `LaDeux.be` | Tipik |
+| `LaTrois.be` | La Trois |
+
 </details>
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -473,6 +485,7 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 - La carte se protège désormais contre un double enregistrement du composant (garde `customElements.get()` avant `customElements.define()`), une cause possible de l'erreur "Custom element doesn't exist" rapportée occasionnellement par certains utilisateurs.
 - Le fichier JS de la carte est servi sans en-tete de cache HTTP explicite (`cache_headers=False`), pour reduire le risque que le navigateur garde en memoire une ancienne version de la carte apres une mise a jour. Si la carte ne se met pas a jour visuellement apres une mise a jour HACS (redemarrage effectue), un rechargement force de la page (ou de l'application Compagnon) resout generalement le probleme.
 - Un appareil Alexa (Alexa Media Player) choisi comme cible `media_player` pour l'annonce vocale d'un rappel est automatiquement détecté et route l'annonce via son propre service `notify.alexa_media_<appareil>` (donc avec la vraie voix Alexa), plutôt que via la synthèse vocale générique de Home Assistant qui nécessiterait une URL de fichier audio accessible publiquement.
+- Le rapprochement des jaquettes TMDB s'appuie désormais aussi sur l'année de diffusion fournie par le flux XMLTV (attribut `date`) quand elle est disponible, en plus du titre, pour fiabiliser le matching des films et séries ayant un remake ou une resortie.
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
 <div align="center">
 
