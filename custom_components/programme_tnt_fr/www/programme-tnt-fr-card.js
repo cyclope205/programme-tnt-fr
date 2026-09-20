@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.4.3";
+const CARD_VERSION = "2.5.0";
 (function () {
   "use strict";
 
@@ -25,6 +25,7 @@ const CARD_VERSION = "2.4.3";
     ".slot-title-icon.live { background: #e0263f; }",
     ".slot-title-icon.prime { background: #3f6fe0; }",
     ".slot-title-icon.second { background: #1c9c8a; }",
+    ".slot-title-icon.next { background: #f2a900; }",
     ".carousel-wrap { position: relative; }",
     ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
@@ -149,6 +150,7 @@ const CARD_VERSION = "2.4.3";
 
 var SLOT_DEFS = [
     ["current", "En ce moment à la télé", "live"],
+    ["next", "À suivre", "next"],
     ["prime_time", "Programmes télé en 1ère partie de soirée", "prime"],
     ["second_part", "Programmes télé en 2ème partie de soirée", "second"]
   ];
@@ -680,10 +682,16 @@ var SLOT_DEFS = [
       var activeSlotDefs = SLOT_DEFS.filter(function (def) {
         var key = def[0];
         if (key === "current" && self._config.show_current === false) return false;
+        if (key === "next" && self._config.show_next === false) return false;
         if (key === "prime_time" && self._config.show_prime_time === false) return false;
         if (key === "second_part" && self._config.show_second_part === false) return false;
         return true;
       });
+
+      // Rangees "En ce moment" et "A suivre" solidaires au defilement : la
+      // meme colonne (index de chaine) doit rester alignee entre les deux
+      // rangees quand on swipe/clique les fleches sur l'une ou l'autre.
+      var syncCarousels = {};
 
       activeSlotDefs.forEach(function (def, index) {
         var slotKey = def[0], sectionTitle = def[1], colorClass = def[2];
@@ -718,7 +726,33 @@ var SLOT_DEFS = [
         if (previousScroll[index]) {
           carousel.scrollLeft = previousScroll[index];
         }
+
+        if (slotKey === "current" || slotKey === "next") {
+          syncCarousels[slotKey] = carousel;
+        }
       });
+
+      if (syncCarousels.current && syncCarousels.next) {
+        this._linkCarouselScroll(syncCarousels.current, syncCarousels.next);
+      }
+    }
+
+    // Synchronise le defilement horizontal de deux carrousels (En ce moment
+    // / A suivre) pour que la meme chaine reste alignee verticalement entre
+    // les deux rangees, quel que soit le cote swipe/clique. Le garde-fou
+    // "syncing" evite la boucle infinie provoquee par le mirroring mutuel
+    // (le scroll programmatique de l'un declenche son propre evenement
+    // "scroll", qui sans garde relancerait un mirroring vers l'autre, etc).
+    _linkCarouselScroll(a, b) {
+      var syncing = false;
+      function mirror(from, to) {
+        if (syncing) return;
+        syncing = true;
+        to.scrollLeft = from.scrollLeft;
+        syncing = false;
+      }
+      a.addEventListener("scroll", function () { mirror(a, b); });
+      b.addEventListener("scroll", function () { mirror(b, a); });
     }
 
     _buildPosterCard(channelLabel, slotKey, prog, channelIcon, isFavorite, channelId) {
@@ -1846,6 +1880,7 @@ var SLOT_DEFS = [
       }
 
       addToggle("show_current", "Afficher l''En ce moment''");
+      addToggle("show_next", "Afficher \"A suivre\"");
       addToggle("show_prime_time", "Afficher la 1re partie de soiree");
       addToggle("show_second_part", "Afficher la 2e partie de soiree");
 
@@ -1952,10 +1987,34 @@ var SLOT_DEFS = [
           var favSet = {};
           currentFavorites.forEach(function (cid) { favSet[cid] = true; });
 
+          // Petit separateur visuel quand la liste (triee par CHANNEL_ORDER,
+          // qui place les chaines belges apres les francaises) passe des
+          // chaines françaises (.fr) aux chaines belges (.be), pour qu'on
+          // distingue les deux groupes sans avoir a deviner a l'oeil.
+          var lastCountryGroup = null;
+          function countryGroupLabel(cid) {
+            if (cid.slice(-3) === ".be") return "Chaînes belges";
+            if (cid.slice(-3) === ".fr") return "Chaînes françaises";
+            return null;
+          }
+
           ids.forEach(function (id) {
             var attrs = hass.states[id].attributes || {};
             var cid = attrs.channel_id;
             if (!cid) return;
+
+            var group = countryGroupLabel(cid);
+            if (group && group !== lastCountryGroup) {
+              lastCountryGroup = group;
+              var groupHeader = document.createElement("div");
+              groupHeader.textContent = group;
+              groupHeader.style.fontSize = "12px";
+              groupHeader.style.fontWeight = "600";
+              groupHeader.style.opacity = "0.65";
+              groupHeader.style.margin = "8px 0 2px";
+              wrap.appendChild(groupHeader);
+            }
+
             var row = document.createElement("ha-formfield");
             row.setAttribute("label", attrs.channel_name || id);
             row.style.display = "flex";
@@ -2008,6 +2067,6 @@ var SLOT_DEFS = [
   window.customCards.push({
     type: "programme-tnt-fr-card",
     name: "Programme TNT FR",
-    description: "Programme TV des chaînes françaises en 3 carrousels horizontaux (en ce moment / 1re et 2e partie de soirée), avec chaînes favorites épinglables, un bouton Guide TV (recherche, jour, horaire, genre) et un bouton Top films pour voir le classement des films les mieux notés sur plusieurs jours."
+    description: "Programme TV des chaînes françaises et belges (RTBF) en carrousels horizontaux (en ce moment / à suivre / 1re et 2e partie de soirée, les deux premiers solidaires au défilement), avec chaînes favorites épinglables, un bouton Guide TV (recherche, jour, horaire, genre) et un bouton Top films pour voir le classement des films les mieux notés sur plusieurs jours."
   });
 })();
