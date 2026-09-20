@@ -181,7 +181,7 @@ EXTRA_CHANNELS = {
 }
 
 # Union des deux listes pour le formulaire de selection des chaines.
-ALL_CHANNELS = {**TNT_CHANNELS, **EXTRA_CHANNELS}
+ALL_CHANNELS = {**TNT_CHANNELS, **EXTRA_CHANNELS, **RTBF_CHANNELS}
 
 # Curated display order for the 30 standard TNT channels, matching the
 # physical remote numbering with related channels grouped nearby (e.g.
