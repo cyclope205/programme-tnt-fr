@@ -360,6 +360,8 @@ type: custom:programme-tnt-fr-card
 hide_next_poster: true
 ```
 
+<img width="467" height="732" alt="Section À suivre sans jaquette" src="https://github.com/user-attachments/assets/8401d613-71dd-4e63-95c6-895acf3063b3" />
+
 Cette option est également disponible dans l'éditeur visuel, juste après les bascules d'affichage des sections.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
