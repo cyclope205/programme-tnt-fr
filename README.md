@@ -80,6 +80,19 @@ Ecran de configuration des chaines suivies :
 
 ![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
 
+Chaines francaises et belges separees dans le formulaire de configuration (v2.5.1) :
+
+![Chaines francaises separees](docs/screenshots/screenshot-1789957969585-d090cb52.jpg)
+
+![Chaines belges separees](docs/screenshots/screenshot-1789958289704-fecde14a.jpg)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Rangee "a suivre" et date de diffusion d'origine dans le detail du programme (v2.5.1) :
+
+![Rangee a suivre avec chaines FR et BE](docs/screenshots/screenshot-1789957747170-04fb6ec5.jpg)
+
+![Date de diffusion d'origine dans le detail du programme](docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg)
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
 
@@ -163,7 +176,7 @@ La carte Lovelace est enregistree automatiquement par l'intégration : aucune re
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Configuration
 
-A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller.
+A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller. Depuis la version 2.5.1, les chaines francaises et les chaines belges (RTBF) sont presentees dans deux listes distinctes, aussi bien a l'ajout de l'integration que dans ses options.
 
 Les chaines favorites se choisissent depuis la configuration de la carte (option `favorite_channels`, en YAML ou via l'éditeur visuel) : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
 
@@ -404,7 +417,7 @@ Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du G
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
 
-Chaque capteur `sensor.programme_tnt_fr_<chaine>` éxpose, pour le programme `current`, `prime_time` et `second_part`, les attributs suivants :
+Chaque capteur `sensor.programme_tnt_fr_<chaine>` éxpose, pour le programme `current`, `next`, `prime_time` et `second_part`, les attributs suivants :
 
 | Attribut | Description |
 | --- | --- |
@@ -414,6 +427,7 @@ Chaque capteur `sensor.programme_tnt_fr_<chaine>` éxpose, pour le programme `cu
 | `category` | Categorie XMLTV |
 | `icon` | Icone associee |
 | `rating` | Classification (ex. age) fournie par le flux XMLTV |
+| `date` | Annee ou date de diffusion d'origine du programme, precision variable (issue du flux XMLTV) - egalement utilisee pour fiabiliser le rapprochement TMDB. `null` si absente. |
 | `start` / `stop` | Horaires de diffusion (ISO 8601) |
 | `poster` | URL de l'affiche recuperee sur TMDB (`null` si aucune correspondance) |
 | `tmdb_id` | Identifiant TMDB du film ou de la serie (`null` si aucune correspondance) |
@@ -486,6 +500,7 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 - Le fichier JS de la carte est servi sans en-tete de cache HTTP explicite (`cache_headers=False`), pour reduire le risque que le navigateur garde en memoire une ancienne version de la carte apres une mise a jour. Si la carte ne se met pas a jour visuellement apres une mise a jour HACS (redemarrage effectue), un rechargement force de la page (ou de l'application Compagnon) resout generalement le probleme.
 - Un appareil Alexa (Alexa Media Player) choisi comme cible `media_player` pour l'annonce vocale d'un rappel est automatiquement détecté et route l'annonce via son propre service `notify.alexa_media_<appareil>` (donc avec la vraie voix Alexa), plutôt que via la synthèse vocale générique de Home Assistant qui nécessiterait une URL de fichier audio accessible publiquement.
 - Le rapprochement des jaquettes TMDB s'appuie désormais aussi sur l'année de diffusion fournie par le flux XMLTV (attribut `date`) quand elle est disponible, en plus du titre, pour fiabiliser le matching des films et séries ayant un remake ou une resortie.
+- Pour les formats non-fiction (magazine, information, journal, meteo, sport, divertissement, religion, jeu...), aucune recherche TMDB n'est tentee sur le seul titre : ces formats recurrents n'ont pas d'oeuvre unique correspondante et exposaient a des faux positifs (ex. un magazine associe par erreur a un film homonyme).
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
 <div align="center">
 
