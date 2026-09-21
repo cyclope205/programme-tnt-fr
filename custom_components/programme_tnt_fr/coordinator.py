@@ -670,12 +670,31 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     def _titles_match(query_norm: str, candidate_norm: str) -> bool:
         """Return True if a normalized TMDB candidate matches a normalized query.
 
-        A prefix match in either direction: handles XMLTV titles with episode
-        suffixes (ex: "Koh-Lanta - S29E01" matching TMDB's "Koh-Lanta") while
-        rejecting loose full-text matches where neither is a prefix of the
-        other (ex: "Meteo" vs "Miss Meteo").
+        A prefix match in either direction, but only at a word boundary:
+        handles XMLTV titles with episode suffixes (ex: "Koh-Lanta - S29E01"
+        matching TMDB's "Koh-Lanta") while rejecting loose full-text matches
+        where neither is a prefix of the other (ex: "Meteo" vs "Miss Meteo"),
+        and rejecting a prefix that merely shares leading letters with an
+        unrelated, longer title - ex: XMLTV "Lucifer" (serie) matchait a
+        tort avec le film TMDB "Luciferina" (2018), car "luciferina"
+        commence par "lucifer" mais en plein milieu d'un mot, pas a une
+        coupure de mot - verifie en direct.
         """
-        return query_norm.startswith(candidate_norm) or candidate_norm.startswith(query_norm)
+
+        def _boundary_after(text: str, idx: int) -> bool:
+            return idx >= len(text) or not text[idx].isalnum()
+
+        if query_norm == candidate_norm:
+            return True
+        if query_norm.startswith(candidate_norm) and _boundary_after(
+            query_norm, len(candidate_norm)
+        ):
+            return True
+        if candidate_norm.startswith(query_norm) and _boundary_after(
+            candidate_norm, len(query_norm)
+        ):
+            return True
+        return False
 
     @staticmethod
     def _normalize_title(value: str) -> str:
