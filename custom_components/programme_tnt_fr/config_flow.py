@@ -9,9 +9,10 @@ from homeassistant.helpers import selector
 from homeassistant.helpers import entity_registry as er
 
 from .const import (
-    ALL_CHANNELS,
     CONF_ANNOUNCE_VOLUME,
     CONF_CHANNELS,
+    CONF_CHANNELS_BELGIQUE,
+    CONF_CHANNELS_FRANCE,
     CONF_MEDIA_PLAYER_TARGETS,
     CONF_NOTIFY_TARGET,
     CONF_REMINDER_PROFILES,
@@ -19,6 +20,8 @@ from .const import (
     CONF_TTS_ENGINE,
     DEFAULT_CHANNELS,
     DOMAIN,
+    EXTRA_CHANNELS,
+    RTBF_CHANNELS,
     TNT_CHANNELS,
 )
 
@@ -86,10 +89,18 @@ def _schema(
     channels_default: list[str],
     tmdb_api_key_default: str | None = None,
 ) -> vol.Schema:
-    options = [
+    france_channels = {**TNT_CHANNELS, **EXTRA_CHANNELS}
+    france_options = [
         selector.SelectOptionDict(value=channel_id, label=name)
-        for channel_id, name in ALL_CHANNELS.items()
+        for channel_id, name in france_channels.items()
     ]
+    belgique_options = [
+        selector.SelectOptionDict(value=channel_id, label=name)
+        for channel_id, name in RTBF_CHANNELS.items()
+    ]
+    france_default = [c for c in channels_default if c in france_channels]
+    belgique_default = [c for c in channels_default if c in RTBF_CHANNELS]
+
     fields: dict = {}
 
     tmdb_selector = selector.selector({"text": {"type": "password"}})
@@ -98,10 +109,19 @@ def _schema(
     else:
         fields[vol.Optional(CONF_TMDB_API_KEY)] = tmdb_selector
 
-    fields[vol.Required(CONF_CHANNELS, default=channels_default)] = selector.selector(
+    fields[vol.Optional(CONF_CHANNELS_FRANCE, default=france_default)] = selector.selector(
         {
             "select": {
-                "options": options,
+                "options": france_options,
+                "multiple": True,
+                "mode": "list",
+            }
+        }
+    )
+    fields[vol.Optional(CONF_CHANNELS_BELGIQUE, default=belgique_default)] = selector.selector(
+        {
+            "select": {
+                "options": belgique_options,
                 "multiple": True,
                 "mode": "list",
             }
@@ -180,7 +200,9 @@ class ProgrammeTntFrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         errors: dict[str, str] = {}
         if user_input is not None:
-            channels = user_input.get(CONF_CHANNELS) or []
+            channels = (user_input.get(CONF_CHANNELS_FRANCE) or []) + (
+                user_input.get(CONF_CHANNELS_BELGIQUE) or []
+            )
             if not channels:
                 errors["base"] = "no_channels"
             else:
@@ -229,7 +251,9 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
         )
 
         if user_input is not None:
-            channels = user_input.get(CONF_CHANNELS) or []
+            channels = (user_input.get(CONF_CHANNELS_FRANCE) or []) + (
+                user_input.get(CONF_CHANNELS_BELGIQUE) or []
+            )
             if not channels:
                 errors["base"] = "no_channels"
             else:
