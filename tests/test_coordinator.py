@@ -625,7 +625,7 @@ def _dt(day, hour, minute):
     return datetime(2026, 8, day, hour, minute, tzinfo=_TZ)
 
 
-def _programme(start, stop, title):
+def _programme(start, stop, title, date=None):
     return Programme(
         start=start,
         stop=stop,
@@ -635,6 +635,7 @@ def _programme(start, stop, title):
         category=None,
         icon=None,
         rating=None,
+        date=date,
     )
 
 
@@ -651,7 +652,7 @@ def test_pick_slots_current_is_programme_covering_now():
         _programme(_dt(10, 21, 0), _dt(10, 22, 0), "Apres"),
     ]
     coordinator = _coordinator_with(progs)
-    current, _, _ = coordinator._pick_slots("TF1.fr", _dt(10, 20, 30))
+    current, _, _, _ = coordinator._pick_slots("TF1.fr", _dt(10, 20, 30))
     assert current.title == "En cours"
 
 
@@ -662,7 +663,7 @@ def test_pick_slots_current_none_when_now_falls_in_a_gap():
         _programme(_dt(10, 20, 5), _dt(10, 21, 0), "Apres coupure"),
     ]
     coordinator = _coordinator_with(progs)
-    current, _, _ = coordinator._pick_slots("TF1.fr", _dt(10, 20, 2))
+    current, _, _, _ = coordinator._pick_slots("TF1.fr", _dt(10, 20, 2))
     assert current is None
 
 
@@ -672,7 +673,7 @@ def test_pick_slots_prime_time_is_programme_covering_threshold():
         _programme(_dt(10, 21, 15), _dt(10, 23, 0), "Prime"),
     ]
     coordinator = _coordinator_with(progs)
-    _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 18, 0))
+    _, _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 18, 0))
     assert prime_time.title == "Prime"
 
 
@@ -684,7 +685,7 @@ def test_pick_slots_prime_time_falls_back_to_next_programme_when_gap_at_threshol
         _programme(_dt(10, 21, 30), _dt(10, 23, 0), "Retard antenne"),
     ]
     coordinator = _coordinator_with(progs)
-    _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 18, 0))
+    _, _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 18, 0))
     assert prime_time.title == "Retard antenne"
 
 
@@ -697,7 +698,7 @@ def test_pick_slots_second_part_corrects_when_same_programme_as_prime_time():
         _programme(_dt(10, 23, 30), _dt(10, 23, 59), "Late news"),
     ]
     coordinator = _coordinator_with(progs)
-    _, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
+    _, _, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
     assert prime_time.title == "Long film"
     assert second_part.title == "Late news"
 
@@ -707,7 +708,7 @@ def test_pick_slots_second_part_none_when_nothing_follows_prime_time():
         _programme(_dt(10, 21, 15), _dt(10, 23, 59), "Seul programme de la soiree"),
     ]
     coordinator = _coordinator_with(progs)
-    _, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
+    _, _, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
     assert prime_time.title == "Seul programme de la soiree"
     assert second_part is None
 
@@ -720,13 +721,13 @@ def test_pick_slots_uses_previous_broadcast_day_before_day_reset():
         _programme(_dt(10, 21, 15), _dt(10, 23, 0), "Prime du jour meme"),
     ]
     coordinator = _coordinator_with(progs)
-    _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 2, 0))
+    _, _, prime_time, _ = coordinator._pick_slots("TF1.fr", _dt(10, 2, 0))
     assert prime_time.title == "Prime de la veille"
 
 
 def test_pick_slots_empty_programme_list_returns_all_none():
     coordinator = _coordinator_with([])
-    current, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
+    current, _, prime_time, second_part = coordinator._pick_slots("TF1.fr", _dt(10, 20, 0))
     assert current is None
     assert prime_time is None
     assert second_part is None
@@ -736,7 +737,7 @@ def test_pick_slots_unknown_channel_returns_all_none():
     coordinator = _coordinator_with(
         [_programme(_dt(10, 21, 15), _dt(10, 22, 0), "X")]
     )
-    current, prime_time, second_part = coordinator._pick_slots(
+    current, _, prime_time, second_part = coordinator._pick_slots(
         "UnknownChannel.fr", _dt(10, 20, 0)
     )
     assert current is None
