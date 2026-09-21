@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.5.2";
+const CARD_VERSION = "2.5.3";
 (function () {
   "use strict";
 
@@ -888,6 +888,8 @@ var SLOT_DEFS = [
       if (prog.category) metaParts.push(prog.category);
       metaParts.push(channelLabel);
       metaParts.push((startFmt || "?") + " - " + (stopFmt || "?"));
+var progDate = formatProgDate(prog.date);
+if (progDate) metaParts.push(progDate);
       timeEl.textContent = metaParts.join(" • ");
       content.appendChild(timeEl);
       btn.appendChild(content);
