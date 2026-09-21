@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.5.5";
+const CARD_VERSION = "2.5.6";
 (function () {
   "use strict";
 
@@ -18,7 +18,7 @@ const CARD_VERSION = "2.5.5";
     ".header-guide-link:active { transform: scale(0.96); }",
     ".header-guide-link.active { background: var(--primary-color, #3f6fe0); color: #fff; }",
     ".header-guide-link[hidden] { display: none; }",
-    ".slot-section { margin-bottom: 14px; }",
+    ".slot-section { margin-bottom: 10px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
     ".slot-title-header { font-size: 1.12em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); display: flex; align-items: center; gap: 9px; }",
     ".slot-title-icon { width: 8px; height: 22px; border-radius: 4px; flex-shrink: 0; }",
@@ -27,7 +27,7 @@ const CARD_VERSION = "2.5.5";
     ".slot-title-icon.second { background: #1c9c8a; }",
     ".slot-title-icon.next { background: #f2a900; }",
     ".carousel-wrap { position: relative; }",
-    ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
+    ".carousel { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 2px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }",
     ".carousel::-webkit-scrollbar { display: none; }",
     ".carousel { scrollbar-width: none; }",
     ".poster-card { position: relative; flex: 0 0 calc((100% - (var(--tntfr-columns, 2) - 1) * 12px) / var(--tntfr-columns, 2)); width: calc((100% - (var(--tntfr-columns, 2) - 1) * 12px) / var(--tntfr-columns, 2)); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; border: none; padding: 0; margin: 0; cursor: pointer; scroll-snap-align: start; background: none; transition: transform 0.15s ease; font-family: inherit; -webkit-tap-highlight-color: transparent; }",
@@ -66,7 +66,7 @@ const CARD_VERSION = "2.5.5";
     ".poster-live-badge { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 5px; background: rgba(224,38,63,0.94); color: #fff; font-size: 0.66em; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 20px; box-shadow: 0 2px 10px rgba(224,38,63,0.5); z-index: 1; }",
     ".poster-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: tntfr-pulse 1.6s infinite; }",
     "@keyframes tntfr-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); } 70% { box-shadow: 0 0 0 6px rgba(255,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } }",
-    ".poster-content { padding: 10px 12px 12px; color: var(--primary-text-color); background: transparent; flex: 1 1 auto; }",
+    ".poster-content { padding: 10px 12px 2px; color: var(--primary-text-color); background: transparent; flex: 1 1 auto; }",
     ".poster-channel-name { font-size: 0.72em; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
     ".poster-title { font-size: 1.02em; font-weight: 700; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }",
     ".poster-time { font-size: 0.76em; font-weight: 600; opacity: 0.9; margin-top: 6px; }",
@@ -788,7 +788,8 @@ var SLOT_DEFS = [
 
       var imageWrap = document.createElement("div");
       imageWrap.className = "poster-image-wrap";
-      btn.appendChild(imageWrap);
+      var hideNextPoster = slotKey === "next" && self._config && self._config.hide_next_poster === true;
+      if (!hideNextPoster) btn.appendChild(imageWrap);
 
       if (channelIcon) {
         var badge = document.createElement("img");
@@ -1910,6 +1911,7 @@ if (progDate) metaParts.push(progDate);
 
       addToggle("show_current", "Afficher l''En ce moment''");
       addToggle("show_next", "Afficher \"A suivre\"");
+      addToggle("hide_next_poster", "Masquer les jaquettes de \"A suivre\" (texte seul)");
       addToggle("show_prime_time", "Afficher la 1re partie de soiree");
       addToggle("show_second_part", "Afficher la 2e partie de soiree");
 
