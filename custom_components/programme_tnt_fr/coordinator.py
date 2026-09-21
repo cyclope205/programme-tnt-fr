@@ -422,17 +422,25 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
         else:
             search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
-        for url in search_order:
-            match = await self._tmdb_search(url, clean_title)
-            if match:
-                return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
-        # Repli avec filtre par annee, uniquement si un marqueur "*AAAA" a ete
-        # trouve et que rien n'a matche sans lui (ex: distinguer le Magnum de
-        # 2018 de l'original) - tente en plus, ne remplace jamais les essais
-        # ci-dessus, donc ne peut pas faire regresser un match qui marchait deja.
         if year:
+            # Recherche avec l'annee en priorite quand elle est disponible (issue du
+            # marqueur "*AAAA" ou du champ <date> XMLTV) : sur un homonyme (plusieurs
+            # films/series portant le meme titre), une recherche sans annee peut
+            # retenir le premier resultat qui matche le titre et possede un poster,
+            # meme si ce n'est pas la bonne annee (ex: mauvaise fiche "Nikita").
             for url in search_order:
                 match = await self._tmdb_search(url, clean_title, year)
+                if match:
+                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
+            # Repli sans annee si la recherche filtree n'a rien donne (l'annee XMLTV
+            # peut etre legerement decalee, ex: rediffusion, erreur de flux).
+            for url in search_order:
+                match = await self._tmdb_search(url, clean_title)
+                if match:
+                    return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
+        else:
+            for url in search_order:
+                match = await self._tmdb_search(url, clean_title)
                 if match:
                     return replace(match, poster=TMDB_IMAGE_BASE_URL + match.poster)
         # Dernier repli : une description libre apres une virgule/deux-points
