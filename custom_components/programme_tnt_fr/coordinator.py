@@ -81,6 +81,14 @@ _VERSION_QUALIFIER_RE = re.compile(
     re.IGNORECASE,
 )
 _YEAR_MARKER_RE = re.compile(r"\s*\*(\d{4})\b")
+# Decoupage d'un programme en plusieurs parties dans le flux XMLTV, sans que
+# TMDB ne liste cette subdivision (ex: "Quotidien, deuxieme partie" -> TMDB
+# n'a qu'une seule fiche "Quotidien" pour l'emission entiere - verifie en
+# direct). On retire ce suffixe pour retrouver le titre de la fiche TMDB.
+_PART_SUFFIX_RE = re.compile(
+    r"\s*,\s*(?:premi[eè]re|deuxi[eè]me|1[eè]re|2[eè]me)\s+partie\s*$",
+    re.IGNORECASE,
+)
 
 # De nombreux titres XMLTV omettent l'article de tete que TMDB inclut
 # systematiquement (ex: XMLTV "Meilleur Patissier" vs TMDB "Le Meilleur
@@ -403,25 +411,18 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     async def _lookup_tmdb_poster(
         self, title: str, category: str | None = None, date: str | None = None
     ) -> TmdbMatch | None:
-        tv_format_only = False
-        if self._is_non_fiction_category(category):
-            if self._is_recurring_tv_format(category):
-                # Formats recurrents mais neanmoins catalogues sur TMDB comme
-                # une fiche serie unique (jeu, divertissement, talk-show,
-                # telerealite de longue duree) : on tente une recherche cote
-                # serie uniquement (jamais cote film) pour afficher la
-                # jaquette quand elle existe, sans reintroduire le faux
-                # positif magazine/film documente ci-dessous.
-                tv_format_only = True
-            else:
-                # Formats recurrents (magazine, information, journal...) : un
-                # match TMDB sur le seul titre est peu fiable pour ces
-                # categories (pas d'oeuvre unique de fiction correspondante)
-                # et expose a de faux positifs - ex. "A l origine" (Magazine
-                # de societe) matche a tort avec le film "A l origine"
-                # (2009) de Xavier Giannoli. On ne tente donc aucune
-                # recherche TMDB pour ces categories.
-                return None
+        # Formats recurrents (magazine, information, journal, meteo, sport,
+        # divertissement, religion, jeu, talk-show, telerealite...) : ces
+        # categories n'ont pas d'oeuvre unique de fiction correspondante, donc
+        # la recherche TMDB reste limitee a une fiche serie (jamais film) pour
+        # eviter le faux positif historiquement documente sur cette garde -
+        # ex. "A l origine" (Magazine de societe) matchait a tort avec le
+        # film "A l origine" (2009) de Xavier Giannoli. Une recherche cote
+        # serie uniquement affiche la jaquette quand une fiche legitime
+        # existe (ex. "C a vous", "Arte Journal", "Le 19.45") sans exposer a
+        # ce risque, grace aux garde-fous existants (correspondance de titre
+        # + jaquette obligatoire).
+        tv_format_only = self._is_non_fiction_category(category)
         clean_title, year = self._clean_search_query(title)
         if not year:
             # Repli sur l'annee fournie par le champ <date> du flux XMLTV
@@ -524,32 +525,6 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "telerealite",
         )
         return any(keyword in normalized for keyword in non_fiction_keywords)
-
-    @staticmethod
-    def _is_recurring_tv_format(category: str | None) -> bool:
-        """Return True for non-fiction categories that are nonetheless
-        usually catalogued on TMDB as a single ongoing TV show (long-running
-        game shows, talk-shows, reality shows), unlike formats with no
-        single corresponding work (magazine, news, weather...).
-
-        Restricting these to a TV-only search (never falling back to Movie)
-        lets their poster show up when TMDB has an entry - ex: "N'oubliez
-        pas les paroles" (categorie XMLTV "Divertissement") a bien une
-        fiche serie TMDB - sans reintroduire le faux positif magazine/film
-        documente dans _is_non_fiction_category.
-        """
-        if not category:
-            return False
-        normalized = category.strip().lower()
-        tv_format_keywords = (
-            "divertissement",
-            "jeu",
-            "talk-show",
-            "talk show",
-            "téléréalité",
-            "telerealite",
-        )
-        return any(keyword in normalized for keyword in tv_format_keywords)
 
     async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> TmdbMatch | None:
         params = {
@@ -686,6 +661,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             working = _SUBTITLE_NUMBER_MARKER_RE.sub("", working)
         if working == before:
             working = _VERSION_QUALIFIER_RE.sub("", working)
+        if working == before:
+            working = _PART_SUFFIX_RE.sub("", working)
         working = working.strip()
         return (working or title or "", year)
 
@@ -725,6 +702,13 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # deux cotes.
         for curly in ("’", "‘", "‛"):
             value = value.replace(curly, "'")
+        # TMDB utilise parfois la ligature "oe"/"ae" (œ/æ) la ou XMLTV ecrit
+        # "oe"/"ae" en toutes lettres (ex: TMDB "La Villa des Cœurs Brisés" vs
+        # XMLTV "La villa des coeurs brises" - verifie sur une vraie fiche
+        # TMDB). NFD ne decompose pas ces ligatures (ce ne sont pas des
+        # caracteres combines), donc on les deplie explicitement avant NFD.
+        for ligature, expanded in (("œ", "oe"), ("Œ", "OE"), ("æ", "ae"), ("Æ", "AE")):
+            value = value.replace(ligature, expanded)
         normalized = unicodedata.normalize("NFD", value or "")
         normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
         normalized = normalized.lower().strip()
