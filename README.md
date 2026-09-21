@@ -120,7 +120,7 @@ Carrousel avec une chaine favorite épinglée et son étoile:
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue Favoris :
 
-<!-- TODO : ajouter une capture d'écran de la vue Favoris -->
+<img width="600" alt="Vue Favoris" src="https://github.com/user-attachments/assets/19a7bf0d-abbf-4678-be30-dea4c6c64851" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Guide TV avec le filtre "Genre" appliqué:
