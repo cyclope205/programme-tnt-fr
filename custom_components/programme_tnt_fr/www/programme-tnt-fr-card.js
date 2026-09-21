@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.5.0";
+const CARD_VERSION = "2.5.1";
 (function () {
   "use strict";
 
@@ -211,6 +211,31 @@ var SLOT_DEFS = [
     var h = String(d.getHours()).padStart(2, "0");
     var m = String(d.getMinutes()).padStart(2, "0");
     return h + "h" + m;
+  }
+
+  function formatProgDate(dateStr) {
+    if (!dateStr) return null;
+    var digits = String(dateStr).replace(/[^0-9]/g, "");
+    if (digits.length < 4) return null;
+    var year = digits.slice(0, 4);
+    var months = [
+      "janvier", "fevrier", "mars", "avril", "mai", "juin",
+      "juillet", "aout", "septembre", "octobre", "novembre", "decembre",
+    ];
+    if (digits.length >= 8) {
+      var day = parseInt(digits.slice(6, 8), 10);
+      var monthIdx = parseInt(digits.slice(4, 6), 10) - 1;
+      if (monthIdx >= 0 && monthIdx < 12 && day > 0) {
+        return day + " " + months[monthIdx] + " " + year;
+      }
+    }
+    if (digits.length >= 6) {
+      var monthIdx2 = parseInt(digits.slice(4, 6), 10) - 1;
+      if (monthIdx2 >= 0 && monthIdx2 < 12) {
+        return months[monthIdx2] + " " + year;
+      }
+    }
+    return year;
   }
 
   function liveFraction(prog) {
@@ -1590,6 +1615,8 @@ var SLOT_DEFS = [
       if (startFmt && stopFmt) metaParts.push(startFmt + " - " + stopFmt);
       if (prog.category) metaParts.push(prog.category);
       if (prog.rating) metaParts.push("CSA : " + prog.rating);
+      var progDate = formatProgDate(prog.date);
+      if (progDate) metaParts.push("Diffusion d'origine : " + progDate);
       els.modalMeta.textContent = metaParts.join(" • ");
 
       if (prog.tmdb_rating) {
