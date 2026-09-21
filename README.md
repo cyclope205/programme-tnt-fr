@@ -349,6 +349,8 @@ show_current: false
 ```
 <img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
 
+---
+
 #### Masquer la jaquette de la section « à suivre »
 
 Pour la section « à suivre », l'affiche du programme peut être masquée pour ne garder que le texte (titre, chaîne, horaire). Le clic sur la vignette ouvre toujours le détail avec le synopsis.
