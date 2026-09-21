@@ -82,14 +82,14 @@ Ecran de configuration des chaines suivies :
 
 Options d'affichage de la carte (dont « À suivre ») et chaines favorites regroupees par pays dans l'editeur visuel (v2.5.1) :
 
-<img width="350" alt="Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays" src="docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg" />
+<img width="600" alt="Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays" src="docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Rangees "En ce moment" et "A suivre" synchronisees, et date de diffusion d'origine dans le detail du programme (v2.5.1) :
 
-<img width="350" alt="Rangees En ce moment et A suivre synchronisees" src="docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
+<img width="600" alt="Rangees En ce moment et A suivre synchronisees" src="docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
 
-<img width="350" alt="Date de diffusion d'origine dans le detail du programme" src="docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg" />
+<img width="600" alt="Date de diffusion d'origine dans le detail du programme" src="docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
@@ -104,18 +104,18 @@ Vue "2eme partie de soirée" :
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Guide TV, avec le "filtre horaire" :
 
-<img width="184" height="320" alt="Capture d-ecran 2026-08-26 a 22 09 20" src="https://github.com/user-attachments/assets/c32927eb-80a2-4eba-b5c5-d9c87cb4be66" />
+<img width="600" height="320" alt="Capture d-ecran 2026-08-26 a 22 09 20" src="https://github.com/user-attachments/assets/c32927eb-80a2-4eba-b5c5-d9c87cb4be66" />
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Configuration des chaines favorites:
 
-<img width="1286" height="812" alt="image" src="https://github.com/user-attachments/assets/9625d200-f72b-44ee-9e38-63572ff7416e" />
+<img width="600" height="812" alt="image" src="https://github.com/user-attachments/assets/9625d200-f72b-44ee-9e38-63572ff7416e" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Carrousel avec une chaine favorite épinglée et son étoile:
 
-<img width="1271" height="777" alt="image" src="https://github.com/user-attachments/assets/b705a916-4f02-4c8c-bc93-4062756b2231" />
+<img width="600" height="777" alt="image" src="https://github.com/user-attachments/assets/b705a916-4f02-4c8c-bc93-4062756b2231" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue Favoris :
@@ -125,37 +125,37 @@ Vue Favoris :
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Guide TV avec le filtre "Genre" appliqué:
 
-<img width="184" height="320" alt="Capture d-ecran 2026-08-26 a 22 08 04" src="https://github.com/user-attachments/assets/95a1fffc-ad10-49c1-a3d2-ae9cf68a7758" />
+<img width="600" height="320" alt="Capture d-ecran 2026-08-26 a 22 08 04" src="https://github.com/user-attachments/assets/95a1fffc-ad10-49c1-a3d2-ae9cf68a7758" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue Top films avec la navigation jour par jour:
 
-<img width="460" height="552" alt="image" src="https://github.com/user-attachments/assets/53121b73-6221-4704-b054-36fe7cdcc835" />
+<img width="600" height="552" alt="image" src="https://github.com/user-attachments/assets/53121b73-6221-4704-b054-36fe7cdcc835" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Bouton de rappel dans le détail d'un programme :
 
-<img width="663" height="718" alt="Capture d&#39;écran 2026-09-01 214115" src="https://github.com/user-attachments/assets/e7b01917-d2ee-4cb2-900e-7879b3dfd5db" />
+<img width="600" height="718" alt="Capture d&#39;écran 2026-09-01 214115" src="https://github.com/user-attachments/assets/e7b01917-d2ee-4cb2-900e-7879b3dfd5db" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Configuration des appareils de notification et de l'annonce vocale :
 
-<img width="737" height="742" alt="Capture d&#39;écran 2026-09-01 214327" src="https://github.com/user-attachments/assets/bac71e1c-d31d-4e70-9d86-f30bd9865300" />
+<img width="600" height="742" alt="Capture d&#39;écran 2026-09-01 214327" src="https://github.com/user-attachments/assets/bac71e1c-d31d-4e70-9d86-f30bd9865300" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Gestion des profils de rappel (ajout/édition) :
 
-<img width="718" height="770" alt="Capture d&#39;écran 2026-09-01 214514" src="https://github.com/user-attachments/assets/dadd9f3f-9e4a-4cdb-a9fa-5197d94f2e55" />
+<img width="600" height="770" alt="Capture d&#39;écran 2026-09-01 214514" src="https://github.com/user-attachments/assets/dadd9f3f-9e4a-4cdb-a9fa-5197d94f2e55" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Sélection d'un profil dans la fiche du programme avant de programmer un rappel :
 
-<img width="653" height="757" alt="Capture d&#39;écran 2026-09-01 214655" src="https://github.com/user-attachments/assets/1bd0b0f1-7826-464d-aa4e-3a65ca56a68d" />
+<img width="600" height="757" alt="Capture d&#39;écran 2026-09-01 214655" src="https://github.com/user-attachments/assets/1bd0b0f1-7826-464d-aa4e-3a65ca56a68d" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 
-<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
+<img width="600" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
 
 ## Installation
 
@@ -347,7 +347,7 @@ Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la c
 type: custom:programme-tnt-fr-card
 show_current: false
 ```
-<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
+<img width="600" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
 
 ---
 
@@ -360,7 +360,7 @@ type: custom:programme-tnt-fr-card
 hide_next_poster: true
 ```
 
-<img width="467" height="732" alt="Section À suivre sans jaquette" src="https://github.com/user-attachments/assets/8401d613-71dd-4e63-95c6-895acf3063b3" />
+<img width="600" height="732" alt="Section À suivre sans jaquette" src="https://github.com/user-attachments/assets/8401d613-71dd-4e63-95c6-895acf3063b3" />
 
 Cette option est également disponible dans l'éditeur visuel, juste après les bascules d'affichage des sections.
 
@@ -395,7 +395,7 @@ Comme les autres options ci-dessus, `columns` est également réglable directeme
 
 Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes affichées dans le carrousel :
 
-<img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
+<img width="600" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -429,7 +429,7 @@ zap_channel_scripts:
 
 Résultat : logos cliquables sur le carrousel (config ci-dessus) :
 
-<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
+<img width="600" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
 
 Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
 
@@ -512,7 +512,7 @@ content: |
   {% set medals = ['🥇', '🥈', '🥉'] %}
   ## 🏆 Top {{ displayed | length }} film{{ 's' if displayed | length > 1 else '' }} suggér{{ 'és' if displayed | length > 1 else 'é' }} ce soir (1ère partie de soirée)
   {% if displayed | length > 0 -%}
-  <table width="100%"><tr>{% for film in displayed -%}<td width="{{ (100 / displayed|length)|int }}%" valign="top" align="center"><a href="https://www.themoviedb.org/movie/{{ film.tmdb_id }}">{% if film.poster %}<img src="{{ film.poster }}" width="120">{% endif %}</a><br><b>{{ medals[loop.index0] }} {{ film.title }}</b><br>{{ film.channel }} • {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} • {{ film.rating }}/10</td>{% endfor -%}</tr></table>
+  <table width="100%"><tr>{% for film in displayed -%}<td width="{{ (100 / displayed|length)|int }}%" valign="top" align="center"><a href="https://www.themoviedb.org/movie/{{ film.tmdb_id }}">{% if film.poster %}<img src="{{ film.poster }}" width="600">{% endif %}</a><br><b>{{ medals[loop.index0] }} {{ film.title }}</b><br>{{ film.channel }} • {{ film.start | as_timestamp | timestamp_custom('%Hh%M', true) }} • {{ film.rating }}/10</td>{% endfor -%}</tr></table>
   {%- else -%}
   Aucun film noté trouvé pour ce soir.
   {%- endif %}
@@ -520,7 +520,7 @@ content: |
 
 Aucune configuration nécessaire : le Template parcourt automatiquement tous les capteurs `programme_tnt_fr_*` présents chez l'utilisateur, quelles que soient les chaines sélectionnées à la configuration. Seul le filtre `category == 'Film'` est volontaire : TMDB catalogue parfois des captations de théâtre sous `tmdb_media_type: movie`, ce croisement avec la catégorie XMLTV évite les faux positifs. Chaque jaquette est un lien direct vers sa fiche TMDB (affiche, synopsis complet, casting) : pas besoin de re-chercher le film soi-même pour en savoir plus. Le titre du classement (`{{ displayed | length }}`) reflète désormais le nombre réel de films trouves, plutôt que d'afficher systématiquement "Top 3" même quand moins de films correspondent. La jaquette TMDB du film s'affiche désormais devant chaque titre, quand une correspondance est trouvée.
 
- <img width="466" height="452" alt="image" src="https://github.com/user-attachments/assets/45b4270e-c43a-469f-a9bc-3ec5ffb852f9" />
+ <img width="600" height="452" alt="image" src="https://github.com/user-attachments/assets/45b4270e-c43a-469f-a9bc-3ec5ffb852f9" />
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
