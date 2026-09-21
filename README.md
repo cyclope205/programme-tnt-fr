@@ -80,16 +80,14 @@ Ecran de configuration des chaines suivies :
 
 ![Ecran de configuration des chaines suivies](https://github.com/user-attachments/assets/179cca31-8e7c-466b-b5da-8c169168f9c2)
 
-Chaines francaises et belges separees dans le formulaire de configuration (v2.5.1) :
+Options d'affichage de la carte (dont « À suivre ») et chaines favorites regroupees par pays dans l'editeur visuel (v2.5.1) :
 
-![Chaines francaises separees](docs/screenshots/screenshot-1789957969585-d090cb52.jpg)
-
-![Chaines belges separees](docs/screenshots/screenshot-1789958289704-fecde14a.jpg)
+![Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays](docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Rangee "a suivre" et date de diffusion d'origine dans le detail du programme (v2.5.1) :
+Rangees "En ce moment" et "A suivre" synchronisees, et date de diffusion d'origine dans le detail du programme (v2.5.1) :
 
-![Rangee a suivre avec chaines FR et BE](docs/screenshots/screenshot-1789957747170-04fb6ec5.jpg)
+![Rangees En ce moment et A suivre synchronisees](docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg)
 
 ![Date de diffusion d'origine dans le detail du programme](docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg)
 
@@ -417,7 +415,16 @@ Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du G
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
 
-Chaque capteur `sensor.programme_tnt_fr_<chaine>` éxpose, pour le programme `current`, `next`, `prime_time` et `second_part`, les attributs suivants :
+Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose quatre attributs de premier niveau, un par creneau :
+
+| Attribut | Description |
+| --- | --- |
+| `current` | Programme actuellement diffuse |
+| `next` | Programme suivant, juste apres `current` |
+| `prime_time` | Programme de la 1ere partie de soiree |
+| `second_part` | Programme de la 2eme partie de soiree |
+
+Chacun de ces quatre objets contient les champs suivants :
 
 | Attribut | Description |
 | --- | --- |
