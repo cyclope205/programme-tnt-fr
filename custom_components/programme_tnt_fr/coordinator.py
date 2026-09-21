@@ -403,14 +403,25 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     async def _lookup_tmdb_poster(
         self, title: str, category: str | None = None, date: str | None = None
     ) -> TmdbMatch | None:
+        tv_format_only = False
         if self._is_non_fiction_category(category):
-            # Formats recurrents (magazine, information, jeu...) : un match
-            # TMDB sur le seul titre est peu fiable pour ces categories (pas
-            # oeuvre unique de fiction correspondante) et expose a de faux
-            # positifs - ex. "A l origine" (Magazine de societe) matche a
-            # tort avec le film "A l origine" (2009) de Xavier Giannoli. On
-            # ne tente donc aucune recherche TMDB pour ces categories.
-            return None
+            if self._is_recurring_tv_format(category):
+                # Formats recurrents mais neanmoins catalogues sur TMDB comme
+                # une fiche serie unique (jeu, divertissement, talk-show,
+                # telerealite de longue duree) : on tente une recherche cote
+                # serie uniquement (jamais cote film) pour afficher la
+                # jaquette quand elle existe, sans reintroduire le faux
+                # positif magazine/film documente ci-dessous.
+                tv_format_only = True
+            else:
+                # Formats recurrents (magazine, information, journal...) : un
+                # match TMDB sur le seul titre est peu fiable pour ces
+                # categories (pas d'oeuvre unique de fiction correspondante)
+                # et expose a de faux positifs - ex. "A l origine" (Magazine
+                # de societe) matche a tort avec le film "A l origine"
+                # (2009) de Xavier Giannoli. On ne tente donc aucune
+                # recherche TMDB pour ces categories.
+                return None
         clean_title, year = self._clean_search_query(title)
         if not year:
             # Repli sur l'annee fournie par le champ <date> du flux XMLTV
@@ -418,7 +429,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             # frequent que le marqueur manuel "*AAAA" dans le titre, pour
             # le meme usage (distinguer un remake/reboot homonyme).
             year = self._extract_year_from_xmltv_date(date)
-        if self._is_movie_category(category):
+        if tv_format_only:
+            search_order = (TMDB_SEARCH_TV_URL,)
+        elif self._is_movie_category(category):
             search_order = (TMDB_SEARCH_MOVIE_URL, TMDB_SEARCH_TV_URL)
         else:
             search_order = (TMDB_SEARCH_TV_URL, TMDB_SEARCH_MOVIE_URL)
@@ -511,6 +524,32 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "telerealite",
         )
         return any(keyword in normalized for keyword in non_fiction_keywords)
+
+    @staticmethod
+    def _is_recurring_tv_format(category: str | None) -> bool:
+        """Return True for non-fiction categories that are nonetheless
+        usually catalogued on TMDB as a single ongoing TV show (long-running
+        game shows, talk-shows, reality shows), unlike formats with no
+        single corresponding work (magazine, news, weather...).
+
+        Restricting these to a TV-only search (never falling back to Movie)
+        lets their poster show up when TMDB has an entry - ex: "N'oubliez
+        pas les paroles" (categorie XMLTV "Divertissement") a bien une
+        fiche serie TMDB - sans reintroduire le faux positif magazine/film
+        documente dans _is_non_fiction_category.
+        """
+        if not category:
+            return False
+        normalized = category.strip().lower()
+        tv_format_keywords = (
+            "divertissement",
+            "jeu",
+            "talk-show",
+            "talk show",
+            "téléréalité",
+            "telerealite",
+        )
+        return any(keyword in normalized for keyword in tv_format_keywords)
 
     async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> TmdbMatch | None:
         params = {
