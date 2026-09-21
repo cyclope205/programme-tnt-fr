@@ -403,6 +403,14 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     async def _lookup_tmdb_poster(
         self, title: str, category: str | None = None, date: str | None = None
     ) -> TmdbMatch | None:
+        if self._is_non_fiction_category(category):
+            # Formats recurrents (magazine, information, jeu...) : un match
+            # TMDB sur le seul titre est peu fiable pour ces categories (pas
+            # oeuvre unique de fiction correspondante) et expose a de faux
+            # positifs - ex. "A l origine" (Magazine de societe) matche a
+            # tort avec le film "A l origine" (2009) de Xavier Giannoli. On
+            # ne tente donc aucune recherche TMDB pour ces categories.
+            return None
         clean_title, year = self._clean_search_query(title)
         if not year:
             # Repli sur l'annee fournie par le champ <date> du flux XMLTV
@@ -462,6 +470,39 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "cinema",
         )
         return any(keyword in normalized for keyword in movie_keywords)
+
+    @staticmethod
+    def _is_non_fiction_category(category: str | None) -> bool:
+        """Return True for XMLTV categories where a bare-title TMDB match
+        is unreliable and prone to false positives.
+
+        Recurring non-fiction formats (magazine, news, game shows...) are
+        not unique fiction works, so a title-only TMDB search can land on
+        an unrelated homonymous film or series - ex: "A l origine" (a 2026
+        "Magazine de societe" episode) wrongly matched the 2009 film "A
+        l origine" by Xavier Giannoli, since the previous logic fell back
+        to a Movie search for every non-movie category. These categories
+        are skipped entirely rather than falling back to Movie/TV search.
+        """
+        if not category:
+            return False
+        normalized = category.strip().lower()
+        non_fiction_keywords = (
+            "magazine",
+            "information",
+            "journal",
+            "m\u00e9t\u00e9o",
+            "meteo",
+            "sport",
+            "divertissement",
+            "religion",
+            "jeu",
+            "talk-show",
+            "talk show",
+            "t\u00e9l\u00e9r\u00e9alit\u00e9",
+            "telerealite",
+        )
+        return any(keyword in normalized for keyword in non_fiction_keywords)
 
     async def _tmdb_search(self, url: str, title: str, year: str | None = None) -> TmdbMatch | None:
         params = {
