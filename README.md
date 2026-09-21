@@ -82,14 +82,14 @@ Ecran de configuration des chaines suivies :
 
 Options d'affichage de la carte (dont « À suivre ») et chaines favorites regroupees par pays dans l'editeur visuel (v2.5.1) :
 
-![Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays](docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg)
+<img width="350" alt="Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays" src="docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Rangees "En ce moment" et "A suivre" synchronisees, et date de diffusion d'origine dans le detail du programme (v2.5.1) :
 
-![Rangees En ce moment et A suivre synchronisees](docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg)
+<img width="350" alt="Rangees En ce moment et A suivre synchronisees" src="docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
 
-![Date de diffusion d'origine dans le detail du programme](docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg)
+<img width="350" alt="Date de diffusion d'origine dans le detail du programme" src="docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
