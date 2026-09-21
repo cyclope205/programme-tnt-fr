@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.5.1";
+const CARD_VERSION = "2.5.2";
 (function () {
   "use strict";
 
@@ -773,7 +773,7 @@ var SLOT_DEFS = [
       function mirror(from, to) {
         if (syncing) return;
         syncing = true;
-        to.scrollLeft = from.scrollLeft;
+        to.scrollTo({ left: from.scrollLeft, behavior: "instant" });
         syncing = false;
       }
       a.addEventListener("scroll", function () { mirror(a, b); });
