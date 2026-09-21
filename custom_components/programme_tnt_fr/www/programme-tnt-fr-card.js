@@ -5,7 +5,7 @@
  * type: custom:programme-tnt-fr-card
  */
 
-const CARD_VERSION = "2.5.4";
+const CARD_VERSION = "2.5.5";
 (function () {
   "use strict";
 
@@ -18,7 +18,7 @@ const CARD_VERSION = "2.5.4";
     ".header-guide-link:active { transform: scale(0.96); }",
     ".header-guide-link.active { background: var(--primary-color, #3f6fe0); color: #fff; }",
     ".header-guide-link[hidden] { display: none; }",
-    ".slot-section { margin-bottom: 26px; }",
+    ".slot-section { margin-bottom: 14px; }",
     ".slot-section:last-child { margin-bottom: 0; }",
     ".slot-title-header { font-size: 1.12em; font-weight: 700; margin-bottom: 12px; color: var(--primary-text-color); display: flex; align-items: center; gap: 9px; }",
     ".slot-title-icon { width: 8px; height: 22px; border-radius: 4px; flex-shrink: 0; }",
