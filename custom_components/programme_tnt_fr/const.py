@@ -15,6 +15,8 @@ CARD_VERSION = "2.5.1"
 XMLTV_URL = "https://xmltvfr.fr/xmltv/xmltv_fr.xml"
 
 CONF_CHANNELS = "channels"
+CONF_CHANNELS_FRANCE = "channels_france"
+CONF_CHANNELS_BELGIQUE = "channels_belgique"
 CONF_NOTIFY_TARGET = "notify_target"
 CONF_MEDIA_PLAYER_TARGETS = "media_player_targets"
 CONF_TTS_ENGINE = "tts_engine"
