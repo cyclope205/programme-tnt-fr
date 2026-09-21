@@ -182,126 +182,12 @@ Les appareils utilisés pour les rappels se configurent via des **profils de rap
 
 Chaque profil peut également définir un volume d'annonce (0 à 100 %) : le volume de l'enceinte/TV ciblée est temporairement réglé sur cette valeur juste avant l'annonce vocale, puis restauré à son niveau d'origine juste après (délai estimé selon la longueur du message). Ce réglage est facultatif : s'il n'est pas défini, aucun changement de volume n'est appliqué.
 
-Pour que plusieurs personnes du foyer reçoivent leurs rappels chacune sur leurs propres appareils, un profil distinct peut être créé pour chacune, avec ses propres cibles indépendantes des autres profils. Le profil est ensuite sélectionnable dans la fiche du programme au moment de programmer le rappel ; sans profil configuré, aucun rappel ne peut être envoyé.
+Pour que plusieurs personnes du foyer reçoivent leurs rappels chacune sur leurs propres appareils, un profil distinct peut être créé pour chacune, avec ses propres cibles indépendantes des autres profils. Le profil est ensuite sélectionnable dans la fiche du programme au moment de programmer le rappel ; sans profil configuré, aucun rappel ne peut être envoyé.### Chaînes disponibles
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## Utilisation dans un tableau de bord
-
-Ajouter une carte manuelle avec :
-
-```yaml
-type: custom:programme-tnt-fr-card
-```
-
-Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines configurées.
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-### Options d'affichage
-
-#### Sections affichees (En ce moment / 1ere / 2eme partie de soiree)
-
-Par défaut, les quatre sections (En ce moment / À suivre / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-show_current: true
-show_next: true
-show_prime_time: true
-show_second_part: true
-```
-
-Ces options sont également disponibles directement dans l'éditeur visuel de la carte (quatre interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les quatre bascules sans avoir a écrire de YAML.
-
-Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-show_current: false
-```
-<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
-
-#### Masquer la jaquette de la section « à suivre »
-
-Pour la section « à suivre », l'affiche du programme peut être masquée pour ne garder que le texte (titre, chaîne, horaire). Le clic sur la vignette ouvre toujours le détail avec le synopsis.
-
-```yaml
-type: custom:programme-tnt-fr-card
-hide_next_poster: true
-```
-
-Cette option est également disponible dans l'éditeur visuel, juste après les bascules d'affichage des sections.
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#### Vues affichees (Carrousel / Favoris / Guide TV / Top films)
-
-Les quatre vues de la carte (Carrousel, Favoris, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-show_carousel: true
-show_favorites: true
-show_guide_tv: true
-show_top_films: true
-```
-
-La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#### Nombre de jaquettes par ligne (columns)
-
-Le nombre de vignettes affichées par ligne dans le carrousel se règle avec l'option `columns` (2 par défaut, entre 1 et 4) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-columns: 3
-```
-
-Comme les autres options ci-dessus, `columns` est également réglable directement depuis l'éditeur visuel de la carte (section "Carrousel", champ "Nombre de jaquettes visibles"), sans avoir à écrire de YAML.
-
-Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes affichées dans le carrousel :
-
-<img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#### Chaines favorites (favorite_channels)
-
-Les chaines favorites, épinglées en tête du carrousel avec une étoile, se configurent avec `favorite_channels` :
-
-```yaml
-type: custom:programme-tnt-fr-card
-favorite_channels:
-  - TF1
-  - France 2
-```
-
-Comme pour les bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML : la liste des chaines y est regroupée par pays (« Chaînes françaises » / « Chaînes belges ») pour s'y retrouver plus facilement.
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#### Zap TNT (zap_channel_scripts)
-
-Le clic sur le logo de chaîne (zap) se configure avec `zap_channel_scripts` : un dictionnaire qui associe l'identifiant de chaîne (`channel_id`, visible dans les [attributs disponibles](#attributs-disponibles)) au script Home Assistant à appeler pour zapper sur cette chaîne. **Chaque script doit déjà exister et avoir été testé de ton côté** : la carte se contente d'appeler `script.turn_on` sur l'entité indiquée, elle ne sait rien de ta box ou de ta TV et n'en crée aucun.
-
-Exemple (remplace ces noms de script par les tiens) :
-
-```yaml
-type: custom:programme-tnt-fr-card
-zap_channel_scripts:
-  TF1.fr: script.zap_tf1
-  France2.fr: script.zap_france_2
-```
-
-Résultat : logos cliquables sur le carrousel (config ci-dessus) :
-
-<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
-
-Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
+Liste complète des identifiants `channel_id` utilisés par l'intégration (utile pour repérer une chaîne, ou pour configurer `favorite_channels` / `zap_channel_scripts`).
 
 <details>
-<summary>Voir la liste complète des <code>channel_id</code> disponibles (pour zap_channel_scripts)</summary>
+<summary>Voir la liste complète des `channel_id` disponibles</summary>
 
 #### Chaînes TNT
 
@@ -423,17 +309,142 @@ Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du G
 
 </details>
 
+---
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## Utilisation dans un tableau de bord
+
+Ajouter une carte manuelle avec :
+
+```yaml
+type: custom:programme-tnt-fr-card
+```
+
+Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines configurées.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Options d'affichage
+
+#### Sections affichees (En ce moment / 1ere / 2eme partie de soiree)
+
+Par défaut, les quatre sections (En ce moment / À suivre / 1ere partie de soirée / 2eme partie de soirée) sont toutes affichées. Chacune peut être masquée individuellement avec les options suivantes (toutes à `true` par defaut) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_current: true
+show_next: true
+show_prime_time: true
+show_second_part: true
+```
+
+Ces options sont également disponibles directement dans l'éditeur visuel de la carte (quatre interrupteurs), pas seulement en YAML : ouvrez l'édition de la carte depuis le tableau de bord, l'éditeur graphique propose les quatre bascules sans avoir a écrire de YAML.
+
+Par exemple, pour masquer uniquement le programme "en ce moment" (comme sur la capture ci-dessous) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_current: false
+```
+<img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
+
+#### Masquer la jaquette de la section « à suivre »
+
+Pour la section « à suivre », l'affiche du programme peut être masquée pour ne garder que le texte (titre, chaîne, horaire). Le clic sur la vignette ouvre toujours le détail avec le synopsis.
+
+```yaml
+type: custom:programme-tnt-fr-card
+hide_next_poster: true
+```
+
+Cette option est également disponible dans l'éditeur visuel, juste après les bascules d'affichage des sections.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### Vues affichees (Carrousel / Favoris / Guide TV / Top films)
+
+Les quatre vues de la carte (Carrousel, Favoris, Guide TV, Top films) peuvent elles aussi être masquées individuellement, avec les options suivantes (toutes à `true` par défaut) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+show_carousel: true
+show_favorites: true
+show_guide_tv: true
+show_top_films: true
+```
+
+La vue Favoris ne s'affiche de toute façon que si au moins une chaîne favorite est configurée (`favorite_channels`), même si `show_favorites` vaut `true`. Ces quatre bascules sont également disponibles dans l'éditeur visuel, sous "Vues disponibles". Les boutons de navigation dans l'entête ne s'affichent que si plusieurs vues sont actives à la fois ; si une seule vue reste activée, la carte l'affiche directement sans bouton de navigation (utile par exemple pour n'afficher que le Guide TV sur un écran dédié).
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### Nombre de jaquettes par ligne (columns)
+
+Le nombre de vignettes affichées par ligne dans le carrousel se règle avec l'option `columns` (2 par défaut, entre 1 et 4) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+columns: 3
+```
+
+Comme les autres options ci-dessus, `columns` est également réglable directement depuis l'éditeur visuel de la carte (section "Carrousel", champ "Nombre de jaquettes visibles"), sans avoir à écrire de YAML.
+
+Réglage "Nombre de jaquettes visibles" dans l'éditeur visuel, avec 3 jaquettes affichées dans le carrousel :
+
+<img width="1277" height="636" alt="Reglage du nombre de jaquettes dans l'editeur visuel" src="https://github.com/user-attachments/assets/8fdc9fdf-4efc-4d20-bc0e-d3b188f41b16" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### Chaines favorites (favorite_channels)
+
+Les chaines favorites, épinglées en tête du carrousel avec une étoile, se configurent avec `favorite_channels` :
+
+```yaml
+type: custom:programme-tnt-fr-card
+favorite_channels:
+  - TF1
+  - France 2
+```
+
+Comme pour les bascules `show_*`, cette option est aussi accessible depuis l'éditeur visuel de la carte, sans avoir à écrire de YAML : la liste des chaines y est regroupée par pays (« Chaînes françaises » / « Chaînes belges ») pour s'y retrouver plus facilement.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#### Zap TNT (zap_channel_scripts)
+
+Le clic sur le logo de chaîne (zap) se configure avec `zap_channel_scripts` : un dictionnaire qui associe l'identifiant de chaîne (`channel_id`, visible dans les [attributs disponibles](#attributs-disponibles)) au script Home Assistant à appeler pour zapper sur cette chaîne. **Chaque script doit déjà exister et avoir été testé de ton côté** : la carte se contente d'appeler `script.turn_on` sur l'entité indiquée, elle ne sait rien de ta box ou de ta TV et n'en crée aucun.
+
+Exemple (remplace ces noms de script par les tiens) :
+
+```yaml
+type: custom:programme-tnt-fr-card
+zap_channel_scripts:
+  TF1.fr: script.zap_tf1
+  France2.fr: script.zap_france_2
+```
+
+Résultat : logos cliquables sur le carrousel (config ci-dessus) :
+
+<img width="1282" height="725" alt="625ae289-d9d1-4c84-8f9a-269176f237df-image" src="https://github.com/user-attachments/assets/58f3e1d1-8a8a-4ad7-9baa-cacf6ee73b3b" />
+
+Cette option s'applique au logo de chaîne du Carrousel/Favoris et à celui du Guide TV (en haut de chaque colonne). Seules les chaînes présentes dans ce dictionnaire ont un logo cliquable ; les autres restent de simples logos, sans effet au clic. Cette option n'est pas disponible dans l'éditeur visuel : elle doit être ajoutée en YAML.
+
+Voir la liste complète des `channel_id` disponibles dans la section [Configuration](#configuration).
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Attributs disponibles
 
-Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose quatre attributs de premier niveau, un par creneau :
+Chaque capteur `sensor.programme_tnt_fr_<chaine>` expose sept attributs de premier niveau : l'identifiant, le nom et l'icône de la chaîne, plus un objet par créneau horaire :
 
 | Attribut | Description |
-| --- | --- |
-| `current` | Programme actuellement diffuse |
-| `next` | Programme suivant, juste apres `current` |
-| `prime_time` | Programme de la 1ere partie de soiree |
-| `second_part` | Programme de la 2eme partie de soiree |
+|---|---|
+| `channel_id` | Identifiant technique de la chaîne (ex. `TF1.fr`) |
+| `channel_name` | Nom affiché de la chaîne (ex. `TF1`) |
+| `channel_icon` | URL de l'icône de la chaîne fournie par le flux, ou `null` |
+| `current` | Programme actuellement diffusé |
+| `next` | Programme suivant, juste après `current` |
+| `prime_time` | Programme de la 1ere partie de soirée |
+| `second_part` | Programme de la 2eme partie de soirée |
 
 Chacun de ces quatre objets contient les champs suivants :
 
