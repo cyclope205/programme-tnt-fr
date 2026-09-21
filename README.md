@@ -220,6 +220,17 @@ show_current: false
 ```
 <img width="1277" height="790" alt="image" src="https://github.com/user-attachments/assets/562f46bf-67ed-40b6-8159-4aa55b25fd33" />
 
+#### Masquer la jaquette de la section « à suivre »
+
+Pour la section « à suivre », l'affiche du programme peut être masquée pour ne garder que le texte (titre, chaîne, horaire). Le clic sur la vignette ouvre toujours le détail avec le synopsis.
+
+```yaml
+type: custom:programme-tnt-fr-card
+hide_next_poster: true
+```
+
+Cette option est également disponible dans l'éditeur visuel, juste après les bascules d'affichage des sections.
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #### Vues affichees (Carrousel / Favoris / Guide TV / Top films)
