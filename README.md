@@ -89,8 +89,6 @@ Rangees "En ce moment" et "A suivre" synchronisees, et date de diffusion d'origi
 
 <img width="600" alt="Rangees En ce moment et A suivre synchronisees" src="docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
 
-<img width="600" alt="Date de diffusion d'origine dans le detail du programme" src="docs/screenshots/screenshot-1789957788077-e6ba7eaf.jpg" />
-
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
 
