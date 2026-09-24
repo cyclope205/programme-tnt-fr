@@ -15,7 +15,6 @@
 ---
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://bmc-eight-red.vercel.app/api/donate?repo=programme-tnt-fr) [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://bmc-eight-red.vercel.app/api/paypal?repo=programme-tnt-fr&amount=5)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
 <img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" alt="Programme TNT FR" width="96">
 
 Intégration Home Assistant qui récupère le programme TV des chaines françaises (TNT + une sélection de chaines supplémentaires) et l'affiche dans une carte Lovelace : favoris, carrousel, guide TV complet par chaine et classement des films les mieux notes.
@@ -543,14 +542,3 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 - Le rapprochement des jaquettes TMDB s'appuie désormais aussi sur l'année de diffusion fournie par le flux XMLTV (attribut `date`) quand elle est disponible, en plus du titre, pour fiabiliser le matching des films et séries ayant un remake ou une resortie.
 - Pour les formats non-fiction (magazine, information, journal, meteo, sport, divertissement, religion, jeu...), aucune recherche TMDB n'est tentee sur le seul titre : ces formats recurrents n'ont pas d'oeuvre unique correspondante et exposaient a des faux positifs (ex. un magazine associe par erreur a un film homonyme).
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
-<div align="center">
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-### ☕ Cette intégration te plaît ?
-
-Si elle te fait gagner du temps, un petit don est toujours apprécié : ça m'aide à maintenir le projet et à ajouter de nouvelles fonctionnalités.
-
-<a href="https://bmc-eight-red.vercel.app/api/donate?repo=programme-tnt-fr"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
-<a href="https://paypal.me/cyclope205"><img src="https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal"></a>
-
-</div>
