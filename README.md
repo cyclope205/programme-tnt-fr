@@ -12,6 +12,8 @@
 <!-- Les nouveaux dons seront ajoutés ici automatiquement -->
 <!--END_SECTION:buy-me-a-coffee-->
 
+---
+
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://changelog-traduction.vercel.app/api/donate?repo=programme-tnt-fr)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/cyclope205)
 <img src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/custom_components/programme_tnt_fr/brand/logo.png" alt="Programme TNT FR" width="96">
