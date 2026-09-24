@@ -1,8 +1,9 @@
 # Programme TNT FR
 
-[![release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr?label=release&color=blue)](https://github.com/cyclope205/programme-tnt-fr/releases)
-[![build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
-[![license](https://img.shields.io/github/license/cyclope205/programme-tnt-fr)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/releases)
+[![Build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
+[![Tests](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cyclope205)
