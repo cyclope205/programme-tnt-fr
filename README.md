@@ -311,6 +311,14 @@ Liste complète des identifiants `channel_id` utilisés par l'intégration (util
 </details>
 
 ---
+### ☕ Merci aux donateurs
+
+<!--START_SECTION:buy-me-a-coffee-->
+<div>
+<!-- Les nouveaux dons seront ajoutés ici automatiquement -->
+</div>
+<!--END_SECTION:buy-me-a-coffee-->
+
 
 
 
@@ -546,4 +554,4 @@ Si elle te fait gagner du temps, un petit don est toujours apprécié : ça m'ai
 <a href="https://changelog-traduction.vercel.app/api/donate?repo=programme-tnt-fr"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-cyclope205-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
 <a href="https://paypal.me/cyclope205"><img src="https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal"></a>
 
-</div>\n\n<!--START_SECTION:buy-me-a-coffee-->\n### ☕ Merci aux donateurs\n\n<!--END_SECTION:buy-me-a-coffee-->\n
+</div>\n\n\n
