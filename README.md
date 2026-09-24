@@ -310,14 +310,14 @@ Liste complète des identifiants `channel_id` utilisés par l'intégration (util
 
 </details>
 
----
 ### ☕ Merci aux donateurs
 
 <!--START_SECTION:buy-me-a-coffee-->
-<div>
-<!-- Les nouveaux dons seront ajoutés ici automatiquement -->
-</div>
 <!--END_SECTION:buy-me-a-coffee-->
+
+
+---
+
 
 
 
