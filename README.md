@@ -10,7 +10,6 @@
 
 <!--START_SECTION:paypal-->
 
-- 💙 J***** · 5,00 € · 25/09/2026
 <!--END_SECTION:paypal-->
 
 <!--START_SECTION:buy-me-a-coffee-->
