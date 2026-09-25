@@ -10,9 +10,7 @@
 
 <!--START_SECTION:paypal-->
 
-
-- 💙 J***** · 200,00 € · 25/09/2026
-  > super merci <!-- order:17J34113MK5966721 --><!--END_SECTION:paypal-->
+<!--END_SECTION:paypal-->
 
 <!--START_SECTION:buy-me-a-coffee-->
 <!-- Les nouveaux dons seront ajoutés ici automatiquement -->
