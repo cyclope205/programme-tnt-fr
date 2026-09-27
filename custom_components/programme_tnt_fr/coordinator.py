@@ -511,6 +511,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         normalized = category.strip().lower()
         non_fiction_keywords = (
             "magazine",
+            "société",
+            "societe",
             "information",
             "journal",
             "m\u00e9t\u00e9o",
