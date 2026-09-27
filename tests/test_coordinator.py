@@ -61,6 +61,12 @@ def test_is_movie_category_true_cases():
     assert ProgrammeTntFrCoordinator._is_movie_category("Cinema francais") is True
 
 
+def test_is_non_fiction_category_includes_societe():
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Société") is True
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Societe") is True
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Magazine de société") is True
+
+
 def test_is_movie_category_false_cases():
     assert ProgrammeTntFrCoordinator._is_movie_category(None) is False
     assert ProgrammeTntFrCoordinator._is_movie_category("") is False
