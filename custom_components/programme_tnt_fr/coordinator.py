@@ -247,12 +247,12 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # Cache titre -> URL d'affiche TMDB (ou None si aucune correspondance
         # trouvee), pour eviter de re-interroger TMDB a chaque rafraichissement
         # (toutes les 5 min) pour un programme deja resolu.
-        self._tmdb_poster_cache: dict[str, TmdbMatch | None] = {}
+        self._tmdb_poster_cache: dict[tuple[str, str | None], TmdbMatch | None] = {}
         # Titles currently being resolved by a background TMDB lookup -
         # guards against a slow resolution still being in flight when the
         # next refresh cycle (5 min later) runs, which would otherwise
         # fire a duplicate concurrent TMDB request for the same title.
-        self._tmdb_pending_titles: set[str] = set()
+        self._tmdb_pending_titles: set[tuple[str, str | None]] = set()
         # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
         # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
         self._tmdb_auth_warned = False
@@ -289,24 +289,25 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             # fournie par la source) : ce dernier aide TMDB a distinguer un
             # remake/reboot homonyme sans dependre du marqueur manuel
             # "*AAAA" dans le titre, absent la plupart du temps.
-            title_categories: dict[str, tuple[str | None, str | None]] = {}
-            title_categories_far: dict[str, tuple[str | None, str | None]] = {}
+            title_categories: dict[tuple[str, str | None], str | None] = {}
+            title_categories_far: dict[tuple[str, str | None], str | None] = {}
             near_cutoff = now + timedelta(days=2)
             for channel_id in self._channels:
                 for programme in self._programmes_by_channel.get(channel_id, []):
+                    cache_key = (programme.title, programme.category)
                     if (
                         programme is not None
                         and programme.title
                         and programme.stop > now
-                        and programme.title not in self._tmdb_poster_cache
-                        and programme.title not in title_categories
-                        and programme.title not in title_categories_far
-                        and programme.title not in self._tmdb_pending_titles
+                        and cache_key not in self._tmdb_poster_cache
+                        and cache_key not in title_categories
+                        and cache_key not in title_categories_far
+                        and cache_key not in self._tmdb_pending_titles
                     ):
                         if programme.start <= near_cutoff:
-                            title_categories[programme.title] = (programme.category, programme.date)
+                            title_categories[cache_key] = programme.date
                         else:
-                            title_categories_far[programme.title] = (programme.category, programme.date)
+                            title_categories_far[cache_key] = programme.date
             all_new_titles = {**title_categories, **title_categories_far}
             if all_new_titles:
                 self._tmdb_pending_titles.update(all_new_titles)
@@ -342,20 +343,24 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         per FETCH_MIN_INTERVAL_MINUTES), not on every 5-minute
         coordinator cycle.
         """
-        current_titles = {
-            programme.title
+        current_keys = {
+            (programme.title, programme.category)
             for programmes in self._programmes_by_channel.values()
             for programme in programmes
             if programme is not None and programme.title
         }
-        stale = self._tmdb_poster_cache.keys() - current_titles
-        for title in stale:
-            del self._tmdb_poster_cache[title]
+        stale = self._tmdb_poster_cache.keys() - current_keys
+        for key in stale:
+            del self._tmdb_poster_cache[key]
 
     def _programme_dict(self, programme: Programme | None) -> dict | None:
         if programme is None:
             return None
-        match = self._tmdb_poster_cache.get(programme.title) if self._tmdb_api_key else None
+        match = (
+            self._tmdb_poster_cache.get((programme.title, programme.category))
+            if self._tmdb_api_key
+            else None
+        )
         if match is None:
             return programme.as_dict()
         return programme.as_dict(
@@ -368,8 +373,8 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
 
     async def _background_resolve_tmdb_posters_staged(
         self,
-        near_titles: dict[str, tuple[str | None, str | None]],
-        far_titles: dict[str, tuple[str | None, str | None]],
+        near_titles: dict[tuple[str, str | None], str | None],
+        far_titles: dict[tuple[str, str | None], str | None],
     ) -> None:
         """Resolve near-term (today/tomorrow) TMDB posters first, then the rest.
 
@@ -388,7 +393,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             await self._background_resolve_tmdb_posters(far_titles)
 
     async def _background_resolve_tmdb_posters(
-        self, title_categories: dict[str, tuple[str | None, str | None]]
+        self, title_categories: dict[tuple[str, str | None], str | None]
     ) -> None:
         """Resolve TMDB posters in the background, then push a refresh once done.
 
@@ -403,7 +408,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     async def _resolve_tmdb_posters(
-        self, title_categories: dict[str, tuple[str | None, str | None]]
+        self, title_categories: dict[tuple[str, str | None], str | None]
     ) -> None:
         """Look up a poster on TMDB (film ou serie selon la categorie) pour chaque nouveau titre.
 
@@ -422,12 +427,12 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     # prochain cycle, plutot que fige a tort sur "aucune affiche".
                     _LOGGER.debug("Recherche TMDB reportee pour %s (erreur temporaire): %s", title, err)
                     return
-                self._tmdb_poster_cache[title] = match
+                self._tmdb_poster_cache[(title, category)] = match
 
         await asyncio.gather(
             *(
                 _resolve_one(title, category, date)
-                for title, (category, date) in title_categories.items()
+                for (title, category), date in title_categories.items()
             )
         )
 
