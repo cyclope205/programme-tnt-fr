@@ -276,6 +276,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     "Echec du rafraichissement du flux XMLTV, utilisation du cache: %s",
                     err,
                 )
+            self._prune_tmdb_cache()
 
         picks = {
             channel_id: self._pick_slots(channel_id, now)
@@ -328,6 +329,28 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 "second_part": self._programme_dict(second_part),
             }
         return result
+
+    def _prune_tmdb_cache(self) -> None:
+        """Drop cached TMDB lookups for titles no longer present in the
+        currently loaded XMLTV programmes.
+
+        _tmdb_poster_cache never expires entries on its own, so without
+        this it grows without bound as new programme titles air day
+        after day - reported as steadily increasing Home Assistant RAM
+        usage after a few weeks of uptime. Runs only when
+        _fetch_and_parse actually refreshed the programmes (at most once
+        per FETCH_MIN_INTERVAL_MINUTES), not on every 5-minute
+        coordinator cycle.
+        """
+        current_titles = {
+            programme.title
+            for programmes in self._programmes_by_channel.values()
+            for programme in programmes
+            if programme is not None and programme.title
+        }
+        stale = self._tmdb_poster_cache.keys() - current_titles
+        for title in stale:
+            del self._tmdb_poster_cache[title]
 
     def _programme_dict(self, programme: Programme | None) -> dict | None:
         if programme is None:
