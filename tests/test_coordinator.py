@@ -749,3 +749,52 @@ def test_pick_slots_unknown_channel_returns_all_none():
     assert current is None
     assert prime_time is None
     assert second_part is None
+
+
+# ---------------------------------------------------------------------------
+# _prune_tmdb_cache: drops stale TMDB lookups once titles fall out of the
+# currently loaded XMLTV programmes. Guards against unbounded growth of
+# _tmdb_poster_cache over weeks of uptime (reported: +300 Mo RAM, CPU
+# 1%->10% after a few weeks).
+# ---------------------------------------------------------------------------
+
+def test_prune_tmdb_cache_removes_titles_no_longer_in_programmes():
+    progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Toujours la")]
+    coordinator = _coordinator_with(progs)
+    coordinator._tmdb_poster_cache = {
+        "Toujours la": TmdbMatch(
+            poster="/a.jpg", tmdb_id=1, media_type="tv", rating=5, votes=10
+        ),
+        "Disparu du flux": TmdbMatch(
+            poster="/b.jpg", tmdb_id=2, media_type="movie", rating=6, votes=20
+        ),
+    }
+    coordinator._prune_tmdb_cache()
+    assert set(coordinator._tmdb_poster_cache.keys()) == {"Toujours la"}
+
+def test_prune_tmdb_cache_keeps_none_matches_for_still_present_titles():
+    # None est une valeur de cache valide (echec de recherche TMDB deja
+    # tente) : un titre toujours present ne doit pas etre retire meme si
+    # sa valeur en cache est None.
+    progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Titre sans poster")]
+    coordinator = _coordinator_with(progs)
+    coordinator._tmdb_poster_cache = {"Titre sans poster": None}
+    coordinator._prune_tmdb_cache()
+    assert coordinator._tmdb_poster_cache == {"Titre sans poster": None}
+
+def test_prune_tmdb_cache_empty_programmes_clears_entire_cache():
+    coordinator = _coordinator_with([])
+    coordinator._tmdb_poster_cache = {"Ancien titre": None}
+    coordinator._prune_tmdb_cache()
+    assert coordinator._tmdb_poster_cache == {}
+
+def test_prune_tmdb_cache_noop_when_nothing_stale():
+    progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Present")]
+    coordinator = _coordinator_with(progs)
+    coordinator._tmdb_poster_cache = {
+        "Present": TmdbMatch(
+            poster="/a.jpg", tmdb_id=1, media_type="tv", rating=5, votes=10
+        )
+    }
+    coordinator._prune_tmdb_cache()
+    assert set(coordinator._tmdb_poster_cache.keys()) == {"Present"}
