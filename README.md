@@ -196,7 +196,7 @@ A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de 
 
 Une cle API TMDB partagee est fournie par defaut pour recuperer les jaquettes (voir Fonctionnalites) : aucune configuration n'est necessaire pour en beneficier. Si vous le souhaitez, vous pouvez renseigner votre propre cle dans les options de l'integration (champ "Cle API TMDB personnelle", section General) - elle sera alors utilisee a la place de la cle partagee.
 
-**Fortement recommande** : la cle partagee est utilisee par l'ensemble des installations HACS de cette integration, et peut donc se faire limiter par TMDB en cas de forte charge cumulee (des recherches d'affiches echouent alors de facon repetee, avec de nouvelles tentatives progressivement espacees). Pour eviter ce type de probleme, creez votre propre compte et cle TMDB (gratuit, 2 minutes) sur https://www.themoviedb.org/settings/api, puis renseignez-la dans les options de l'integration comme indique ci-dessus.
+**Fortement recommandé** : la clé partagée est utilisée par l'ensemble des installations HACS de cette intégration, et peut donc se faire limiter par TMDB en cas de forte charge cumulée (des recherches d'affiches échouent alors de façon répétée, avec de nouvelles tentatives progressivement espacées). Pour éviter ce type de problème, créez votre propre compte et clé TMDB (gratuit, 2 minutes) sur https://www.themoviedb.org/settings/api, puis renseignez-la dans les options de l'intégration comme indiqué ci-dessus.
 
 Les chaines favorites se choisissent depuis la configuration de la carte (option `favorite_channels`, en YAML ou via l'éditeur visuel) : cette sélection est facultative et n'affecte que l'ordre d'affichage dans le carrousel.
 
