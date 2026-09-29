@@ -256,6 +256,20 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         # Evite de repeter le warning de cle TMDB invalide/revoquee a chaque
         # cycle de rafraichissement (toutes les 5 min) une fois qu'il a ete logue.
         self._tmdb_auth_warned = False
+        # Nombre d'echecs consecutifs (erreur reseau, rate limit...) et
+        # date a partir de laquelle une nouvelle tentative est autorisee,
+        # par titre. Sans ce delai progressif, un titre en echec permanent
+        # (ex: cle TMDB partagee saturee par l'ensemble des utilisateurs
+        # HACS) serait retente a CHAQUE cycle de 5 min, indefiniment - une
+        # charge de fond continue reportee en usage reel (voir issue
+        # "conso CPU permanente resolue en passant sur une cle perso").
+        self._tmdb_failure_counts: dict[tuple[str, str | None], int] = {}
+        self._tmdb_retry_after: dict[tuple[str, str | None], object] = {}
+        # Evite de repeter la recommandation "creez votre propre cle TMDB"
+        # a chaque echec ; ne s'applique que quand la cle partagee par
+        # defaut est utilisee (une cle perso peut aussi echouer, mais ce
+        # n'est alors pas un probleme de charge partagee a signaler ainsi).
+        self._tmdb_own_key_recommended = False
 
     async def _async_update_data(self) -> dict:
         now = dt_util.now()
@@ -303,6 +317,10 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                         and cache_key not in title_categories
                         and cache_key not in title_categories_far
                         and cache_key not in self._tmdb_pending_titles
+                        and (
+                            cache_key not in self._tmdb_retry_after
+                            or now >= self._tmdb_retry_after[cache_key]
+                        )
                     ):
                         if programme.start <= near_cutoff:
                             title_categories[cache_key] = programme.date
@@ -352,6 +370,13 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         stale = self._tmdb_poster_cache.keys() - current_keys
         for key in stale:
             del self._tmdb_poster_cache[key]
+        # Meme nettoyage pour les compteurs d'echec/delai de nouvelle
+        # tentative - sinon ils grossiraient indefiniment au meme titre
+        # que _tmdb_poster_cache avant ce correctif.
+        for key in self._tmdb_failure_counts.keys() - current_keys:
+            del self._tmdb_failure_counts[key]
+        for key in self._tmdb_retry_after.keys() - current_keys:
+            del self._tmdb_retry_after[key]
 
     def _programme_dict(self, programme: Programme | None) -> dict | None:
         if programme is None:
@@ -423,10 +448,45 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                     match = await self._lookup_tmdb_poster(title, category, date)
                 except Exception as err:  # noqa: BLE001
                     # Erreur temporaire (reseau, cle invalide, rate limit...) :
-                    # on ne met PAS en cache pour que ce titre soit retente au
-                    # prochain cycle, plutot que fige a tort sur "aucune affiche".
-                    _LOGGER.debug("Recherche TMDB reportee pour %s (erreur temporaire): %s", title, err)
+                    # on ne met PAS en cache pour que ce titre soit retente,
+                    # mais avec un delai progressif (_tmdb_retry_after) plutot
+                    # qu'a CHAQUE cycle de 5 min indefiniment - une cle tres
+                    # sollicitee (ex: la cle partagee par defaut, utilisee par
+                    # tous les installs HACS) peut sinon generer une charge de
+                    # fond permanente pour tous les utilisateurs qui ne se sont
+                    # pas crees leur propre cle.
+                    key = (title, category)
+                    fail_count = self._tmdb_failure_counts.get(key, 0) + 1
+                    self._tmdb_failure_counts[key] = fail_count
+                    backoff_minutes = min(5 * (2 ** min(fail_count - 1, 6)), 240)
+                    self._tmdb_retry_after[key] = dt_util.now() + timedelta(
+                        minutes=backoff_minutes
+                    )
+                    _LOGGER.debug(
+                        "Recherche TMDB reportee pour %s (erreur temporaire, "
+                        "nouvelle tentative dans %s min): %s",
+                        title,
+                        backoff_minutes,
+                        err,
+                    )
+                    if (
+                        not self._tmdb_own_key_recommended
+                        and self._tmdb_api_key == DEFAULT_TMDB_API_KEY
+                    ):
+                        self._tmdb_own_key_recommended = True
+                        _LOGGER.warning(
+                            "Des recherches TMDB echouent de facon repetee avec la "
+                            "cle partagee par defaut (utilisee par l'ensemble des "
+                            "installations HACS de cette integration, donc plus "
+                            "susceptible d'etre limitee en cas de forte charge "
+                            "cumulee). Pour eviter ce type de probleme, il est "
+                            "fortement recommande de creer votre propre compte et "
+                            "cle TMDB (gratuit, https://www.themoviedb.org/settings/api) "
+                            "et de la renseigner dans les options de l'integration."
+                        )
                     return
+                self._tmdb_failure_counts.pop((title, category), None)
+                self._tmdb_retry_after.pop((title, category), None)
                 self._tmdb_poster_cache[(title, category)] = match
 
         await asyncio.gather(
