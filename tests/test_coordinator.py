@@ -648,6 +648,13 @@ def _programme(start, stop, title, date=None):
 def _coordinator_with(programmes, channel_id="TF1.fr"):
     coordinator = ProgrammeTntFrCoordinator.__new__(ProgrammeTntFrCoordinator)
     coordinator._programmes_by_channel = {channel_id: programmes}
+    # __new__ bypasses __init__, so these must be seeded manually - added
+    # alongside the v3.0.0 TMDB retry backoff (_prune_tmdb_cache prunes
+    # both dicts, see coordinator.py), otherwise any test that reaches
+    # _prune_tmdb_cache via a coordinator built by this helper crashes
+    # with AttributeError instead of exercising the pruning logic.
+    coordinator._tmdb_failure_counts = {}
+    coordinator._tmdb_retry_after = {}
     return coordinator
 
 
