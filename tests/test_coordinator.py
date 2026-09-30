@@ -798,3 +798,31 @@ def test_prune_tmdb_cache_noop_when_nothing_stale():
     }
     coordinator._prune_tmdb_cache()
     assert set(coordinator._tmdb_poster_cache.keys()) == {"Present"}
+
+
+def test_titles_match_rejects_prefix_not_at_word_boundary():
+    # Regression pour le cas documente dans _titles_match : "Lucifer" (serie)
+    # ne doit pas matcher "Luciferina" (film TMDB, 2018) meme si le second
+    # commence par les lettres du premier - "lucifer" n'est un prefixe valide
+    # de "luciferina" qu'en plein milieu du mot, pas a une coupure de mot.
+    query = ProgrammeTntFrCoordinator._normalize_title("Lucifer")
+    candidate = ProgrammeTntFrCoordinator._normalize_title("Luciferina")
+    assert ProgrammeTntFrCoordinator._titles_match(query, candidate) is False
+
+
+def test_is_non_fiction_category_false_for_fiction_categories():
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Serie") is False
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Action") is False
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Drame") is False
+    assert ProgrammeTntFrCoordinator._is_non_fiction_category("Film") is False
+
+
+def test_extract_year_from_xmltv_date_various_granularities():
+    extract = ProgrammeTntFrCoordinator._extract_year_from_xmltv_date
+    assert extract("2026") == "2026"
+    assert extract("202609") == "2026"
+    assert extract("20260930") == "2026"
+    assert extract("20260930120000") == "2026"
+    assert extract(None) is None
+    assert extract("") is None
+    assert extract("abcd") is None
