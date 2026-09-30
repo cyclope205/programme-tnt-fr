@@ -769,15 +769,15 @@ def test_prune_tmdb_cache_removes_titles_no_longer_in_programmes():
     progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Toujours la")]
     coordinator = _coordinator_with(progs)
     coordinator._tmdb_poster_cache = {
-        "Toujours la": TmdbMatch(
+        ("Toujours la", None): TmdbMatch(
             poster="/a.jpg", tmdb_id=1, media_type="tv", rating=5, votes=10
         ),
-        "Disparu du flux": TmdbMatch(
+        ("Disparu du flux", None): TmdbMatch(
             poster="/b.jpg", tmdb_id=2, media_type="movie", rating=6, votes=20
         ),
     }
     coordinator._prune_tmdb_cache()
-    assert set(coordinator._tmdb_poster_cache.keys()) == {"Toujours la"}
+    assert set(coordinator._tmdb_poster_cache.keys()) == {("Toujours la", None)}
 
 def test_prune_tmdb_cache_keeps_none_matches_for_still_present_titles():
     # None est une valeur de cache valide (echec de recherche TMDB deja
@@ -785,9 +785,9 @@ def test_prune_tmdb_cache_keeps_none_matches_for_still_present_titles():
     # sa valeur en cache est None.
     progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Titre sans poster")]
     coordinator = _coordinator_with(progs)
-    coordinator._tmdb_poster_cache = {"Titre sans poster": None}
+    coordinator._tmdb_poster_cache = {("Titre sans poster", None): None}
     coordinator._prune_tmdb_cache()
-    assert coordinator._tmdb_poster_cache == {"Titre sans poster": None}
+    assert coordinator._tmdb_poster_cache == {("Titre sans poster", None): None}
 
 def test_prune_tmdb_cache_empty_programmes_clears_entire_cache():
     coordinator = _coordinator_with([])
@@ -799,12 +799,12 @@ def test_prune_tmdb_cache_noop_when_nothing_stale():
     progs = [_programme(_dt(10, 20, 0), _dt(10, 21, 0), "Present")]
     coordinator = _coordinator_with(progs)
     coordinator._tmdb_poster_cache = {
-        "Present": TmdbMatch(
+        ("Present", None): TmdbMatch(
             poster="/a.jpg", tmdb_id=1, media_type="tv", rating=5, votes=10
         )
     }
     coordinator._prune_tmdb_cache()
-    assert set(coordinator._tmdb_poster_cache.keys()) == {"Present"}
+    assert set(coordinator._tmdb_poster_cache.keys()) == {("Present", None)}
 
 
 def test_titles_match_rejects_prefix_not_at_word_boundary():
