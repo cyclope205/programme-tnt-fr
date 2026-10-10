@@ -220,8 +220,16 @@ class _ReminderManager:
         targets, media_player_targets, tts_engine, announce_volume = (
             self._resolve_targets(profile_name)
         )
-        if not media_player_targets or not tts_engine:
-            media_player_targets = []
+        if not tts_engine:
+            # Un media_player sans moteur TTS reste utilisable si
+            # c'est un appareil Alexa (route via notify.alexa_media_*
+            # dans _async_notify, qui ne necessite aucun tts_engine) -
+            # ne vider que les cibles qui en ont reellement besoin.
+            media_player_targets = [
+                player
+                for player in media_player_targets
+                if self._alexa_notify_slug(player)
+            ]
         if not targets and not media_player_targets:
             raise ServiceValidationError(
                 "Aucun appareil de notification configure - configure-le dans "
