@@ -370,6 +370,7 @@ class ProgrammeTntFrOptionsFlow(config_entries.OptionsFlow):
             notify_default = user_input.get(CONF_NOTIFY_TARGET)
             media_player_default = user_input.get(CONF_MEDIA_PLAYER_TARGETS)
             tts_default = user_input.get(CONF_TTS_ENGINE)
+            announce_volume_default = user_input.get(CONF_ANNOUNCE_VOLUME)
         else:
             name_default = existing["name"] if existing else None
             notify_default = existing.get(CONF_NOTIFY_TARGET) if existing else None
