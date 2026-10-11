@@ -53,7 +53,7 @@ def _programme(start, stop, title):
 def test_backoff_delay_doubles_on_each_consecutive_failure():
     coordinator = _coordinator()
     coordinator._lookup_tmdb_poster = AsyncMock(side_effect=Exception("boom"))
-    key = ("Titre en echec", None)
+    key = ("Titre en echec", None, None)
 
     run(coordinator._resolve_tmdb_posters({key: None}))
     assert coordinator._tmdb_failure_counts[key] == 1
@@ -73,7 +73,7 @@ def test_backoff_delay_doubles_on_each_consecutive_failure():
 def test_backoff_caps_at_240_minutes_after_enough_failures():
     coordinator = _coordinator()
     coordinator._lookup_tmdb_poster = AsyncMock(side_effect=Exception("boom"))
-    key = ("Titre toujours en echec", None)
+    key = ("Titre toujours en echec", None, None)
 
     for _ in range(8):
         run(coordinator._resolve_tmdb_posters({key: None}))
@@ -85,7 +85,7 @@ def test_backoff_caps_at_240_minutes_after_enough_failures():
 def test_backoff_resets_on_success_after_previous_failures():
     coordinator = _coordinator()
     coordinator._lookup_tmdb_poster = AsyncMock(side_effect=Exception("boom"))
-    key = ("Titre qui finit par reussir", None)
+    key = ("Titre qui finit par reussir", None, None)
 
     run(coordinator._resolve_tmdb_posters({key: None}))
     assert coordinator._tmdb_failure_counts[key] == 1
@@ -110,8 +110,8 @@ def test_async_update_data_skips_title_still_within_backoff_window():
         ]
     }
     coordinator._channels_meta = {}
-    coordinator._tmdb_failure_counts = {("En echec", None): 3}
-    coordinator._tmdb_retry_after = {("En echec", None): now + timedelta(minutes=15)}
+    coordinator._tmdb_failure_counts = {("En echec", None, None): 3}
+    coordinator._tmdb_retry_after = {("En echec", None, None): now + timedelta(minutes=15)}
 
     hass = MagicMock()
     hass.async_create_task = MagicMock()
@@ -136,9 +136,9 @@ def test_async_update_data_retries_title_once_backoff_window_elapsed():
         ]
     }
     coordinator._channels_meta = {}
-    coordinator._tmdb_failure_counts = {("Pret a reessayer", None): 3}
+    coordinator._tmdb_failure_counts = {("Pret a reessayer", None, None): 3}
     coordinator._tmdb_retry_after = {
-        ("Pret a reessayer", None): now - timedelta(minutes=1)
+        ("Pret a reessayer", None, None): now - timedelta(minutes=1)
     }
 
     hass = MagicMock()
