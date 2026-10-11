@@ -4,6 +4,10 @@ Historique des versions de l'integration Programme TNT FR. Reconstitue a partir 
 manifest.json et de l'historique Git ; le detail complet reste dans l'historique des
 commits.
 
+## 3.0.3 - 2026-10-11
+
+- Ajout d'une etape de validation syntaxe JavaScript (node --check) dans la CI, pour detecter les erreurs dans la carte Lovelace avant qu'elles n'atteignent les utilisateurs.
+
 ## 3.0.0 - 2026-09-29
 Version majeure de communication avec TMDB (breaking change).
 
