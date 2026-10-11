@@ -652,31 +652,43 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             return None
         query_norm = self._normalize_title(title)
         media_type = "movie" if url == TMDB_SEARCH_MOVIE_URL else "tv"
-        # TMDB peut lister plusieurs fiches homonymes exactes (ex: un film
-        # rejoue plusieurs annees de suite genere 3 fiches "Fini de rire",
-        # dont deux sans affiche uploadee cote TMDB) : s'arreter a la
-        # premiere correspondance de titre, meme sans affiche, faisait
-        # perdre une affiche bel et bien disponible sur une fiche suivante.
-        # On continue donc de chercher une affiche parmi TOUTES les fiches
-        # dont le titre correspond avant d'abandonner.
+        # TMDB peut lister plusieurs fiches homonymes exactes avec le meme
+        # titre (ex: la comedie "Le Prenom" de 2012 vs un drame senegalais
+        # de 2023 du meme nom - verifie en direct sur l'API). Prendre la
+        # premiere correspondance de titre avec affiche, comme avant, faisait
+        # gagner n'importe quelle fiche obscure simplement parce qu'elle
+        # arrivait en tete de la reponse TMDB, sans rapport avec sa
+        # pertinence reelle. On parcourt donc TOUTES les fiches dont le titre
+        # correspond et on retient celle avec le plus de vote_count (le
+        # nombre de votes TMDB est un bien meilleur indicateur de "laquelle
+        # est le vrai programme diffuse ce soir" que l'ordre de reponse de
+        # l'API, qui n'est pas trie par popularite).
+        best_result = None
+        best_votes = -1
         for result in results:
             candidate = result.get("title") or result.get("name") or ""
             candidate_norm = self._normalize_title(candidate)
+            matched = False
             if candidate_norm and self._titles_match(query_norm, candidate_norm):
-                if result.get("poster_path"):
-                    return self._build_tmdb_match(result, media_type)
-                continue
-            # Repli sur le titre original (non localise) : le titre fr-FR peut
-            # diverger du nom XMLTV alors que le titre original correspond.
-            original = result.get("original_title") or result.get("original_name") or ""
-            original_norm = self._normalize_title(original)
-            if (
-                original_norm
-                and original_norm != candidate_norm
-                and self._titles_match(query_norm, original_norm)
-                and result.get("poster_path")
-            ):
-                return self._build_tmdb_match(result, media_type)
+                matched = True
+            else:
+                # Repli sur le titre original (non localise) : le titre fr-FR peut
+                # diverger du nom XMLTV alors que le titre original correspond.
+                original = result.get("original_title") or result.get("original_name") or ""
+                original_norm = self._normalize_title(original)
+                if (
+                    original_norm
+                    and original_norm != candidate_norm
+                    and self._titles_match(query_norm, original_norm)
+                ):
+                    matched = True
+            if matched and result.get("poster_path"):
+                votes = int(result.get("vote_count") or 0)
+                if votes > best_votes:
+                    best_votes = votes
+                    best_result = result
+        if best_result:
+            return self._build_tmdb_match(best_result, media_type)
         return None
 
     @staticmethod
