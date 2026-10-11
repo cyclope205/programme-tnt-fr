@@ -1,15 +1,15 @@
 # Programme TNT FR
 
+[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![Build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
 [![Tests](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml)
+[![Issues](https://img.shields.io/github/issues/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/issues)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![Stars](https://img.shields.io/github/stars/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/stargazers)
-[![Forks](https://img.shields.io/github/forks/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/network/members)
 [![Downloads](https://img.shields.io/github/downloads/cyclope205/programme-tnt-fr/total)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![Downloads latest](https://img.shields.io/github/downloads/cyclope205/programme-tnt-fr/latest/total)](https://github.com/cyclope205/programme-tnt-fr/releases/latest)
-[![Issues](https://img.shields.io/github/issues/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/issues)
+[![Stars](https://img.shields.io/github/stars/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/stargazers)
+[![Forks](https://img.shields.io/github/forks/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/network/members)
 
 ---
 
