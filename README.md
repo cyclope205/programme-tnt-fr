@@ -182,7 +182,7 @@ Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 
 ## Installation
 
-1. Ajouter ce depot a HACS comme depot personnalise :
+1. Dans HACS, rechercher **Programme TNT FR** et l'installer (l'intégration fait désormais partie du dépôt par défaut HACS, plus besoin d'ajouter de dépôt personnalisé) :
 
    [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
 
