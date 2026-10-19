@@ -182,15 +182,20 @@ Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 
 ## Installation
 
-1. Dans HACS, rechercher **Programme TNT FR** et l'installer (l'intégration fait désormais partie du dépôt par défaut HACS, plus besoin d'ajouter de dépôt personnalisé) :
+1. Ouvrir Programme TNT FR dans HACS et l'installer :
+
+   [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+
+   ou rechercher **Programme TNT FR** dans HACS.
+2. Télécharger la dernière version de Programme TNT FR.
+3. Redémarrer Home Assistant.
+4. Ajouter l'intégration :
 
    [![Open your Home Assistant instance and show the add integration dialog with a specific integration pre-selected.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=programme_tnt_fr)
 
-2. Télécharger la dernière Version de Programme TNT FR.
-3. Redémarrer Home Assistant.
-4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR** (ou cliquez sur le bouton ci-dessus).
+   ou **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
-La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
+   La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
 **⚠️ La carte affiche « Erreur de configuration : Custom element doesn't exist: programme-tnt-fr-card » juste apres l'installation ?** C'est normal, le temps que le navigateur recharge le cache : faites **Ctrl+F5** sur navigateur (rechargement force), ou **fermez completement puis relancez l'application Home Assistant Companion** sur mobile. La carte s'affiche ensuite normalement.
 
