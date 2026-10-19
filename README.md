@@ -1,6 +1,6 @@
 # Programme TNT FR
 
-[![HACS: Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![HACS: Default](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/v/release/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![Build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
 [![Tests](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml)
