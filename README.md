@@ -184,11 +184,11 @@ Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 
 1. Dans HACS, rechercher **Programme TNT FR** et l'installer (l'intégration fait désormais partie du dépôt par défaut HACS, plus besoin d'ajouter de dépôt personnalisé) :
 
-   [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+   [![Open your Home Assistant instance and show the add integration dialog with a specific integration pre-selected.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=programme_tnt_fr)
 
 2. Télécharger la dernière Version de Programme TNT FR.
 3. Redémarrer Home Assistant.
-4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
+4. Ajouter l'intégration via **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR** (ou cliquez sur le bouton ci-dessus).
 
 La carte Lovelace est enregistree automatiquement par l'intégration : aucune ressource a déclarer à la main.
 
