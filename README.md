@@ -347,6 +347,14 @@ Liste complète des identifiants `channel_id` utilisés par l'intégration (util
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Utilisation dans un tableau de bord
 
+Depuis l'interface (recommandé) :
+
+1. Ouvrez le tableau de bord concerné et cliquez sur le crayon en haut à droite pour passer en mode édition.
+2. Cliquez sur "+ Ajouter une carte" en bas de l'écran.
+3. Dans la barre de recherche, tapez "Programme TNT FR" : la carte apparaît dans la liste, cliquez dessus puis sur "Enregistrer".
+
+Alternative en YAML (onglet "Modifier en YAML" de la fenêtre d'ajout de carte) :
+
 Ajouter une carte manuelle avec :
 
 ```yaml
