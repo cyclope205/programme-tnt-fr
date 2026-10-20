@@ -38,6 +38,8 @@
 
 En remerciement, votre nom apparaîtra (de façon anonymisée) dans la section « ☕ Merci aux donateurs » ci-dessus.
 
+---
+
 Intégration Home Assistant qui récupère le programme TV des chaines françaises (TNT + une sélection de chaines supplémentaires) et l'affiche dans une carte Lovelace : favoris, carrousel, guide TV complet par chaine et classement des films les mieux notes.
 
 ## Sommaire
