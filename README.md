@@ -44,8 +44,7 @@ Intégration Home Assistant qui récupère le programme TV des chaines français
 - [Captures d'ecran](#captures-decran)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Utilisation dans un tableau de bord](#utilisation-dans-un-tableau-de-bord)
-  - [Options d'affichage](#options-daffichage)
+- [Options d'affichage](#options-daffichage)
 - [Attributs disponibles](#attributs-disponibles)
 - [A savoir](#a-savoir)
 
@@ -202,6 +201,26 @@ Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 **⚠️ La carte affiche « Erreur de configuration : Custom element doesn't exist: programme-tnt-fr-card » juste apres l'installation ?** C'est normal, le temps que le navigateur recharge le cache : faites **Ctrl+F5** sur navigateur (rechargement force), ou **fermez completement puis relancez l'application Home Assistant Companion** sur mobile. La carte s'affiche ensuite normalement.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Ajouter la carte au tableau de bord
+
+Depuis l'interface (recommandé) :
+
+1. Ouvrez le tableau de bord concerné et cliquez sur le crayon en haut à droite pour passer en mode édition.
+2. Cliquez sur "+ Ajouter une carte" en bas de l'écran.
+3. Dans la barre de recherche, tapez "Programme TNT FR" : la carte apparaît dans la liste, cliquez dessus puis sur "Enregistrer".
+
+Alternative en YAML (onglet "Modifier en YAML" de la fenêtre d'ajout de carte) :
+
+Ajouter une carte manuelle avec :
+
+```yaml
+type: custom:programme-tnt-fr-card
+```
+
+Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines configurées.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 ## Configuration
 
 A l'ajout de l'intégration, une liste de chaines est proposée (les chaines de la TNT francaise sont selectionnées par defaut, une selection plus large de chaines est également disponible). La selection peut être modifiée à tout moment depuis les options de l'intégration, sans avoir à la réinstaller. Depuis la version 2.5.1, les chaines francaises et les chaines belges (RTBF) sont presentees dans deux listes distinctes, aussi bien a l'ajout de l'integration que dans ses options.
@@ -347,26 +366,7 @@ Liste complète des identifiants `channel_id` utilisés par l'intégration (util
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## Utilisation dans un tableau de bord
-
-Depuis l'interface (recommandé) :
-
-1. Ouvrez le tableau de bord concerné et cliquez sur le crayon en haut à droite pour passer en mode édition.
-2. Cliquez sur "+ Ajouter une carte" en bas de l'écran.
-3. Dans la barre de recherche, tapez "Programme TNT FR" : la carte apparaît dans la liste, cliquez dessus puis sur "Enregistrer".
-
-Alternative en YAML (onglet "Modifier en YAML" de la fenêtre d'ajout de carte) :
-
-Ajouter une carte manuelle avec :
-
-```yaml
-type: custom:programme-tnt-fr-card
-```
-
-Aucune autre option n'est nécessaire : la carte trouve elle-même les chaines configurées.
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-### Options d'affichage
+## Options d'affichage
 
 #### Sections affichees (En ce moment / 1ere / 2eme partie de soiree)
 
