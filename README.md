@@ -581,3 +581,7 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 - Le rapprochement des jaquettes TMDB s'appuie désormais aussi sur l'année de diffusion fournie par le flux XMLTV (attribut `date`) quand elle est disponible, en plus du titre, pour fiabiliser le matching des films et séries ayant un remake ou une resortie.
 - Pour les formats non-fiction (magazine, information, journal, meteo, sport, divertissement, religion, jeu...), aucune recherche TMDB n'est tentee sur le seul titre : ces formats recurrents n'ont pas d'oeuvre unique correspondante et exposaient a des faux positifs (ex. un magazine associe par erreur a un film homonyme).
 - Les problèmes et demandes d'évolution se signalent via l'onglet **Issues** du dépôt.
+
+## Licence
+
+MIT — voir [LICENSE](LICENSE).
