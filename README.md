@@ -5,7 +5,7 @@
 [![Build](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/validate.yml)
 [![Tests](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml/badge.svg)](https://github.com/cyclope205/programme-tnt-fr/actions/workflows/tests.yml)
 [![Issues](https://img.shields.io/github/issues/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/issues)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/cyclope205/programme-tnt-fr/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/cyclope205/programme-tnt-fr/total)](https://github.com/cyclope205/programme-tnt-fr/releases)
 [![Downloads latest](https://img.shields.io/github/downloads/cyclope205/programme-tnt-fr/latest/total)](https://github.com/cyclope205/programme-tnt-fr/releases/latest)
 [![Stars](https://img.shields.io/github/stars/cyclope205/programme-tnt-fr)](https://github.com/cyclope205/programme-tnt-fr/stargazers)
@@ -584,4 +584,4 @@ Aucune configuration nécessaire : le Template parcourt automatiquement tous les
 
 ## Licence
 
-MIT — voir [LICENSE](LICENSE).
+MIT — voir [LICENSE](https://github.com/cyclope205/programme-tnt-fr/blob/main/LICENSE).
