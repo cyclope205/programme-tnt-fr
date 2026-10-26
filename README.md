@@ -113,12 +113,12 @@ Ecran de configuration des chaines suivies :
 
 Options d'affichage de la carte (dont « À suivre ») et chaines favorites regroupees par pays dans l'editeur visuel (v2.5.1) :
 
-<img width="600" alt="Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays" src="docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg" />
+<img width="600" alt="Editeur visuel de la carte : bascules d'affichage et chaines favorites regroupees par pays" src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/docs/screenshots/2f912f10-c34a-4d93-9b54-bc5cfc07f7a3-FullSizeRender.jpeg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Rangees "En ce moment" et "A suivre" synchronisees, et date de diffusion d'origine dans le detail du programme (v2.5.1) :
 
-<img width="600" alt="Rangees En ce moment et A suivre synchronisees" src="docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
+<img width="600" alt="Rangees En ce moment et A suivre synchronisees" src="https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/docs/screenshots/96c088c2-e5b1-4f81-9209-3de153b757a9-FullSizeRender.jpeg" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Vue "En ce moment" / "1ere partie de soirée" avec jaquettes TMDB :
