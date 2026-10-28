@@ -344,7 +344,9 @@ class _ReminderManager:
         return None
 
     async def _async_notify(self, reminder: dict) -> None:
-        targets = reminder.get("targets") or self._resolve_notify_targets()
+        targets = reminder.get("targets")
+        if targets is None:
+            targets = self._resolve_notify_targets()
         media_player_targets_early = reminder.get("media_player_targets") or []
         if not targets and not media_player_targets_early:
             _LOGGER.warning(
