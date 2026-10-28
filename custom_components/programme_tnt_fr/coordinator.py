@@ -959,6 +959,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
                 if programme.start >= current.stop:
                     next = programme
                     break
+        else:
+            for programme in progs:
+                if programme.start >= now:
+                    next = programme
+                    break
 
         if now.time() < DAY_RESET:
             broadcast_day = (now - timedelta(days=1)).date()
