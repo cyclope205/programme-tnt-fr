@@ -190,15 +190,15 @@ Configuration du zap TNT (zap_channel_scripts) et rendu dans le carrousel :
 
 1. Ouvrir Programme TNT FR dans HACS et l'installer :
 
-   [![Ouvrir dans HACS](https://img.shields.io/badge/Ouvrir_dans_HACS-18BCF2?style=for-the-badge&logo=homeassistant&logoColor=white)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
-      [![Ouvrir dans Marketplace](https://img.shields.io/badge/Ouvrir_dans_Marketplace-18BCF2?style=for-the-badge&logo=homeassistant&logoColor=white)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+   [![Ouvrir dans HACS](https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/docs/badges/badge-hacs-fr.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
+      [![Ouvrir dans Marketplace](https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/docs/badges/badge-marketplace-fr.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=cyclope205&repository=programme-tnt-fr&category=integration)
 
    ou rechercher **Programme TNT FR** dans HACS.
 3. Télécharger la dernière version de Programme TNT FR.
 4. Redémarrer Home Assistant.
 5. Ajouter l'intégration :
 
-   [![Ajouter l'intégration](https://img.shields.io/badge/Ajouter_l'int%C3%A9gration-18BCF2?style=for-the-badge&logo=homeassistant&logoColor=white)](https://my.home-assistant.io/redirect/config_flow_start/?domain=programme_tnt_fr)
+   [![Ajouter l'intégration](https://raw.githubusercontent.com/cyclope205/programme-tnt-fr/main/docs/badges/badge-add-integration-fr.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=programme_tnt_fr)
 
    ou **Paramètres > Appareils et services > Ajouter une intégration > Programme TNT FR**.
 
