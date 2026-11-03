@@ -120,6 +120,7 @@ class _ReminderManager:
     def __init__(self, hass: HomeAssistant, store: Store) -> None:
         self._hass = hass
         self._store = store
+        self._store_lock = asyncio.Lock()
 
     def _resolve_notify_targets(self) -> list[str]:
         """Notify service slugs (e.g. "mobile_app_iphone_fred") to call directly.
@@ -317,8 +318,11 @@ class _ReminderManager:
             await self._async_remove(reminder["id"])
             await self._async_notify(reminder)
 
-        unsub = async_track_point_in_time(self._hass, _fire, fire_time)
-        self._hass.data.setdefault(_UNSUB_KEY, {})[reminder["id"]] = unsub
+        unsub_map = self._hass.data.setdefault(_UNSUB_KEY, {})
+        old_unsub = unsub_map.pop(reminder["id"], None)
+        if old_unsub:
+            old_unsub()
+        unsub_map[reminder["id"]] = async_track_point_in_time(self._hass, _fire, fire_time)
 
     def _alexa_notify_slug(self, entity_id: str) -> str | None:
         """notify.alexa_media_<slug> service name for this entity, if any.
@@ -468,13 +472,15 @@ class _ReminderManager:
             )
 
     async def _async_save(self, reminder: dict) -> None:
-        data = await self._store.async_load() or {"reminders": []}
-        reminders = [r for r in data.get("reminders", []) if r["id"] != reminder["id"]]
-        reminders.append(reminder)
-        data["reminders"] = reminders
-        await self._store.async_save(data)
+        async with self._store_lock:
+            data = await self._store.async_load() or {"reminders": []}
+            reminders = [r for r in data.get("reminders", []) if r["id"] != reminder["id"]]
+            reminders.append(reminder)
+            data["reminders"] = reminders
+            await self._store.async_save(data)
 
     async def _async_remove(self, reminder_id: str) -> None:
-        data = await self._store.async_load() or {"reminders": []}
-        data["reminders"] = [r for r in data.get("reminders", []) if r["id"] != reminder_id]
-        await self._store.async_save(data)
+        async with self._store_lock:
+            data = await self._store.async_load() or {"reminders": []}
+            data["reminders"] = [r for r in data.get("reminders", []) if r["id"] != reminder_id]
+            await self._store.async_save(data)
