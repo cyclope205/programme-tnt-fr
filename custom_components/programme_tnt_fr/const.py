@@ -14,6 +14,15 @@ CARD_VERSION = "3.0.2"
 # Source et credits : https://github.com/racacax/XML-TV-Fr
 XMLTV_URL = "https://xmltvfr.fr/xmltv/xmltv_fr.xml"
 
+# Flux allege : uniquement les chaines de la TNT francaise standard
+# (~10 Mo decompresse, contre ~80 Mo pour le flux complet ci-dessus).
+# Verifie : il contient exactement les chaines de TNT_CHANNELS ci-dessous,
+# ni les chaines belges (RTBF_CHANNELS) ni les chaines "extra"
+# (EXTRA_CHANNELS). Utilise automatiquement par le coordinator (voir
+# __init__.py) quand la selection de chaines de l'utilisateur ne contient
+# aucune de ces dernieres.
+XMLTV_TNT_URL = "https://xmltvfr.fr/xmltv/xmltv_tnt.xml"
+
 CONF_CHANNELS = "channels"
 CONF_CHANNELS_FRANCE = "channels_france"
 CONF_CHANNELS_BELGIQUE = "channels_belgique"

@@ -25,6 +25,7 @@ from .const import (
     TMDB_SEARCH_MOVIE_URL,
     TMDB_SEARCH_TV_URL,
     UPDATE_INTERVAL_MINUTES,
+    XMLTV_TNT_URL,
     XMLTV_URL,
 )
 
@@ -228,7 +229,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
     """Fetches the XMLTV feed and derives now / prime-time / late-night slots."""
 
     def __init__(
-        self, hass: HomeAssistant, channels: list[str], tmdb_api_key: str | None = None
+        self,
+        hass: HomeAssistant,
+        channels: list[str],
+        tmdb_api_key: str | None = None,
+        tnt_only: bool = False,
     ) -> None:
         super().__init__(
             hass,
@@ -237,6 +242,11 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
         )
         self._channels = channels
+        # xmltv_tnt.xml (~10 Mo) ne contient que les chaines TNT standards :
+        # choisi par l'appelant (voir __init__.py) quand la selection de
+        # l'utilisateur ne depend d'aucune chaine belge ou "extra", absentes
+        # de ce flux allege - sinon on garde le guide complet xmltv_fr.xml.
+        self._xmltv_url = XMLTV_TNT_URL if tnt_only else XMLTV_URL
         self._tmdb_api_key = tmdb_api_key or DEFAULT_TMDB_API_KEY
         self._session = async_get_clientsession(hass)
         self._programmes_by_channel: dict[str, list[Programme]] = {}
@@ -574,9 +584,9 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         normalized = category.strip().lower()
         movie_keywords = (
             "film",
-            "long m\u00e9trage",
+            "long métrage",
             "long metrage",
-            "cin\u00e9ma",
+            "cinéma",
             "cinema",
         )
         return any(keyword in normalized for keyword in movie_keywords)
@@ -603,7 +613,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "societe",
             "information",
             "journal",
-            "m\u00e9t\u00e9o",
+            "météo",
             "meteo",
             "sport",
             "divertissement",
@@ -611,7 +621,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
             "jeu",
             "talk-show",
             "talk show",
-            "t\u00e9l\u00e9r\u00e9alit\u00e9",
+            "téléréalité",
             "telerealite",
         )
         return any(keyword in normalized for keyword in non_fiction_keywords)
@@ -858,7 +868,7 @@ class ProgrammeTntFrCoordinator(DataUpdateCoordinator):
         elif self._last_modified:
             headers["If-Modified-Since"] = self._last_modified
 
-        resp = await self._session.get(XMLTV_URL, timeout=60, headers=headers)
+        resp = await self._session.get(self._xmltv_url, timeout=60, headers=headers)
         if resp.status == 304:
             _LOGGER.debug("Flux XMLTV inchange depuis le dernier telechargement")
             return
