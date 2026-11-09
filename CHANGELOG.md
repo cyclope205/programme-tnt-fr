@@ -4,6 +4,14 @@ Historique des versions de l'integration Programme TNT FR. Reconstitue a partir 
 manifest.json et de l'historique Git ; le detail complet reste dans l'historique des
 commits.
 
+## 3.0.14 - 2026-11-06
+
+- Telechargement allege du flux XMLTV : quand la selection de chaines ne contient que
+  des chaines TNT standards, l'integration telecharge desormais `xmltv_tnt.xml`
+  (~10 Mo) au lieu du guide complet `xmltv_fr.xml` (~80 Mo), ce qui reduit le pic
+  memoire et le temps de demarrage. Deduit automatiquement de la selection de chaines,
+  sans nouvelle option de configuration (issue #14).
+
 ## 3.0.3 - 2026-10-11
 
 - Ajout d'une etape de validation syntaxe JavaScript (node --check) dans la CI, pour detecter les erreurs dans la carte Lovelace avant qu'elles n'atteignent les utilisateurs.
